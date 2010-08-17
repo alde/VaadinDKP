@@ -4,20 +4,13 @@
  */
 package com.unknown.entity;
 
-import com.unknown.entity.character.SiteUser;
-import com.unknown.entity.character.User;
-import com.unknown.entity.character.windows.CharacterEditWindow;
-import com.unknown.entity.character.windows.CharacterInfoWindow;
-import com.unknown.entity.items.ItemList;
-import com.unknown.entity.items.Items;
-import com.unknown.entity.items.windows.ItemEditWindow;
-import com.unknown.entity.items.windows.ItemInfoWindow;
-import com.unknown.entity.raids.Raid;
-import com.unknown.entity.raids.RaidList;
-import com.unknown.entity.raids.windows.RaidEditWindow;
-import com.unknown.entity.raids.windows.RaidInfoWindow;
+import com.unknown.entity.character.*;
+import com.unknown.entity.character.windows.*;
+import com.unknown.entity.items.*;
+import com.unknown.entity.items.windows.*;
+import com.unknown.entity.raids.*;
+import com.unknown.entity.raids.windows.*;
 import com.vaadin.Application;
-import com.vaadin.terminal.gwt.client.ui.Table;
 import com.vaadin.ui.Window;
 
 /**
@@ -28,6 +21,8 @@ public class PopUpControl extends Window {
 
         private ItemList itemList;
         private RaidList raidList;
+        private CharacterList charList;
+        private DkpList dkpList;
         private final Application app;
 
         public PopUpControl(Application app) {
@@ -37,6 +32,19 @@ public class PopUpControl extends Window {
         public void setItemList(ItemList itemList) {
                 this.itemList = itemList;
         }
+
+        public void setRaidList(RaidList raidList) {
+                this.raidList = raidList;
+        }
+
+        public void setCharacterList(CharacterList charList) {
+                this.charList = charList;
+        }
+
+        public void setDkpList(DkpList dkpList) {
+                this.dkpList = dkpList;
+        }
+
         public void showProperCharWindow(User user) throws IllegalArgumentException, NullPointerException {
                 if (isAdmin()) {
                         showCharEditWindow(user);
@@ -48,6 +56,8 @@ public class PopUpControl extends Window {
         private void showCharEditWindow(User user) throws IllegalArgumentException, NullPointerException {
                 CharacterEditWindow info = new CharacterEditWindow(user);
                 info.printInfo();
+                info.addCharacterInfoListener(charList);
+                info.addCharacterInfoListener(dkpList);
                 app.getMainWindow().addWindow(info);
         }
 
@@ -102,9 +112,5 @@ public class PopUpControl extends Window {
                 info.printInfo();
                 info.addRaidInfoListener(raidList);
                 app.getMainWindow().addWindow(info);
-        }
-
-        public void setRaidList(RaidList raidList) {
-                this.raidList = raidList;
         }
 }

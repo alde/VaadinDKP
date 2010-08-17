@@ -73,8 +73,15 @@ public class ItemEditWindow extends Window {
                 deleteButton.addListener(new DeleteButtonClickListener(item));
                 updateButton.addListener(new UpdateButtonClickListener(name, slot, type, wowIdfield, wowIdfieldhc, price, pricehc, islegendary));
                 HorizontalLayout hzl = new HorizontalLayout();
+                Label warning = new Label();
+                warning.setWidth("220px");
+                warning.setValue("Deleting an item also removes it from every character who has looted it. Use carefully. Can NOT be reverted.");
+                warning.addStyleName("error");
                 hzl.addComponent(updateButton);
                 hzl.addComponent(deleteButton);
+                hzl.addComponent(warning);
+                hzl.setSpacing(true);
+                hzl.setMargin(true, false, true, false);
                 addComponent(hzl);
                 itemLootedByTable();
         }

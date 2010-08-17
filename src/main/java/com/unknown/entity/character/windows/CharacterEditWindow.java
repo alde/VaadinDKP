@@ -7,6 +7,7 @@ package com.unknown.entity.character.windows;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.Role;
+import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
 import com.vaadin.data.Item;
@@ -19,11 +20,14 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,6 +36,7 @@ import com.vaadin.ui.Window;
 public class CharacterEditWindow extends Window {
 
         private final User user;
+        private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
 
         public CharacterEditWindow(User user) {
                 this.user = user;
@@ -55,14 +60,25 @@ public class CharacterEditWindow extends Window {
                 final TextField name = new TextField("Name: ", user.getUsername());
                 final ComboBox characterClass = characterEditClassComboBox();
                 final CheckBox active = new CheckBox("Status: ", user.isActive());
-                Button updateButton = characterEditUpdateButton(name, characterClass, active);
-
                 addComponent(name);
                 addComponent(characterClass);
                 addComponent(active);
-
-                addComponent(updateButton);
-        }
+                
+                Button updateButton = characterEditUpdateButton(name, characterClass, active);
+                Button deleteButton = new Button("Delete Character");
+                deleteButton.addListener(new DeleteButtonClickListener());
+                HorizontalLayout hzl = new HorizontalLayout();
+                Label warning = new Label();
+                warning.setWidth("220px");
+                warning.setValue("Deleting a character who has attended raids WILL cause problems with shares. Can NOT be reverted. I strongly suggest making it inactive instead.");
+                warning.addStyleName("error");
+                hzl.addComponent(updateButton);
+                hzl.addComponent(deleteButton);
+                hzl.addComponent(warning);
+                hzl.setSpacing(true);
+                hzl.setMargin(true, false, true, false);
+                addComponent(hzl);
+                }
 
         private Button characterEditUpdateButton(final TextField name, final ComboBox characterClass, final CheckBox active) {
                 Button updateButton = new Button("Update");
@@ -127,6 +143,16 @@ public class CharacterEditWindow extends Window {
 
         }
 
+        public void addCharacterInfoListener(CharacterInfoListener listener) {
+                listeners.add(listener);
+        }
+
+        private void notifyListeners() {
+                for (CharacterInfoListener characterListener : listeners) {
+                        characterListener.onCharacterInfoChange();
+                }
+        }
+
         private class updateBtnClickListener implements ClickListener {
 
                 private final TextField name;
@@ -142,7 +168,20 @@ public class CharacterEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         int success = updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
-                        addComponent(new Label("Success: " + success));
+                        System.out.println(""+success);
+                        notifyListeners();
+                        close();
+                }
+        }
+
+        private static class DeleteButtonClickListener implements ClickListener {
+
+                public DeleteButtonClickListener() {
+                }
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        throw new UnsupportedOperationException("Not supported yet.");
                 }
         }
 }

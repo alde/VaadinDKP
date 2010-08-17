@@ -77,12 +77,12 @@ public class UnknownEntityDKP extends Application {
                 return vertRaid;
         }
 
-        private VerticalLayout VerticalItemListLayout(ItemList itemList) {
+        private VerticalLayout VerticalItemListLayout(final ItemList itemList) {
                 VerticalLayout vertItem = new VerticalLayout();
                 vertItem.addComponent(new Label("Items"));
                 vertItem.addComponent(itemList);
                 HorizontalLayout hzl = new HorizontalLayout();
-                TextField itemname = itemNameFilterField(itemList);
+                SuperImmediateTextField itemname = itemNameFilterField(itemList);
                 ComboBox itemslot = itemSlotFilterBox(itemList);
                 ComboBox itemtype = itemTypeFilterBox(itemList);
                 hzl.addComponent(itemname);
@@ -94,8 +94,8 @@ public class UnknownEntityDKP extends Application {
                 return vertItem;
         }
 
-        private TextField itemNameFilterField(ItemList itemList) {
-                TextField itemname = new TextField("Filter itemname");
+        private SuperImmediateTextField itemNameFilterField(ItemList itemList) {
+                SuperImmediateTextField itemname = new SuperImmediateTextField("Filter itemname");
                 itemname.setImmediate(true);
                 itemname.addListener(new ItemNameFieldValueChangeListener(itemList, itemname));
                 return itemname;
@@ -163,7 +163,6 @@ public class UnknownEntityDKP extends Application {
         public void init() {
                 window = new Window("Unknown Entity DKP");
                 setMainWindow(window);
-				window.addComponent(new SuperImmediateTextField("hej"));
                 Drawings();
         }
 
