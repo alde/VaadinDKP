@@ -89,7 +89,7 @@ public class RaidList extends Table implements RaidInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isCtrlKey()) {
+                        if (event.isDoubleClick()) {
                                 Raid raid = (Raid) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidList.this.getApplication());
                                 pop.setRaidList(raidList);

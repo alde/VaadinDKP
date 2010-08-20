@@ -159,16 +159,7 @@ public class RaidEditWindow extends Window {
                         Item addItem = tbl.addItem(item);
                         RaidInfoWindowLootListAddRow(addItem, item);
                 }
-                tbl.addListener(new ItemClickListener() {
-
-                        @Override
-                        public void itemClick(ItemClickEvent event) {
-                                RaidItem ritem = (RaidItem) event.getItemId();
-                                RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
-                                info.printInfo();
-                                getApplication().getMainWindow().addWindow(info);
-                        }
-                });
+                tbl.addListener(new RaidEditLootListListener(raid));
                 return tbl;
         }
 
@@ -180,16 +171,7 @@ public class RaidEditWindow extends Window {
                         Item addItem = tbl.addItem(reward);
                         RaidInfoWindowRewardListAddRow(addItem, reward);
                 }
-                tbl.addListener(new ItemClickListener() {
-
-                        @Override
-                        public void itemClick(ItemClickEvent event) {
-                                RaidReward rreward = (RaidReward) event.getItemId();
-                                RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
-                                info.printInfo();
-                                getApplication().getMainWindow().addWindow(info);
-                        }
-                });
+                tbl.addListener(new RaidEditRewardListListener());
 
                 return tbl;
 
@@ -237,6 +219,37 @@ public class RaidEditWindow extends Window {
                         } catch (SQLException ex) {
                                 Logger.getLogger(RaidEditWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                }
+        }
+
+        private class RaidEditLootListListener implements ItemClickListener {
+
+                private final Raid raid;
+
+                public RaidEditLootListListener(Raid raid) {
+                        this.raid = raid;
+                }
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                        RaidItem ritem = (RaidItem) event.getItemId();
+                        RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
+                        info.printInfo();
+                        getApplication().getMainWindow().addWindow(info);
+                }
+        }
+
+        private class RaidEditRewardListListener implements ItemClickListener {
+
+                public RaidEditRewardListListener() {
+                }
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                        RaidReward rreward = (RaidReward) event.getItemId();
+                        RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
+                        info.printInfo();
+                        getApplication().getMainWindow().addWindow(info);
                 }
         }
 }

@@ -105,7 +105,7 @@ public class ItemList extends Table implements ItemInfoListener{
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isCtrlKey()) {
+                        if (event.isDoubleClick()) {
                                 Items item = (Items) event.getItemId();
                                 PopUpControl pop = new PopUpControl(ItemList.this.getApplication());
                                 pop.setItemList(itemList);

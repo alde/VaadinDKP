@@ -13,7 +13,6 @@ import com.unknown.entity.character.windows.CharacterAddWindow;
 import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.windows.ItemAddWindow;
-import com.unknown.entity.raids.RaidInfoListener;
 import com.unknown.entity.raids.RaidList;
 import com.unknown.entity.raids.windows.RaidAddWindow;
 import com.vaadin.data.Property.ValueChangeEvent;

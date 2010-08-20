@@ -70,7 +70,7 @@ public class CharacterEditWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 Label warning = new Label();
                 warning.setWidth("220px");
-                warning.setValue("Deleting a character who has attended raids WILL cause problems with shares. Can NOT be reverted. I strongly suggest making it inactive instead.");
+                warning.setValue("Can NOT be reverted.");
                 warning.addStyleName("error");
                 hzl.addComponent(updateButton);
                 hzl.addComponent(deleteButton);
