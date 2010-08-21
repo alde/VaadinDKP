@@ -33,7 +33,8 @@ public class ItemInfoWindow extends Window {
                 this.item = item;
                 this.setCaption(item.getName());
                 this.addStyleName("opaque");
-                this.center();
+                this.setPositionX(400);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
         }
 
@@ -71,14 +72,14 @@ public class ItemInfoWindow extends Window {
         }
 
         private void itemGrid() throws OverlapsException, OutOfBoundsException {
-                
+
                 final Button wowIdBtn = new Button("" + item.getWowId());
                 wowIdBtn.setStyleName(Button.STYLE_LINK);
                 wowIdBtn.addListener(new WowIdButtonClickListener());
                 final Button wowIdBtnhc = new Button("" + item.getWowId_hc());
                 wowIdBtnhc.setStyleName(Button.STYLE_LINK);
                 wowIdBtnhc.addListener(new WowIdHcButtonClickListener());
-                
+
                 GridLayout gl = itemGridLayout(wowIdBtn, wowIdBtnhc);
                 addComponent(gl);
         }

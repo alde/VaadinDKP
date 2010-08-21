@@ -35,8 +35,10 @@ public class CharacterInfoWindow extends Window {
                 this.raidDao = new RaidDB();
                 this.addStyleName("opaque");
                 this.setCaption(user.getUsername());
-                this.center();
+                this.setPositionX(200);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
+
         }
 
         public void printInfo() throws SQLException {
@@ -78,6 +80,7 @@ public class CharacterInfoWindow extends Window {
 
         private void characterLoots() {
                 Table loots = lootList(user);
+                addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
                         addComponent(lootList(user));
                 } else {
@@ -87,6 +90,7 @@ public class CharacterInfoWindow extends Window {
 
         private void characterRaids() throws SQLException {
                 Table raids = raidList(user);
+                addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
                         addComponent(raidList(user));
                 } else {
@@ -121,7 +125,7 @@ public class CharacterInfoWindow extends Window {
                 tbl.addContainerProperty("Date", String.class, "");
                 tbl.setHeight("150px");
                 for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
-                        Item addItem = tbl.addItem(charraid.getId());
+                        Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }

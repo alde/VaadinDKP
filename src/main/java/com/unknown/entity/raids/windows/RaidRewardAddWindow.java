@@ -44,6 +44,8 @@ public class RaidRewardAddWindow extends Window {
 		attendants.setImmediate(true);
 		shares.setImmediate(true);
 		comment.setImmediate(true);
+                this.setPositionX(600);
+                this.setPositionY(300);
 
 	}
 

@@ -54,6 +54,8 @@ public class RaidLootAddWindow extends Window {
                 this.raidDao = new RaidDB();
                 this.itemDao = new ItemDB();
                 this.characterDao = new CharacterDB();
+                this.setPositionX(600);
+                this.setPositionY(300);
         }
 
         public void printInfo() throws SQLException {

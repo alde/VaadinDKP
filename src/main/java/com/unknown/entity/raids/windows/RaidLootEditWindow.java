@@ -48,6 +48,8 @@ public class RaidLootEditWindow extends Window {
                 this.addStyleName("opaque");
                 this.getContent().setSizeUndefined();
                 this.setCaption("Edit loot: " + item.getName() + " for raid : "+raid.getComment());
+                this.setPositionX(600);
+                this.setPositionY(300);
         }
 
         public void printInfo() {

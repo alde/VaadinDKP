@@ -35,11 +35,12 @@ import java.util.logging.Logger;
 public class RaidEditWindow extends Window {
 
         private final Raid raid;
-           private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
+        private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
 
         public RaidEditWindow(Raid raid) {
                 this.raid = raid;
-                this.center();
+                this.setPositionX(600);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
                 this.setCaption("Edit raid: " + raid.getName());
@@ -147,9 +148,9 @@ public class RaidEditWindow extends Window {
         }
 
         private int updateRaid(String raidzoneName, String raidcomment, String raiddate) throws SQLException {
-                        RaidDAO raidDao = new RaidDB();
-                        return raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
-                        }
+                RaidDAO raidDao = new RaidDB();
+                return raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
+        }
 
         private Table lootList(final Raid raid) {
                 Table tbl = new Table();
@@ -185,7 +186,7 @@ public class RaidEditWindow extends Window {
                 }
         }
 
-                public void addRaidInfoListener(RaidInfoListener listener) {
+        public void addRaidInfoListener(RaidInfoListener listener) {
                 listeners.add(listener);
         }
 

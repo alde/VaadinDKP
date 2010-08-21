@@ -32,8 +32,8 @@ public class RaidInfoWindow extends Window {
 
         public RaidInfoWindow(Raid raid) {
                 this.raid = raid;
-                this.setPositionX(100);
-                this.setPositionY(200);
+                this.setPositionX(600);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
                 this.setCaption(raid.getName());

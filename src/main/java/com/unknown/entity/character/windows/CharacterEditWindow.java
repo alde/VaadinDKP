@@ -49,14 +49,15 @@ public class CharacterEditWindow extends Window {
                 this.setCaption("Edit character: " + user.getUsername());
                 this.addStyleName("opaque");
                 this.setPositionX(200);
-                this.setPositionY(400);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
         }
 
-        public void printInfo() {
+        public void printInfo() throws SQLException {
                 characterInformation();
                 characterDKP();
                 characterLoots();
+                characterRaids();
 
         }
 
@@ -119,6 +120,7 @@ public class CharacterEditWindow extends Window {
 
         private void characterLoots() {
                 Table loots = lootList(user);
+                addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
                         addComponent(lootList(user));
                 } else {
@@ -128,6 +130,7 @@ public class CharacterEditWindow extends Window {
 
         private void characterRaids() throws SQLException {
                 Table raids = raidList(user);
+                addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
                         addComponent(raidList(user));
                 } else {
@@ -141,7 +144,7 @@ public class CharacterEditWindow extends Window {
                 tbl.addContainerProperty("Date", String.class, "");
                 tbl.setHeight("150px");
                 for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
-                        Item addItem = tbl.addItem(charraid.getId());
+                        Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }

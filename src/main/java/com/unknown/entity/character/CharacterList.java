@@ -107,7 +107,11 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                 public void buttonClick(ClickEvent event) {
                         if (isAdmin()) {
                                 CharacterEditWindow info = new CharacterEditWindow(user);
-                                info.printInfo();
+                                try {
+                                        info.printInfo();
+                                } catch (SQLException ex) {
+                                        Logger.getLogger(CharacterList.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                                 getApplication().getMainWindow().addWindow(info);
                         } else {
                                 CharacterInfoWindow info = new CharacterInfoWindow(user);

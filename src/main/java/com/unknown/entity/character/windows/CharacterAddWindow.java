@@ -38,7 +38,8 @@ public class CharacterAddWindow extends Window {
         public CharacterAddWindow() {
                 this.setCaption("Add Character");
                 this.addStyleName("opaque");
-                this.center();
+                this.setPositionX(200);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
         }
 

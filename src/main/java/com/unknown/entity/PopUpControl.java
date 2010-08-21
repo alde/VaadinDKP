@@ -58,7 +58,11 @@ public class PopUpControl extends Window {
 
         private void showCharEditWindow(User user) throws IllegalArgumentException, NullPointerException {
                 CharacterEditWindow info = new CharacterEditWindow(user);
-                info.printInfo();
+                try {
+                        info.printInfo();
+                } catch (SQLException ex) {
+                        Logger.getLogger(PopUpControl.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 info.addCharacterInfoListener(charList);
                 info.addCharacterInfoListener(dkpList);
                 app.getMainWindow().addWindow(info);

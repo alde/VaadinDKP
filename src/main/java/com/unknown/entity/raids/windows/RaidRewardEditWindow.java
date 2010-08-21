@@ -43,7 +43,7 @@ class RaidRewardEditWindow extends Window {
                 this.shares = reward.getShares();
                 this.oldcomment = reward.getComment();
                 this.setPositionX(600);
-                this.setPositionY(200);
+                this.setPositionY(100);
                 this.addStyleName("opaque");
                 this.setCaption("Edit reward: " + reward.getComment());
                 this.raidDao = new RaidDB();

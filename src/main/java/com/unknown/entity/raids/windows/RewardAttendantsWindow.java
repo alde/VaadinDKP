@@ -26,7 +26,8 @@ public class RewardAttendantsWindow extends Window {
 	public RewardAttendantsWindow(List<RaidChar> chars) {
 		this.chars = chars;
                 this.setCaption("Attendants");
-		this.center();
+		this.setPositionX(500);
+                this.setPositionY(250);
                 this.addStyleName("opaque");
                 this.getContent().setSizeUndefined();
 	}

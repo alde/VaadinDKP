@@ -48,7 +48,8 @@ public class ItemEditWindow extends Window {
                 this.item = item;
                 this.addStyleName("opaque");
                 this.setCaption("Edit item: " + item.getName());
-                this.center();
+                this.setPositionX(400);
+                this.setPositionY(100);
                 this.getContent().setSizeUndefined();
         }
 
