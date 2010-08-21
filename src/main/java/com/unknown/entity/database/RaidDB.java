@@ -423,10 +423,10 @@ public class RaidDB implements RaidDAO {
                 try {
                         reward = doAddReward(reward);
                         doAddCharacterReward(reward);
-                } catch(SQLException ex) {
-					throw new SQLRuntimeException(ex);
-				} finally {
-                     c.close();
+                } catch (SQLException ex) {
+                        throw new SQLRuntimeException(ex);
+                } finally {
+                        c.close();
                 }
 
                 return success;
@@ -435,35 +435,35 @@ public class RaidDB implements RaidDAO {
         private RaidReward doAddReward(RaidReward reward) throws SQLException {
                 int rewardid = 0;
                 DBConnection c = new DBConnection();
-				try{
-				PreparedStatement p = c.prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
-                p.setInt(1, reward.getShares());
-                p.setString(2, reward.getComment());
-                p.setInt(3, reward.getRaidId());
-                p.executeUpdate();
-                ResultSet rs = p.getGeneratedKeys();
-                while (rs.next()) {
-                        reward.setId(rs.getInt(1));
+                try {
+                        PreparedStatement p = c.prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                        p.setInt(1, reward.getShares());
+                        p.setString(2, reward.getComment());
+                        p.setInt(3, reward.getRaidId());
+                        p.executeUpdate();
+                        ResultSet rs = p.getGeneratedKeys();
+                        while (rs.next()) {
+                                reward.setId(rs.getInt(1));
+                        }
+                } finally {
+                        c.close();
                 }
-			}finally {
-				c.close();
-			}
                 return reward;
         }
 
         private void doAddCharacterReward(RaidReward reward) throws SQLException {
-               DBConnection c = new DBConnection();
-			   try{
-				int success = 0;
-                PreparedStatement p = c.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
-                for (RaidChar eachid : reward.getRewardChars()) {
-                        p.setInt(1, reward.getId());
-                        p.setInt(2, eachid.getId());
-						p.executeUpdate();
+                DBConnection c = new DBConnection();
+                try {
+                        int success = 0;
+                        PreparedStatement p = c.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
+                        for (RaidChar eachid : reward.getRewardChars()) {
+                                p.setInt(1, reward.getId());
+                                p.setInt(2, eachid.getId());
+                                p.executeUpdate();
+                        }
+                } finally {
+                        c.close();
                 }
-			}finally {
-				c.close();
-			}
         }
 
         @Override
@@ -492,37 +492,36 @@ public class RaidDB implements RaidDAO {
                 return ImmutableList.copyOf(invalid);
         }
 
-	@Override
-	public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId) {
-	Set<RaidChar> chars = new HashSet<RaidChar>();
-			final CharacterDB characterDB = new CharacterDB();
-			for (String string : attendantlist) {
-			try {
-				int characterId = characterDB.getCharacterId(string);
-				chars.add(getRaidChar(characterId, raidId));
-			} catch (SQLException ex) {
-				Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
-			}
-		}
-			return chars;
+        @Override
+        public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId) {
+                Set<RaidChar> chars = new HashSet<RaidChar>();
+                final CharacterDB characterDB = new CharacterDB();
+                for (String string : attendantlist) {
+                        try {
+                                int characterId = characterDB.getCharacterId(string);
+                                chars.add(getRaidChar(characterId, raidId));
+                        } catch (SQLException ex) {
+                                Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                }
+                return chars;
 
-	}
+        }
 
-
-	 public RaidChar getRaidChar(int charId, int raidId) {
+        public RaidChar getRaidChar(int charId, int raidId) {
                 DBConnection c = new DBConnection();
                 RaidChar rchar = new RaidChar();
-				try {
-				        PreparedStatement p = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
                         p.setInt(1, raidId);
-                       p.setInt(2, charId);
-						ResultSet rs = p.executeQuery();
-                        while (rs.next()) {      
+                        p.setInt(2, charId);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
                                 rchar.setId(rs.getInt("characters.id"));
                                 rchar.setName(rs.getString("characters.name"));
                                 rchar.setShares(rs.getInt("rewards.number_of_shares"));
                                 rchar.setRaidId(rs.getInt("rewards.raid_id"));
-                                
+
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
@@ -531,4 +530,35 @@ public class RaidDB implements RaidDAO {
                 return rchar;
         }
 
+        @Override
+        public Iterable<Raid> getRaidsForCharacter(int charid) throws SQLException {
+                List<Raid> raids = new ArrayList<Raid>();
+                DBConnection c = new DBConnection();
+                List<Integer> rewardids = getRewardIdForCharacter(charid);
+                PreparedStatement p = c.prepareStatement(" SELECT * FROM raids JOIN rewards WHERE rewards.id=? AND rewards.raid_id=raids.id");
+                for (int t : rewardids) {
+                        p.setInt(1, t);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                Raid raidtemp = new Raid("", rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
+                                raids.add(raidtemp);
+                        }
+
+                }
+                c.close();
+                return raids;
+        }
+
+        private List<Integer> getRewardIdForCharacter(int charid) throws SQLException {
+                List<Integer> rewardids = new ArrayList<Integer>();
+                DBConnection c = new DBConnection();
+                PreparedStatement p = c.prepareStatement("SELECT * FROM character_rewards WHERE character_id=?");
+                p.setInt(1, charid);
+                ResultSet rs = p.executeQuery();
+                while (rs.next()) {
+                        rewardids.add(rs.getInt("character_rewards.reward_id"));
+                        System.out.println(""+rs.getInt("character_rewards.reward_id"));
+                }
+                return rewardids;
+        }
 }

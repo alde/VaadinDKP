@@ -12,6 +12,9 @@ import com.unknown.entity.raids.*;
 import com.unknown.entity.raids.windows.*;
 import com.vaadin.Application;
 import com.vaadin.ui.Window;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -63,7 +66,11 @@ public class PopUpControl extends Window {
 
         private void showCharInfoWindow(User user) throws NullPointerException, IllegalArgumentException {
                 CharacterInfoWindow info = new CharacterInfoWindow(user);
-                info.printInfo();
+                try {
+                        info.printInfo();
+                } catch (SQLException ex) {
+                        Logger.getLogger(PopUpControl.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 app.getMainWindow().addWindow(info);
         }
 

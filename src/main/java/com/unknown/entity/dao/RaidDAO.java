@@ -41,4 +41,6 @@ public interface RaidDAO {
         public List<String> findInvalidCharacters(List<String> attendantlist, CharacterDAO charDao);
 
 		public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId);
+
+        public Iterable<Raid> getRaidsForCharacter(int charid) throws SQLException;
 }

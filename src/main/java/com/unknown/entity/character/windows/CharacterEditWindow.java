@@ -10,6 +10,9 @@ import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
+import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.raids.Raid;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
@@ -26,6 +29,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +41,11 @@ public class CharacterEditWindow extends Window {
 
         private final User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
+        private RaidDAO raidDao;
 
         public CharacterEditWindow(User user) {
                 this.user = user;
+                this.raidDao = new RaidDB();
                 this.setCaption("Edit character: " + user.getUsername());
                 this.addStyleName("opaque");
                 this.setPositionX(200);
@@ -63,7 +69,7 @@ public class CharacterEditWindow extends Window {
                 addComponent(name);
                 addComponent(characterClass);
                 addComponent(active);
-                
+
                 Button updateButton = characterEditUpdateButton(name, characterClass, active);
                 Button deleteButton = new Button("Delete Character");
                 deleteButton.addListener(new DeleteButtonClickListener());
@@ -78,7 +84,7 @@ public class CharacterEditWindow extends Window {
                 hzl.setSpacing(true);
                 hzl.setMargin(true, false, true, false);
                 addComponent(hzl);
-                }
+        }
 
         private Button characterEditUpdateButton(final TextField name, final ComboBox characterClass, final CheckBox active) {
                 Button updateButton = new Button("Update");
@@ -118,6 +124,28 @@ public class CharacterEditWindow extends Window {
                 } else {
                         addComponent(new Label("No items looted yet."));
                 }
+        }
+
+        private void characterRaids() throws SQLException {
+                Table raids = raidList(user);
+                if (raids.size() > 0) {
+                        addComponent(raidList(user));
+                } else {
+                        addComponent(new Label("No raids attended yet."));
+                }
+        }
+
+                private Table raidList(User user) throws SQLException {
+                Table tbl = new Table();
+                tbl.addContainerProperty("Comment", String.class, "");
+                tbl.addContainerProperty("Date", String.class, "");
+                tbl.setHeight("150px");
+                for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
+                        Item addItem = tbl.addItem(charraid.getId());
+                        addItem.getItemProperty("Comment").setValue(charraid.getComment());
+                        addItem.getItemProperty("Date").setValue(charraid.getDate());
+                }
+                return tbl;
         }
 
         private void characterDKP() throws OutOfBoundsException, OverlapsException {
@@ -168,7 +196,7 @@ public class CharacterEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         int success = updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
-                        System.out.println(""+success);
+                        System.out.println("" + success);
                         notifyListeners();
                         close();
                 }

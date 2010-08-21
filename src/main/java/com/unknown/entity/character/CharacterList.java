@@ -15,10 +15,13 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -108,7 +111,11 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                                 getApplication().getMainWindow().addWindow(info);
                         } else {
                                 CharacterInfoWindow info = new CharacterInfoWindow(user);
-                                info.printInfo();
+                                try {
+                                        info.printInfo();
+                                } catch (SQLException ex) {
+                                        Logger.getLogger(CharacterList.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                                 getApplication().getMainWindow().addWindow(info);
                         }
                 }
