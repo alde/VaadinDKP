@@ -50,6 +50,7 @@ public class UnknownEntityDKP extends Application {
 
         private Window window;
         private final AdminPanel adminPanel = new AdminPanel();
+        private CharacterList charList;
 
         public HorizontalLayout HorizontalSegment(final DkpList dKPList, ItemList itemList, RaidList raidList) {
                 final HorizontalLayout hzl = new HorizontalLayout();
@@ -101,6 +102,9 @@ public class UnknownEntityDKP extends Application {
                 return itemname;
         }
 
+        public CharacterList getCharList() {
+                return charList;
+        }
         private ComboBox itemSlotFilterBox(final ItemList itemList) throws ReadOnlyException, ConversionException, UnsupportedOperationException {
                 ComboBox itemslot = new ComboBox("Filter itemslot");
                 itemslot.addStyleName("select-button");
@@ -173,8 +177,9 @@ public class UnknownEntityDKP extends Application {
                 ItemDAO itemDAO = new ItemDB();
 
                 final Button updateButton = new Button("Update");
-                final CharacterList charList = new CharacterList(characterDAO);
+                charList = new CharacterList(characterDAO);
                 final DkpList dKPList = new DkpList(characterDAO);
+                        dKPList.setCharacterList(charList);
                 dKPList.addStyleName("small");
                 final RaidList raidList = new RaidList(raidDAO);
                 raidList.addStyleName("small");
@@ -190,7 +195,7 @@ public class UnknownEntityDKP extends Application {
                 adminPanel.setDkpList(dKPList);
 
                 // Character List based on Character Class
-                characterListOnCharacterClass(charList);
+                characterListOnCharacterClass();
 
                 // DKP Table, Item Table, Raid Table
                 window.addComponent(hzl);
@@ -205,7 +210,7 @@ public class UnknownEntityDKP extends Application {
                 window.addComponent(updateButton);
         }
 
-        private void characterListOnCharacterClass(final CharacterList charList) {
+        private void characterListOnCharacterClass() {
                 HorizontalLayout hzChar = new HorizontalLayout();
                 hzChar.addComponent(charList);
                 charList.printList();

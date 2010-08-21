@@ -26,6 +26,9 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         private CharacterDAO characterDAO;
         IndexedContainer ic;
+        private DkpList dkpList = this;
+        private CharacterList charList = null;
+
 
         public DkpList(CharacterDAO characterDAO) {
                 this.characterDAO = characterDAO;
@@ -101,6 +104,10 @@ public class DkpList extends Table implements CharacterInfoListener {
                 }
         }
 
+        public void setCharacterList(CharacterList charList) {
+                this. charList = charList;
+        }
+
         private class dkpListClickListener implements ItemClickListener {
 
                 public dkpListClickListener() {
@@ -111,6 +118,8 @@ public class DkpList extends Table implements CharacterInfoListener {
                         if (event.isDoubleClick()) {
                                 User user = (User) event.getItemId();
                                 PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
+                                pop.setDkpList(dkpList);
+                                pop.setCharacterList(charList);
                                 pop.showProperCharWindow(user);
                         }
                 }
