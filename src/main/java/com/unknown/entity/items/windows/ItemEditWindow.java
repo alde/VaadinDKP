@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.items.windows;
 
+import com.google.gwt.http.client.URL;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.Slots;
@@ -280,7 +281,7 @@ public class ItemEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         String url = "http://www.wowhead.com/item=" + item.getWowId_hc();
-                        getWindow().open(new ExternalResource(url), "_blank");
+                        open(new ExternalResource(url), "_new");
                 }
         }
 
@@ -289,7 +290,8 @@ public class ItemEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         String url = "http://www.wowhead.com/item=" + item.getWowId();
-                        getWindow().open(new ExternalResource(url), "_blank");
+                        System.out.println(url);
+                        open(new ExternalResource(url), "_blank");
                 }
         }
 

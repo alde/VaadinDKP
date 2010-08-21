@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.unknown.entity.panel;
 
 import com.unknown.entity.Armor;
@@ -16,8 +15,6 @@ import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -31,28 +28,37 @@ import org.vaadin.henrik.superimmediatetextfield.SuperImmediateTextField;
  * @author alde
  */
 public class TablePanel {
-        private CharacterList charList;
 
- public HorizontalLayout HorizontalSegment(final DkpList dKPList, ItemList itemList, RaidList raidList) {
+        private CharacterList charList;
+        private DkpList dkpList;
+        private ItemList itemList;
+        private RaidList raidList;
+
+        public TablePanel(DkpList dkpList, ItemList itemList, RaidList raidList) {
+                this.dkpList = dkpList;
+                this.itemList = itemList;
+                this.raidList = raidList;
+        }
+
+        public HorizontalLayout HorizontalSegment() {
                 final HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
 
                 // Vertical DKP List
-                VerticalLayout vertDKP = VerticalDKPListLayout(dKPList);
-                hzl.addComponent(vertDKP);
+                VerticalLayout vertDkp = VerticalDKPListLayout();
+                hzl.addComponent(vertDkp);
                 // Vertical Item List
-                VerticalLayout vertItem = VerticalItemListLayout(itemList);
+                VerticalLayout vertItem = VerticalItemListLayout();
                 hzl.addComponent(vertItem);
 
                 // Vertical Raid List
-                VerticalLayout vertRaid = VerticalRaidListLayout(raidList);
+                VerticalLayout vertRaid = VerticalRaidListLayout();
                 hzl.addComponent(vertRaid);
 
                 return hzl;
         }
 
-
-   private VerticalLayout VerticalRaidListLayout(RaidList raidList) {
+        private VerticalLayout VerticalRaidListLayout() {
                 VerticalLayout vertRaid = new VerticalLayout();
                 vertRaid.addComponent(new Label("Raids"));
                 vertRaid.addComponent(raidList);
@@ -60,14 +66,14 @@ public class TablePanel {
                 return vertRaid;
         }
 
-        private VerticalLayout VerticalItemListLayout(final ItemList itemList) {
+        private VerticalLayout VerticalItemListLayout() {
                 VerticalLayout vertItem = new VerticalLayout();
                 vertItem.addComponent(new Label("Items"));
                 vertItem.addComponent(itemList);
                 HorizontalLayout hzl = new HorizontalLayout();
-                SuperImmediateTextField itemname = itemNameFilterField(itemList);
-                ComboBox itemslot = itemSlotFilterBox(itemList);
-                ComboBox itemtype = itemTypeFilterBox(itemList);
+                SuperImmediateTextField itemname = itemNameFilterField();
+                ComboBox itemslot = itemSlotFilterBox();
+                ComboBox itemtype = itemTypeFilterBox();
                 hzl.addComponent(itemname);
                 hzl.addComponent(itemslot);
                 hzl.addComponent(itemtype);
@@ -77,17 +83,30 @@ public class TablePanel {
                 return vertItem;
         }
 
-
-        private SuperImmediateTextField itemNameFilterField(ItemList itemList) {
+        private SuperImmediateTextField itemNameFilterField() {
                 SuperImmediateTextField itemname = new SuperImmediateTextField("Filter itemname");
                 itemname.setImmediate(true);
                 itemname.addListener(new ItemNameFieldValueChangeListener(itemList, itemname));
                 return itemname;
         }
-      public CharacterList getCharList() {
+
+        public CharacterList getCharList() {
                 return charList;
         }
-        private ComboBox itemSlotFilterBox(final ItemList itemList) throws ReadOnlyException, ConversionException, UnsupportedOperationException {
+
+        public ItemList getItemList() {
+                return itemList;
+        }
+
+        public RaidList getRaidList() {
+                return raidList;
+        }
+
+        public DkpList getDkpList() {
+                return dkpList;
+        }
+
+        private ComboBox itemSlotFilterBox() throws ReadOnlyException, ConversionException, UnsupportedOperationException {
                 ComboBox itemslot = new ComboBox("Filter itemslot");
                 itemslot.addStyleName("select-button");
                 itemslot.setWidth("180px");
@@ -103,7 +122,7 @@ public class TablePanel {
                 return itemslot;
         }
 
-        private ComboBox itemTypeFilterBox(final ItemList itemList) throws UnsupportedOperationException, ReadOnlyException, ConversionException {
+        private ComboBox itemTypeFilterBox() throws UnsupportedOperationException, ReadOnlyException, ConversionException {
                 ComboBox itemtype = new ComboBox("Filter itemtype");
                 itemtype.addStyleName("select-button");
                 itemtype.setWidth("180px");
@@ -119,22 +138,22 @@ public class TablePanel {
                 return itemtype;
         }
 
-        private VerticalLayout VerticalDKPListLayout(final DkpList dkpList) throws UnsupportedOperationException {
-                VerticalLayout vertDKP = new VerticalLayout();
-                vertDKP.addComponent(new Label("DKP"));
-                vertDKP.addComponent(dkpList);
-                dkpFilterBox(vertDKP, dkpList);
+        private VerticalLayout VerticalDKPListLayout() throws UnsupportedOperationException {
+                VerticalLayout vertDkp = new VerticalLayout();
+                vertDkp.addComponent(new Label("DKP"));
+                vertDkp.addComponent(dkpList);
+                dkpFilterBox(vertDkp);
 
                 dkpList.printList();
-                return vertDKP;
+                return vertDkp;
         }
 
-        private void dkpFilterBox(VerticalLayout vertDKP, final DkpList dkpList) throws UnsupportedOperationException, ReadOnlyException, ConversionException {
+        private void dkpFilterBox(VerticalLayout vertDkp) throws UnsupportedOperationException, ReadOnlyException, ConversionException {
                 final ComboBox filterDkp = new ComboBox("Filter");
                 filterDkp.addStyleName("select-button");
                 filterDkp.setWidth("180px");
                 filterDkp.setImmediate(true);
-                vertDKP.addComponent(filterDkp);
+                vertDkp.addComponent(filterDkp);
                 filterDkp.addItem("<none>");
                 for (Armor armor : Armor.values()) {
                         filterDkp.addItem(armor);
@@ -222,5 +241,4 @@ public class TablePanel {
 
                 }
         }
-
 }
