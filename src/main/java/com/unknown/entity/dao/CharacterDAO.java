@@ -33,4 +33,6 @@ public interface CharacterDAO {
         public int updateCharacter(User user, String name, String charclass, boolean active);
 
         public int addNewSiteUser(String username, String password, int rank);
+
+        public String getAttendanceRaids(User user);
 }

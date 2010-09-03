@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.dao;
 
+import com.unknown.entity.character.User;
 import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidChar;
 import com.unknown.entity.raids.RaidItem;
@@ -43,4 +44,8 @@ public interface RaidDAO {
 		public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId);
 
         public Iterable<Raid> getRaidsForCharacter(int charid) throws SQLException;
+
+        public int getTotalRaidsLastThirtyDays();
+
+        public int getAttendedRaidsLastThirtyDays(User user);
 }

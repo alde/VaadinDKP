@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.unknown.entity.dao.*;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.SQLRuntimeException;
+import com.unknown.entity.character.User;
 import com.unknown.entity.raids.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,12 +16,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -557,8 +562,56 @@ public class RaidDB implements RaidDAO {
                 ResultSet rs = p.executeQuery();
                 while (rs.next()) {
                         rewardids.add(rs.getInt("character_rewards.reward_id"));
-                        System.out.println(""+rs.getInt("character_rewards.reward_id"));
+                        System.out.println("" + rs.getInt("character_rewards.reward_id"));
                 }
                 return rewardids;
+        }
+
+        @Override
+        public int getTotalRaidsLastThirtyDays() {
+                int i = 0;
+                DateTime dt = new DateTime();
+                String startdate = dt.toYearMonthDay().minusDays(30).toString();
+                String enddate = dt.toYearMonthDay().toString();
+                System.out.println("Today: " + enddate);
+                System.out.println("30 Days ago: " + startdate);
+
+                try {
+                        DBConnection c = new DBConnection();
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM raids WHERE date BETWEEN ? AND ?");
+                        p.setString(1, startdate);
+                        p.setString(2, enddate);
+                        ResultSet rs = p.executeQuery();
+                        System.out.println(p);
+                        while (rs.next()) {
+                                i++;
+                        }
+                        c.close();
+                } catch (SQLException e) {
+                }
+                return i;
+        }
+
+        @Override
+        public int getAttendedRaidsLastThirtyDays(User user) {
+                int i = 0;
+                DateTime dt = new DateTime();
+                String startdate = dt.toYearMonthDay().minusDays(30).toString();
+                String enddate = dt.toYearMonthDay().toString();
+                try {
+                        DBConnection c = new DBConnection();
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
+                        p.setInt(1, user.getId());
+                        p.setString(2, startdate);
+                        p.setString(3, enddate);
+                        ResultSet rs = p.executeQuery();
+                        System.out.println(p);
+                        while (rs.next()) {
+                                i++;
+                        }
+                        c.close();
+                } catch (SQLException e) { e.printStackTrace();
+                }
+                return i;
         }
 }

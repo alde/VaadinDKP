@@ -6,7 +6,9 @@ package com.unknown.entity.character.windows;
 
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
+import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.Raid;
 import com.vaadin.data.Item;
@@ -46,6 +48,7 @@ public class CharacterInfoWindow extends Window {
                 characterDKP();
                 characterLoots();
                 characterRaids();
+                raidsAttended();
         }
 
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
@@ -130,5 +133,13 @@ public class CharacterInfoWindow extends Window {
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }
                 return tbl;
+        }
+
+        private void raidsAttended() {
+                CharacterDAO charDao = new CharacterDB();
+                String attendance = charDao.getAttendanceRaids(user);
+                Label attended = new Label();
+                attended.setValue("Attended " + attendance +"% of raids the last 30 days.");
+                addComponent(attended);
         }
 }

@@ -14,6 +14,7 @@ import com.unknown.entity.Role;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
+import com.unknown.entity.dao.RaidDAO;
 import java.math.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,6 +31,8 @@ import java.util.logging.Logger;
  * @author alde
  */
 public class CharacterDB implements CharacterDAO {
+
+        RaidDAO raidDao = new RaidDB();
 
         @Override
         public List<User> getUsers() {
@@ -215,6 +218,17 @@ public class CharacterDB implements CharacterDAO {
 		return userNameBuilder.build();
 
 	}
+
+        @Override
+        public String getAttendanceRaids(User user) {
+                String foo = "";
+                int amountofRaids = raidDao.getTotalRaidsLastThirtyDays();
+                int attendedRaids = raidDao.getAttendedRaidsLastThirtyDays(user);
+                System.out.println("amount fo raids = "+amountofRaids + " -- attended raids = " + attendedRaids);
+                double temp = attendedRaids*100/amountofRaids;
+                foo = ""+temp;
+                return foo;
+        }
 
         private static class HasRolePredicate implements Predicate<User> {
 
