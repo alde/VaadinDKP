@@ -31,6 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -42,6 +43,7 @@ public class CharacterEditWindow extends Window {
         private final User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private RaidDAO raidDao;
+        private Table loots;
 
         public CharacterEditWindow(User user) {
                 this.user = user;
@@ -58,7 +60,7 @@ public class CharacterEditWindow extends Window {
                 characterDKP();
                 characterLoots();
                 characterRaids();
-
+                raidsAttended();
         }
 
         private void characterInformation() {
@@ -89,7 +91,7 @@ public class CharacterEditWindow extends Window {
 
         private Button characterEditUpdateButton(final TextField name, final ComboBox characterClass, final CheckBox active) {
                 Button updateButton = new Button("Update");
-                updateButton.addListener(new updateBtnClickListener(name, characterClass, active));
+                updateButton.addListener(new updateBtnClickListener(name, characterClass, active, loots));
                 return updateButton;
         }
 
@@ -106,11 +108,13 @@ public class CharacterEditWindow extends Window {
         private void characterLootTableSetColumnHeaders(Table tbl) throws UnsupportedOperationException {
                 tbl.addContainerProperty("Name", String.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
+                tbl.addContainerProperty("Delete", CheckBox.class, false);
         }
 
         private void characterLootTableSetRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
                 addItem.getItemProperty("Name").setValue(charitem.getName());
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
+                addItem.getItemProperty("Delete").setValue("");
         }
 
         private int updateCharacter(String name, String charclass, boolean active) {
@@ -119,13 +123,18 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterLoots() {
-                Table loots = lootList(user);
+                loots = lootList(user);
+                Button update = new Button("Update");
+                update.addListener(new updateLootsListener(loots));
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
                         addComponent(lootList(user));
+                        addComponent(update);
                 } else {
                         addComponent(new Label("No items looted yet."));
                 }
+
+
         }
 
         private void characterRaids() throws SQLException {
@@ -138,7 +147,7 @@ public class CharacterEditWindow extends Window {
                 }
         }
 
-                private Table raidList(User user) throws SQLException {
+        private Table raidList(User user) throws SQLException {
                 Table tbl = new Table();
                 tbl.addContainerProperty("Comment", String.class, "");
                 tbl.addContainerProperty("Date", String.class, "");
@@ -164,10 +173,12 @@ public class CharacterEditWindow extends Window {
 
         private Table lootList(User user) {
                 Table tbl = new Table();
+                tbl.setEditable(true);
+                tbl.setImmediate(true);
                 characterLootTableSetColumnHeaders(tbl);
                 tbl.setHeight(150);
                 for (CharacterItem charitem : user.getCharItems()) {
-                        Item addItem = tbl.addItem(charitem.getId());
+                        Item addItem = tbl.addItem(charitem);
                         characterLootTableSetRow(addItem, charitem);
                 }
                 return tbl;
@@ -189,11 +200,13 @@ public class CharacterEditWindow extends Window {
                 private final TextField name;
                 private final ComboBox characterClass;
                 private final CheckBox active;
+                private final Table lootTable;
 
-                public updateBtnClickListener(TextField name, ComboBox characterClass, CheckBox active) {
+                public updateBtnClickListener(TextField name, ComboBox characterClass, CheckBox active, Table loots) {
                         this.name = name;
                         this.characterClass = characterClass;
                         this.active = active;
+                        this.lootTable = loots;
                 }
 
                 @Override
@@ -213,6 +226,33 @@ public class CharacterEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         throw new UnsupportedOperationException("Not supported yet.");
+                }
+        }
+
+        private void raidsAttended() {
+                CharacterDAO charDao = new CharacterDB();
+                String attendance = charDao.getAttendanceRaids(user);
+                Label attended = new Label();
+                attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
+                addComponent(attended);
+        }
+        private void doUpdateLoots(Table loots) {
+                for (Iterator i = loots.getItemIds().iterator(); i.hasNext();) {
+                        Item ci = loots.getItem(i);
+                        System.out.println(ci.getItemProperty("name") + " -- " + ci.getItemProperty("price"));
+                }
+        }
+
+        private class updateLootsListener implements ClickListener {
+                private final Table loots;
+
+                public updateLootsListener(Table loots) {
+                        this.loots = loots;
+                }
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        doUpdateLoots(loots);
                 }
         }
 }
