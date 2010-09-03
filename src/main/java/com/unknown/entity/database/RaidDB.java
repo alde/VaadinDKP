@@ -539,32 +539,16 @@ public class RaidDB implements RaidDAO {
         public Iterable<Raid> getRaidsForCharacter(int charid) throws SQLException {
                 List<Raid> raids = new ArrayList<Raid>();
                 DBConnection c = new DBConnection();
-                List<Integer> rewardids = getRewardIdForCharacter(charid);
-                PreparedStatement p = c.prepareStatement(" SELECT * FROM raids JOIN rewards WHERE rewards.id=? AND rewards.raid_id=raids.id");
-                for (int t : rewardids) {
-                        p.setInt(1, t);
-                        ResultSet rs = p.executeQuery();
-                        while (rs.next()) {
-                                Raid raidtemp = new Raid("", rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
-                                raids.add(raidtemp);
-                        }
-
-                }
-                c.close();
-                return raids;
-        }
-
-        private List<Integer> getRewardIdForCharacter(int charid) throws SQLException {
-                List<Integer> rewardids = new ArrayList<Integer>();
-                DBConnection c = new DBConnection();
-                PreparedStatement p = c.prepareStatement("SELECT * FROM character_rewards WHERE character_id=?");
+                PreparedStatement p = c.prepareStatement("SELECT DISTINCT raids.* FROM raids JOIN rewards JOIN characters JOIN character_rewards WHERE characters.id=? AND rewards.raid_id=raids.id AND character_rewards.character_id=characters.id AND character_rewards.reward_id=rewards.id");
                 p.setInt(1, charid);
                 ResultSet rs = p.executeQuery();
                 while (rs.next()) {
-                        rewardids.add(rs.getInt("character_rewards.reward_id"));
-                        System.out.println("" + rs.getInt("character_rewards.reward_id"));
+                        Raid raidtemp = new Raid("", rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
+                        raids.add(raidtemp);
                 }
-                return rewardids;
+
+                c.close();
+                return raids;
         }
 
         @Override
@@ -610,7 +594,8 @@ public class RaidDB implements RaidDAO {
                                 i++;
                         }
                         c.close();
-                } catch (SQLException e) { e.printStackTrace();
+                } catch (SQLException e) {
+                        e.printStackTrace();
                 }
                 return i;
         }
