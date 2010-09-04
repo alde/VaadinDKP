@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 public class DkpList extends Table implements CharacterInfoListener {
 
         private CharacterDAO characterDAO;
-        IndexedContainer ic;
+        private IndexedContainer ic;
         private DkpList dkpList = this;
         private CharacterList charList = null;
 

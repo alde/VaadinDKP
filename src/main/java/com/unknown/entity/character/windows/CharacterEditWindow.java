@@ -16,6 +16,7 @@ import com.unknown.entity.raids.Raid;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -43,11 +44,18 @@ public class CharacterEditWindow extends Window {
         private final User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private RaidDAO raidDao;
+        private IndexedContainer ic;
         private Table loots;
 
         public CharacterEditWindow(User user) {
                 this.user = user;
                 this.raidDao = new RaidDB();
+                this.ic = new IndexedContainer();
+                this.loots.setContainerDataSource(ic);
+                this.loots = lootList(user);
+                this.loots.setEditable(true);
+                this.loots.setImmediate(true);
+                this.loots.setHeight(150);
                 this.setCaption("Edit character: " + user.getUsername());
                 this.addStyleName("opaque");
                 this.setPositionX(200);
@@ -91,7 +99,7 @@ public class CharacterEditWindow extends Window {
 
         private Button characterEditUpdateButton(final TextField name, final ComboBox characterClass, final CheckBox active) {
                 Button updateButton = new Button("Update");
-                updateButton.addListener(new updateBtnClickListener(name, characterClass, active, loots));
+                updateButton.addListener(new updateBtnClickListener(name, characterClass, active));
                 return updateButton;
         }
 
@@ -105,13 +113,19 @@ public class CharacterEditWindow extends Window {
                 return characterClass;
         }
 
-        private void characterLootTableSetColumnHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", String.class, "");
-                tbl.addContainerProperty("Price", Double.class, 0);
-                tbl.addContainerProperty("Delete", CheckBox.class, false);
+        private void characterLootTableSetColumnHeaders() throws UnsupportedOperationException {
+                ic.addContainerProperty("Name", String.class, "");
+                ic.addContainerProperty("Price", Double.class, 0);
+                ic.addContainerProperty("Delete", CheckBox.class, false);
         }
 
         private void characterLootTableSetRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
+                System.out.println(charitem.getName());
+                System.out.println(addItem);
+                System.out.println(addItem.getItemProperty("Name").toString());
+                System.out.println(charitem.getPrice()+"");
+                System.out.println(addItem.getItemProperty("Price").toString());
+                System.out.println(addItem.getItemProperty("Delete").toString());
                 addItem.getItemProperty("Name").setValue(charitem.getName());
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Delete").setValue("");
@@ -123,9 +137,8 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterLoots() {
-                loots = lootList(user);
                 Button update = new Button("Update");
-                update.addListener(new updateLootsListener(loots));
+                update.addListener(new updateLootsListener());
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
                         addComponent(lootList(user));
@@ -172,16 +185,13 @@ public class CharacterEditWindow extends Window {
         }
 
         private Table lootList(User user) {
-                Table tbl = new Table();
-                tbl.setEditable(true);
-                tbl.setImmediate(true);
-                characterLootTableSetColumnHeaders(tbl);
-                tbl.setHeight(150);
+                characterLootTableSetColumnHeaders();
                 for (CharacterItem charitem : user.getCharItems()) {
-                        Item addItem = tbl.addItem(charitem);
+                        Item addItem = ic.addItem(charitem);
+                        System.out.println(addItem);
                         characterLootTableSetRow(addItem, charitem);
                 }
-                return tbl;
+                return loots;
 
         }
 
@@ -200,13 +210,11 @@ public class CharacterEditWindow extends Window {
                 private final TextField name;
                 private final ComboBox characterClass;
                 private final CheckBox active;
-                private final Table lootTable;
 
-                public updateBtnClickListener(TextField name, ComboBox characterClass, CheckBox active, Table loots) {
+                public updateBtnClickListener(TextField name, ComboBox characterClass, CheckBox active) {
                         this.name = name;
                         this.characterClass = characterClass;
                         this.active = active;
-                        this.lootTable = loots;
                 }
 
                 @Override
@@ -236,23 +244,21 @@ public class CharacterEditWindow extends Window {
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
                 addComponent(attended);
         }
-        private void doUpdateLoots(Table loots) {
-                for (Iterator i = loots.getItemIds().iterator(); i.hasNext();) {
-                        Item ci = loots.getItem(i);
+        private void doUpdateLoots() {
+                for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
+                        Item ci = ic.getItem(i);
                         System.out.println(ci.getItemProperty("name") + " -- " + ci.getItemProperty("price"));
                 }
         }
 
         private class updateLootsListener implements ClickListener {
-                private final Table loots;
-
-                public updateLootsListener(Table loots) {
-                        this.loots = loots;
+                
+                public updateLootsListener() {
                 }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        doUpdateLoots(loots);
+                        doUpdateLoots();
                 }
         }
 }
