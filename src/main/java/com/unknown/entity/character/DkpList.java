@@ -27,7 +27,7 @@ public class DkpList extends Table implements CharacterInfoListener {
         private CharacterDAO characterDAO;
         private IndexedContainer ic;
         private DkpList dkpList = this;
-        private CharacterList charList = null;
+        private CharacterList charList;
 
 
         public DkpList(CharacterDAO characterDAO) {

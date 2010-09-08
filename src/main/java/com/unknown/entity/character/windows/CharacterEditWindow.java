@@ -44,13 +44,14 @@ public class CharacterEditWindow extends Window {
         private final User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private RaidDAO raidDao;
-        private IndexedContainer ic = new IndexedContainer();
-        private Table loots = new Table();
+        private IndexedContainer ic;
+        private Table loots;
 
         public CharacterEditWindow(User user) {
                 this.user = user;
                 this.raidDao = new RaidDB();
-                this.loots = lootList(user);
+                this.ic = new IndexedContainer();
+                this.loots = new Table();
                 this.loots.setContainerDataSource(ic);
                 this.loots.setEditable(true);
                 this.loots.setImmediate(true);
@@ -119,12 +120,12 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterLootTableSetRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
-                System.out.println(charitem.getName());
+                System.out.println("---+++---"+ charitem.getName());
                 System.out.println(addItem);
-                System.out.println(addItem.getItemProperty("Name").toString());
-                System.out.println(charitem.getPrice()+"");
-                System.out.println(addItem.getItemProperty("Price").toString());
-                System.out.println(addItem.getItemProperty("Delete").toString());
+                System.out.println(addItem.getItemProperty("Name"));
+                System.out.println(charitem.getPrice() + "");
+                System.out.println(addItem.getItemProperty("Price"));
+                System.out.println(addItem.getItemProperty("Delete"));
                 addItem.getItemProperty("Name").setValue(charitem.getName());
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Delete").setValue("");
@@ -137,10 +138,11 @@ public class CharacterEditWindow extends Window {
 
         private void characterLoots() {
                 Button update = new Button("Update");
+                lootList();
                 update.addListener(new updateLootsListener());
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
-                        addComponent(lootList(user));
+                        addComponent(loots);
                         addComponent(update);
                 } else {
                         addComponent(new Label("No items looted yet."));
@@ -153,7 +155,7 @@ public class CharacterEditWindow extends Window {
                 Table raids = raidList(user);
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
-                        addComponent(raidList(user));
+                        addComponent(raids);
                 } else {
                         addComponent(new Label("No raids attended yet."));
                 }
@@ -183,15 +185,13 @@ public class CharacterEditWindow extends Window {
                 addComponent(vert);
         }
 
-        private Table lootList(User user) {
+        private void lootList() {
                 characterLootTableSetColumnHeaders();
                 for (CharacterItem charitem : user.getCharItems()) {
                         Item addItem = ic.addItem(charitem);
                         System.out.println(addItem);
                         characterLootTableSetRow(addItem, charitem);
                 }
-                return loots;
-
         }
 
         public void addCharacterInfoListener(CharacterInfoListener listener) {
@@ -243,6 +243,7 @@ public class CharacterEditWindow extends Window {
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
                 addComponent(attended);
         }
+
         private void doUpdateLoots() {
                 for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
                         Item ci = ic.getItem(i);
@@ -251,7 +252,7 @@ public class CharacterEditWindow extends Window {
         }
 
         private class updateLootsListener implements ClickListener {
-                
+
                 public updateLootsListener() {
                 }
 
