@@ -44,15 +44,14 @@ public class CharacterEditWindow extends Window {
         private final User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private RaidDAO raidDao;
-        private IndexedContainer ic;
-        private Table loots;
+        private IndexedContainer ic = new IndexedContainer();
+        private Table loots = new Table();
 
         public CharacterEditWindow(User user) {
                 this.user = user;
                 this.raidDao = new RaidDB();
-                this.ic = new IndexedContainer();
-                this.loots.setContainerDataSource(ic);
                 this.loots = lootList(user);
+                this.loots.setContainerDataSource(ic);
                 this.loots.setEditable(true);
                 this.loots.setImmediate(true);
                 this.loots.setHeight(150);
