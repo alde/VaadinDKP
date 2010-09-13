@@ -114,9 +114,9 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterLootTableSetColumnHeaders() throws UnsupportedOperationException {
-                ic.addContainerProperty("Name", String.class, "");
-                ic.addContainerProperty("Price", Double.class, 0);
-                ic.addContainerProperty("Delete", CheckBox.class, false);
+                loots.addContainerProperty("Name", String.class, "");
+                loots.addContainerProperty("Price", Double.class, 0);
+                loots.addContainerProperty("Delete", CheckBox.class, false);
         }
 
         private void characterLootTableSetRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
@@ -245,9 +245,11 @@ public class CharacterEditWindow extends Window {
         }
 
         private void doUpdateLoots() {
-                for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
-                        Item ci = ic.getItem(i);
-                        System.out.println(ci.getItemProperty("name") + " -- " + ci.getItemProperty("price"));
+               for (Iterator i = loots.getItemIds().iterator(); i.hasNext();) {
+                        CharacterItem iid = (CharacterItem) i.next();
+                            Item item = loots.getItem(iid);
+                            System.out.println(item.getItemProperty("Name")+ "-- --"+ item.getItemProperty("Price") + "-- --" + item.getItemProperty("Delete"));
+    
                 }
         }
 
