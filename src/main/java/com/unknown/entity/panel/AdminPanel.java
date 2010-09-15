@@ -43,7 +43,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button editDefaultBtn = new Button("Edit Default prices");
         private final Button addUserBtn = new Button("Add User");
         private final Button logOutButton = new Button("");
-        private final ComboBox themeBox = new ComboBox("Select Theme");
         RaidList raidList = null;
         CharacterList characterList = null;
         DkpList dkpList = null;
@@ -75,7 +74,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         public void init() {
                 if (!isAdmin()) {
                         addComponent(loginBtn);
-                //        themeBox();
                 }
         }
 
@@ -91,19 +89,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 } else {
                         addComponent(loginBtn);
                 }
-                // themeBox();
-        }
-
-        private void themeBox() throws UnsupportedOperationException {
-                themeBox.addItem("chameleon-blue");
-                themeBox.addItem("chameleon-green");
-                themeBox.addItem("chameleon-dark");
-                themeBox.addItem("chameleon-ue");
-                themeBox.setImmediate(true);
-                this.addComponent(themeBox);
-                themeBox.addListener(new ThemeChangeListener(themeBox));
-            //    themeBox.addStyleName(".topright { position: absolute; top: 5px; right: 5px; text-align: right; }");
-                this.setComponentAlignment(themeBox, Alignment.TOP_RIGHT);
         }
 
         private boolean isAdmin() {
@@ -217,21 +202,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         AddNewUserWindow newUser = new AddNewUserWindow();
                         newUser.printInfo();
                         getMainWindow().addWindow(newUser);
-                }
-        }
-
-        private class ThemeChangeListener implements ValueChangeListener {
-
-                ComboBox themeBox;
-
-                public ThemeChangeListener(ComboBox themeBox) {
-                        this.themeBox = themeBox;
-
-                }
-
-                @Override
-                public void valueChange(ValueChangeEvent event) {
-                        getApplication().setTheme(themeBox.getValue().toString());
                 }
         }
 }

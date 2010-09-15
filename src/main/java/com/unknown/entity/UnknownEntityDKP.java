@@ -48,6 +48,7 @@ public class UnknownEntityDKP extends Application {
                 window = new Window("Unknown Entity DKP");
                 setMainWindow(window);
                 Drawings();
+                setTheme("chameleon-dark");
         }
 
         private void Drawings() {

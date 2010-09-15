@@ -19,7 +19,6 @@ import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
 
@@ -36,7 +35,7 @@ public class CharacterInfoWindow extends Window {
                 this.user = user;
                 this.raidDao = new RaidDB();
                 this.addStyleName("opaque");
-                this.setCaption(user.getUsername());
+                this.setCaption("Character information: " + user.getUsername());
                 this.setPositionX(200);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
@@ -45,37 +44,45 @@ public class CharacterInfoWindow extends Window {
 
         public void printInfo() throws SQLException {
                 characterInformation();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterDKP();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterLoots();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterRaids();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 raidsAttended();
         }
 
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
                 addItem.getItemProperty("Name").setValue(charitem.getName());
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
+                addItem.getItemProperty("Heroic").setValue(charitem.getHeroic());
         }
 
         private void characterInfoLootTableSetHeaders(Table tbl) throws UnsupportedOperationException {
                 tbl.addContainerProperty("Name", String.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
+                tbl.addContainerProperty("Heroic", Boolean.class, false);
         }
 
         private void characterInformation() {
-                addComponent(new Label("Character information"));
                 HorizontalLayout hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
                 hzl.addComponent(new Label("Name: "));
                 Label charname = new Label(user.getUsername());
                 charname.addStyleName("color");
                 hzl.addComponent(charname);
                 addComponent(hzl);
                 hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
                 hzl.addComponent(new Label("Class: "));
                 Label charclass = new Label(user.getRole().toString());
                 charclass.addStyleName("color");
                 hzl.addComponent(charclass);
                 addComponent(hzl);
                 hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
                 hzl.addComponent(new Label("Status: "));
                 Label charactive = new Label((user.isActive() ? "Active" : "Inactive"));
                 charactive.addStyleName("color");
@@ -102,13 +109,37 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void characterDKP() throws OutOfBoundsException, OverlapsException {
-                addComponent(new Label("DKP"));
-                VerticalLayout vert = new VerticalLayout();
-                vert.addComponent(new Label("Shares: " + user.getShares()));
-                vert.addComponent(new Label("DKP Earned: " + user.getDKPEarned()));
-                vert.addComponent(new Label("DKP Spent: " + user.getDKPSpent()));
-                vert.addComponent(new Label("DKP: " + user.getDKP()));
-                addComponent(vert);
+                HorizontalLayout hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("Shares: "));
+                Label shares = new Label(""+user.getShares());
+                shares.addStyleName("color");
+                hzl.addComponent(shares);
+                addComponent(hzl);
+                
+                hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("DKP Earned: "));
+                Label dkpearned = new Label(""+user.getDKPEarned());
+                dkpearned.addStyleName("color");
+                hzl.addComponent(dkpearned);
+                addComponent(hzl);
+
+                hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("DKP Spent: "));
+                Label dkpspent = new Label(""+user.getDKPSpent());
+                dkpspent.addStyleName("color");
+                hzl.addComponent(dkpspent);
+                addComponent(hzl);
+
+                hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("DKP: "));
+                Label dkp = new Label(""+user.getDKP());
+                dkp.addStyleName("color");
+                hzl.addComponent(dkp);
+                addComponent(hzl);
         }
 
         private Table lootList(User user) {

@@ -14,6 +14,7 @@ import com.unknown.entity.Role;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
+import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.dao.RaidDAO;
 import java.math.*;
 import java.sql.Connection;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 public class CharacterDB implements CharacterDAO {
 
         RaidDAO raidDao = new RaidDB();
+        ItemDAO itemDao = new ItemDB();
 
         @Override
         public List<User> getUsers() {
@@ -228,6 +230,65 @@ public class CharacterDB implements CharacterDAO {
                 double temp = attendedRaids*100/amountofRaids;
                 foo = ""+temp;
                 return foo;
+        }
+
+        @Override
+        public void removeLootFromCharacter(String itemname, User user) {
+                Connection c = null;
+
+                try {
+                        c = new DBConnection().getConnection();
+                        int charid = getCharacterId(user.getUsername());
+                        int itemid = itemDao.getItemId(c, itemname);
+                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
+                        p.setInt(1, itemid);
+                        p.setInt(2, charid);
+                        int success = p.executeUpdate();
+                        System.out.println(success + " items deleted.");
+                 } catch (SQLException e) {
+                        e.printStackTrace();
+                } finally {
+                        if (c != null) {
+                                try {
+                                        c.close();
+                                } catch (SQLException ex) {
+                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                        }
+                }
+        }
+
+        @Override
+        public void updateLootForCharacter(String itemname, double price, boolean heroic, User user, int lootid) {
+                               Connection c = null;
+
+                try {
+                        c = new DBConnection().getConnection();
+                        int charid = getCharacterId(user.getUsername());
+                        int itemid = itemDao.getItemId(c, itemname);
+
+                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , raid_id=? , mob_id=?, character_id=?, price=?, heroic=? WHERE id=?");
+                        //PreparedStatement p = c.prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
+                        p.setInt(1, itemid);
+                        p.setInt(2, 1);
+                        p.setInt(3, 1);
+                        p.setInt(4, charid);
+                        p.setDouble(5, price);
+                        p.setBoolean(6, heroic);
+                        p.setInt(7, lootid);
+                        int success = p.executeUpdate();
+                        System.out.println(success + " items updated.");
+                 } catch (SQLException e) {
+                        e.printStackTrace();
+                } finally {
+                        if (c != null) {
+                                try {
+                                        c.close();
+                                } catch (SQLException ex) {
+                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                        }
+                }
         }
 
         private static class HasRolePredicate implements Predicate<User> {

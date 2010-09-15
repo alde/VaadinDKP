@@ -10,8 +10,11 @@ import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
+import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.items.Items;
 import com.unknown.entity.raids.Raid;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
@@ -34,6 +37,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,12 +49,16 @@ public class CharacterEditWindow extends Window {
         private final User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private RaidDAO raidDao;
+        private ItemDAO itemDao;
+        private CharacterDAO charDao;
         private IndexedContainer ic;
         private Table loots;
 
         public CharacterEditWindow(User user) {
                 this.user = user;
                 this.raidDao = new RaidDB();
+                this.charDao = new CharacterDB();
+                this.itemDao = new ItemDB();
                 this.ic = new IndexedContainer();
                 this.loots = new Table();
                 this.loots.setContainerDataSource(ic);
@@ -65,15 +74,17 @@ public class CharacterEditWindow extends Window {
 
         public void printInfo() throws SQLException {
                 characterInformation();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterDKP();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterLoots();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterRaids();
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 raidsAttended();
         }
 
         private void characterInformation() {
-                addComponent(new Label("Character information"));
-
                 final TextField name = new TextField("Name: ", user.getUsername());
                 final ComboBox characterClass = characterEditClassComboBox();
                 final CheckBox active = new CheckBox("Status: ", user.isActive());
@@ -114,25 +125,26 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterLootTableSetColumnHeaders() throws UnsupportedOperationException {
-                loots.addContainerProperty("Name", String.class, "");
+                loots.addContainerProperty("Name", ComboBox.class, "");
                 loots.addContainerProperty("Price", Double.class, 0);
+                loots.addContainerProperty("Heroic", Boolean.class, false);
                 loots.addContainerProperty("Delete", CheckBox.class, false);
         }
 
         private void characterLootTableSetRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
-                System.out.println("---+++---"+ charitem.getName());
-                System.out.println(addItem);
-                System.out.println(addItem.getItemProperty("Name"));
-                System.out.println(charitem.getPrice() + "");
-                System.out.println(addItem.getItemProperty("Price"));
-                System.out.println(addItem.getItemProperty("Delete"));
-                addItem.getItemProperty("Name").setValue(charitem.getName());
+                ComboBox items = new ComboBox();
+                for (Items item : itemDao.getItems()) {
+                        items.addItem(item.getName());
+                }
+                items.setValue(charitem.getName());
+                items.setNullSelectionAllowed(false);
+                addItem.getItemProperty("Name").setValue(items);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
+                addItem.getItemProperty("Heroic").setValue(charitem.getHeroic());
                 addItem.getItemProperty("Delete").setValue("");
         }
 
         private int updateCharacter(String name, String charclass, boolean active) {
-                CharacterDAO charDao = new CharacterDB();
                 return charDao.updateCharacter(user, name, charclass, active);
         }
 
@@ -147,8 +159,6 @@ public class CharacterEditWindow extends Window {
                 } else {
                         addComponent(new Label("No items looted yet."));
                 }
-
-
         }
 
         private void characterRaids() throws SQLException {
@@ -175,14 +185,37 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterDKP() throws OutOfBoundsException, OverlapsException {
-                addComponent(new Label("DKP"));
+                HorizontalLayout hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("Shares: "));
+                Label shares = new Label(""+user.getShares());
+                shares.addStyleName("color");
+                hzl.addComponent(shares);
+                addComponent(hzl);
 
-                VerticalLayout vert = new VerticalLayout();
-                vert.addComponent(new Label("Shares: " + user.getShares()));
-                vert.addComponent(new Label("DKP Earned: " + user.getDKPEarned()));
-                vert.addComponent(new Label("DKP Spent: " + user.getDKPSpent()));
-                vert.addComponent(new Label("DKP: " + user.getDKP()));
-                addComponent(vert);
+                hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("DKP Earned: "));
+                Label dkpearned = new Label(""+user.getDKPEarned());
+                dkpearned.addStyleName("color");
+                hzl.addComponent(dkpearned);
+                addComponent(hzl);
+
+                hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("DKP Spent: "));
+                Label dkpspent = new Label(""+user.getDKPSpent());
+                dkpspent.addStyleName("color");
+                hzl.addComponent(dkpspent);
+                addComponent(hzl);
+
+                hzl = new HorizontalLayout();
+                hzl.setWidth("200px");
+                hzl.addComponent(new Label("DKP: "));
+                Label dkp = new Label(""+user.getDKP());
+                dkp.addStyleName("color");
+                hzl.addComponent(dkp);
+                addComponent(hzl);
         }
 
         private void lootList() {
@@ -204,6 +237,14 @@ public class CharacterEditWindow extends Window {
                 }
         }
 
+        private void removeLootFromCharacter(Item item) {
+                charDao.removeLootFromCharacter(item.getItemProperty("Name").toString(), user);
+        }
+
+        private void updateLootForCharacter(Item item, int lootid) {
+                charDao.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
+        }
+
         private class updateBtnClickListener implements ClickListener {
 
                 private final TextField name;
@@ -221,6 +262,7 @@ public class CharacterEditWindow extends Window {
                         int success = updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
                         System.out.println("" + success);
                         notifyListeners();
+
                         close();
                 }
         }
@@ -237,7 +279,6 @@ public class CharacterEditWindow extends Window {
         }
 
         private void raidsAttended() {
-                CharacterDAO charDao = new CharacterDB();
                 String attendance = charDao.getAttendanceRaids(user);
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
@@ -245,11 +286,15 @@ public class CharacterEditWindow extends Window {
         }
 
         private void doUpdateLoots() {
-               for (Iterator i = loots.getItemIds().iterator(); i.hasNext();) {
+                for (Iterator i = loots.getItemIds().iterator(); i.hasNext();) {
                         CharacterItem iid = (CharacterItem) i.next();
-                            Item item = loots.getItem(iid);
-                            System.out.println(item.getItemProperty("Name")+ "-- --"+ item.getItemProperty("Price") + "-- --" + item.getItemProperty("Delete"));
-    
+                        Item item = loots.getItem(iid);
+                        if (item.getItemProperty("Delete").toString().equalsIgnoreCase("True")) {
+                                removeLootFromCharacter(item);
+                        } else {
+                                updateLootForCharacter(item, iid.getId());
+                        }
+
                 }
         }
 
@@ -261,6 +306,8 @@ public class CharacterEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         doUpdateLoots();
+                        notifyListeners();
+                        close();
                 }
         }
 }

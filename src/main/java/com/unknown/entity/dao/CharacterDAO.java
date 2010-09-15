@@ -7,6 +7,7 @@ package com.unknown.entity.dao;
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.User;
+import com.vaadin.data.Property;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -35,4 +36,8 @@ public interface CharacterDAO {
         public int addNewSiteUser(String username, String password, int rank);
 
         public String getAttendanceRaids(User user);
+
+        public void removeLootFromCharacter(String itemname, User user);
+
+        public void updateLootForCharacter(String itemname, double price, boolean heroic, User user, int lootid);
 }

@@ -14,7 +14,6 @@ public class CharacterItem {
         private String name;
         private double price;
         boolean heroic;
-        boolean delete;
 
         public int getId() {
 		return id;
@@ -45,12 +44,5 @@ public class CharacterItem {
 
         public boolean getHeroic() {
                 return heroic;
-        }
-
-        public void setDelete(boolean delete) {
-                this.delete = delete;
-        }
-        public boolean getDelete() {
-                return delete;
         }
 }
