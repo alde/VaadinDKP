@@ -11,6 +11,7 @@ import com.unknown.entity.items.*;
 import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidItem;
 import com.unknown.entity.raids.RaidReward;
+import com.unknown.entity.raids.RaidRewardList;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
@@ -48,6 +49,8 @@ public class RaidInfoWindow extends Window {
 
                 hzl.addComponent(getTable(rewardList(raid)));
                 hzl.addComponent(getTable(lootList(raid)));
+                RaidRewardList rrList = new RaidRewardList(raid);
+                hzl.addComponent(rrList);
 
                 addComponent(hzl);
         }
