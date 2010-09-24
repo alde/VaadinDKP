@@ -29,27 +29,16 @@
                                 <version>2.2</version>
                                 <configuration>
                                         <archive>
-                                                <index>true</index>
-                                                <manifest>
-                                                        <addClasspath>true</addClasspath>
-                            <!-- Implementation-Title and Implementation-Version come from the POM by default -->
-                                                        <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                                </manifest>
-                                                <manifestEntries>
-                            <!-- Package format version - do not change -->
-                                                        <Vaadin-Package-Version>1</Vaadin-Package-Version>
-
-                            <!-- Add-on specific fields to update -->
-
-                            <!-- Implementation-Title and Implementation-Version come from the POM by default -->
-                            <!--
-                            <Implementation-Title>${pom.name}</Implementation-Title>
-                            <Implementation-Version>${pom.version}</Implementation-Version>
-                            -->
-
-                            <!-- Comma-separated list of widgetsets in the package -->
-                                                        <Vaadin-Widgetsets>com.unknown.entity.gwt.MyWidgetSet</Vaadin-Widgetsets>
-                                                </manifestEntries>
+                                          <index>true</index>
+                                          <manifest>
+                                            <addClasspath>true</addClasspath>
+                                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                          </manifest>
+                                          <manifestEntries>
+                                            <Vaadin-Package-Version>1</Vaadin-Package-Version>
+                                            
+                                            <Vaadin-Widgetsets>com.unknown.entity.gwt.MyWidgetSet</Vaadin-Widgetsets>
+                                          </manifestEntries>
                                         </archive>
                                 </configuration>
                         </plugin>
@@ -148,18 +137,22 @@
         </build>
 
         <repositories>
-                <repository>
-                        <id>vaadin-snapshots</id>
-                        <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-                        <releases>
-                                <enabled>false</enabled>
-                        </releases>
-                        <snapshots>
-                                <enabled>true</enabled>
-                        </snapshots>
-                </repository>
+          <repository>
+            <id>vaadin-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+            <releases>
+              <enabled>false</enabled>
+            </releases>
+            <snapshots>
+              <enabled>true</enabled>
+            </snapshots>
+          </repository>
+          <repository>
+            <id>vaadin-addons</id>
+            <url>http://maven.vaadin.com/vaadin-addons</url>
+          </repository>
         </repositories>
-
+        
         <pluginRepositories>
                 <pluginRepository>
                         <id>mojo-snapshots</id>
@@ -225,10 +218,11 @@
                         <version>1.6.1</version>
                 </dependency>
                 <dependency>
-                        <groupId>org.vaadin</groupId>
-                        <artifactId>SuperImmediateTextField</artifactId>
-                        <version>1.0.0</version>
+                  <groupId>org.vaadin.addons</groupId>
+                  <artifactId>superimmediatetextfield</artifactId>
+                  <version>1.0.0</version>
                 </dependency>
+                
         </dependencies>
 
 </project>
