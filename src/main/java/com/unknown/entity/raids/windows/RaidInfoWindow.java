@@ -47,10 +47,10 @@ public class RaidInfoWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
 
-                hzl.addComponent(getTable(rewardList(raid)));
-                hzl.addComponent(getTable(lootList(raid)));
                 RaidRewardList rrList = new RaidRewardList(raid);
                 hzl.addComponent(rrList);
+                rrList.addListener(new RewardListClickListener());
+                hzl.addComponent(getTable(lootList(raid)));
 
                 addComponent(hzl);
         }
@@ -67,16 +67,6 @@ public class RaidInfoWindow extends Window {
                 tbl.addContainerProperty("Item", String.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
                 tbl.addContainerProperty("Heroic", String.class, "");
-        }
-
-        private void raidInfoWindowRewardListAddRow(Item addItem, RaidReward reward) throws ReadOnlyException, ConversionException {
-                addItem.getItemProperty("Comment").setValue(reward.getComment());
-                addItem.getItemProperty("Shares").setValue(reward.getShares());
-        }
-
-        private void raidInfoWindowRewardListSetHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Comment", String.class, "");
-                tbl.addContainerProperty("Shares", Integer.class, "");
         }
 
         private void raidInformation() {
@@ -97,20 +87,6 @@ public class RaidInfoWindow extends Window {
                 }
                 tbl.addListener(new LootListClickListener());
                 return tbl;
-        }
-
-        private Table rewardList(final Raid raid) {
-                Table tbl = new Table();
-                tbl.addStyleName("small");
-                raidInfoWindowRewardListSetHeaders(tbl);
-                tbl.setHeight("150px");
-                for (RaidReward reward : raid.getRaidRewards()) {
-                        Item addItem = tbl.addItem(reward);
-                        raidInfoWindowRewardListAddRow(addItem, reward);
-                }
-                tbl.addListener(new RewardListClickListener());
-                return tbl;
-
         }
 
         private Component getTable(Table rewards) {

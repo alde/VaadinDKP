@@ -5,8 +5,11 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.raids.windows.RewardAttendantsWindow;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
 import java.util.List;
 
@@ -16,20 +19,19 @@ import java.util.List;
  */
 public class RaidRewardList extends Table implements RaidInfoListener {
 
-        // private RaidDAO raidDAO;
         IndexedContainer ic;
         private final RaidRewardList raidRewardList = this;
         private Raid raid;
 
         public RaidRewardList(Raid raid) {
-              //  this.raidDAO = raidDAO;
                 this.ic = new IndexedContainer();
                 this.raid = raid;
                 this.setSelectable(true);
                 this.setHeight("500px");
                 this.setWidth("300px");
-                //       this.addListener(new RaidListClickListener());
+                this.addListener(new RewardListClickListener());
                 raidRewardListSetHeaders();
+                printList();
         }
 
         private void update() {
@@ -40,7 +42,7 @@ public class RaidRewardList extends Table implements RaidInfoListener {
 
         @Override
         public void onRaidInfoChanged() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                update();
         }
 
         private void raidRewardListSetHeaders() {
@@ -55,6 +57,7 @@ public class RaidRewardList extends Table implements RaidInfoListener {
 
         public void printList() {
                 List<RaidReward> rewards = raid.getRaidRewards();
+                System.out.println("++++ ---- "+ raid.getRaidRewards());
                 for (RaidReward rreward : rewards) {
                         Item addItem = addItem(rreward);
                         raidListAddRow(addItem, rreward);
@@ -62,7 +65,20 @@ public class RaidRewardList extends Table implements RaidInfoListener {
         }
 
         private void raidListAddRow(Item addItem, RaidReward rreward) {
+                System.out.println(rreward.getComment());
                 addItem.getItemProperty("Comment").setValue(rreward.getComment());
                 addItem.getItemProperty("Shares").setValue(rreward.getShares());
         }
+
+        private class RewardListClickListener implements ItemClickListener {
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                        RaidReward rreward = (RaidReward) event.getItemId();
+                        RewardAttendantsWindow info = new RewardAttendantsWindow(rreward.getRewardChars());
+                        info.printInfo();
+                        getApplication().getMainWindow().addWindow(info);
+                }
+        }
+
 }
