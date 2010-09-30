@@ -4,8 +4,7 @@
  */
 package com.unknown.entity.raids;
 
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.raids.windows.RewardAttendantsWindow;
+import com.unknown.entity.PopUpControl;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -17,7 +16,7 @@ import java.util.List;
  *
  * @author alde
  */
-public class RaidRewardList extends Table implements RaidInfoListener {
+public class RaidRewardList extends Table implements RaidRewardListener {
 
         IndexedContainer ic;
         private final RaidRewardList raidRewardList = this;
@@ -75,9 +74,9 @@ public class RaidRewardList extends Table implements RaidInfoListener {
                 @Override
                 public void itemClick(ItemClickEvent event) {
                         RaidReward rreward = (RaidReward) event.getItemId();
-                        RewardAttendantsWindow info = new RewardAttendantsWindow(rreward.getRewardChars());
-                        info.printInfo();
-                        getApplication().getMainWindow().addWindow(info);
+                        PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
+                        pop.setRaidRewardList(raidRewardList);
+                        pop.showProperRaidRewardWindow(rreward);
                 }
         }
 

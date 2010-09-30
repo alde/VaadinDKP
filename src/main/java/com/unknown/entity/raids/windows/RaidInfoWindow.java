@@ -49,7 +49,7 @@ public class RaidInfoWindow extends Window {
 
                 RaidRewardList rrList = new RaidRewardList(raid);
                 hzl.addComponent(rrList);
-                rrList.addListener(new RewardListClickListener());
+       //         rrList.addListener(new RewardListClickListener());
                 hzl.addComponent(getTable(lootList(raid)));
 
                 addComponent(hzl);
@@ -97,7 +97,7 @@ public class RaidInfoWindow extends Window {
                 }
         }
 
-        private class RewardListClickListener implements ItemClickListener {
+   /*     private class RewardListClickListener implements ItemClickListener {
 
                 public RewardListClickListener() {
                 }
@@ -110,7 +110,7 @@ public class RaidInfoWindow extends Window {
                         getApplication().getMainWindow().addWindow(info);
                 }
         }
-
+*/
         private class LootListClickListener implements ItemClickListener {
 
                 public LootListClickListener() {

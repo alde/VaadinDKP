@@ -5,6 +5,8 @@
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.raids.RaidChar;
+import com.unknown.entity.raids.RaidRewardList;
+import com.unknown.entity.raids.RaidRewardListener;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
@@ -13,6 +15,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +25,7 @@ import java.util.List;
 public class RewardAttendantsWindow extends Window {
 
 	private final List<RaidChar> chars;
+        private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
 
 	public RewardAttendantsWindow(List<RaidChar> chars) {
 		this.chars = chars;
@@ -69,5 +73,9 @@ public class RewardAttendantsWindow extends Window {
 		} else {
 			return new Label("No members in this reward.");
 		}
+        }
+
+        public void addRaidRewardInfoListener(RaidRewardListener listener) {
+                listeners.add(listener);
         }
 }
