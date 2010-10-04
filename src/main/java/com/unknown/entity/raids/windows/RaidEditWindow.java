@@ -44,7 +44,6 @@ public class RaidEditWindow extends Window {
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
                 this.setCaption("Edit raid: " + raid.getName());
-
         }
 
         public void printInfo() {
@@ -53,7 +52,9 @@ public class RaidEditWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
 
-                hzl.addComponent(getTable(rewardList(raid)));
+                RaidRewardList rrList = new RaidRewardList(raid);
+                hzl.addComponent(rrList);
+
                 hzl.addComponent(getTable(lootList(raid)));
 
                 Button addReward = new Button("Add Reward");
@@ -105,16 +106,6 @@ public class RaidEditWindow extends Window {
                 tbl.addContainerProperty("Heroic", String.class, "");
         }
 
-        private void RaidInfoWindowRewardListAddRow(Item addItem, RaidReward reward) throws ReadOnlyException, ConversionException {
-                addItem.getItemProperty("Comment").setValue(reward.getComment());
-                addItem.getItemProperty("Shares").setValue(reward.getShares());
-        }
-
-        private void RaidInfoWindowRewardListSetHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Comment", String.class, "");
-                tbl.addContainerProperty("Shares", Integer.class, "");
-        }
-
         private void raidInformation() {
                 RaidDAO raidDAO = new RaidDB();
                 List<String> zoneList = raidDAO.getRaidZoneList();
@@ -162,20 +153,6 @@ public class RaidEditWindow extends Window {
                 }
                 tbl.addListener(new RaidEditLootListListener(raid));
                 return tbl;
-        }
-
-        private Table rewardList(final Raid raid) {
-                Table tbl = new Table();
-                RaidInfoWindowRewardListSetHeaders(tbl);
-                tbl.setHeight(150);
-                for (RaidReward reward : raid.getRaidRewards()) {
-                        Item addItem = tbl.addItem(reward);
-                        RaidInfoWindowRewardListAddRow(addItem, reward);
-                }
-                tbl.addListener(new RaidEditRewardListListener());
-
-                return tbl;
-
         }
 
         private Component getTable(Table rewards) {
@@ -235,20 +212,6 @@ public class RaidEditWindow extends Window {
                 public void itemClick(ItemClickEvent event) {
                         RaidItem ritem = (RaidItem) event.getItemId();
                         RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
-                        info.printInfo();
-                        getApplication().getMainWindow().addWindow(info);
-                }
-        }
-
-        private class RaidEditRewardListListener implements ItemClickListener {
-
-                public RaidEditRewardListListener() {
-                }
-
-                @Override
-                public void itemClick(ItemClickEvent event) {
-                        RaidReward rreward = (RaidReward) event.getItemId();
-                        RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
                         info.printInfo();
                         getApplication().getMainWindow().addWindow(info);
                 }

@@ -54,7 +54,7 @@ public class RaidRewardList extends Table implements RaidRewardListener {
                 this.removeAllItems();
         }
 
-        public void printList() {
+        private void printList() {
                 List<RaidReward> rewards = raid.getRaidRewards();
                 System.out.println("++++ ---- "+ raid.getRaidRewards());
                 for (RaidReward rreward : rewards) {

@@ -28,6 +28,7 @@ public class PopUpControl extends Window {
         private DkpList dkpList;
         private final Application app;
         private RaidRewardList raidRewardList;
+        private RaidLootList raidLootList;
 
         public PopUpControl(Application app) {
                 this.app = app;
@@ -132,7 +133,7 @@ public class PopUpControl extends Window {
 
         public void showProperRaidRewardWindow(RaidReward rreward) {
                if (isAdmin()) {
-
+                        showRaidRewardEditWindow(rreward);
                } else {
                         showRaidRewardInfoWindow(rreward);
                }
@@ -143,5 +144,15 @@ public class PopUpControl extends Window {
                 info.printInfo();
                 info.addRaidRewardInfoListener(raidRewardList);
                 app.getMainWindow().addWindow(info);
+        }
+
+        private void showRaidRewardEditWindow(RaidReward rreward) {
+                 RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
+                 info.printInfo();
+                 app.getMainWindow().addWindow(info);
+        }
+
+        public void setRaidLootList(RaidLootList raidLootList) {
+                this.raidLootList = raidLootList;
         }
 }

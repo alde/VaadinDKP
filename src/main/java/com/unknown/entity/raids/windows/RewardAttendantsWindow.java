@@ -5,7 +5,6 @@
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.raids.RaidChar;
-import com.unknown.entity.raids.RaidRewardList;
 import com.unknown.entity.raids.RaidRewardListener;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;

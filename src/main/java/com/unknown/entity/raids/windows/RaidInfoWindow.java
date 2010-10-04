@@ -49,7 +49,6 @@ public class RaidInfoWindow extends Window {
 
                 RaidRewardList rrList = new RaidRewardList(raid);
                 hzl.addComponent(rrList);
-       //         rrList.addListener(new RewardListClickListener());
                 hzl.addComponent(getTable(lootList(raid)));
 
                 addComponent(hzl);
@@ -96,21 +95,7 @@ public class RaidInfoWindow extends Window {
                         return new Label("No rewards in this raid.");
                 }
         }
-
-   /*     private class RewardListClickListener implements ItemClickListener {
-
-                public RewardListClickListener() {
-                }
-
-                @Override
-                public void itemClick(ItemClickEvent event) {
-                        RaidReward rreward = (RaidReward) event.getItemId();
-                        RewardAttendantsWindow info = new RewardAttendantsWindow(rreward.getRewardChars());
-                        info.printInfo();
-                        getApplication().getMainWindow().addWindow(info);
-                }
-        }
-*/
+        
         private class LootListClickListener implements ItemClickListener {
 
                 public LootListClickListener() {

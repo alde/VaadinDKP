@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author alde
  */
-class RaidRewardEditWindow extends Window {
+public class RaidRewardEditWindow extends Window {
 
         private final List<RaidChar> chars;
         private final int shares;
@@ -37,7 +37,7 @@ class RaidRewardEditWindow extends Window {
         private final RaidDAO raidDao;
         private final CharacterDAO chardao;
 
-        RaidRewardEditWindow(RaidReward reward) {
+        public RaidRewardEditWindow(RaidReward reward) {
                 this.reward = reward;
                 this.chars = reward.getRewardChars();
                 this.shares = reward.getShares();
@@ -86,7 +86,6 @@ class RaidRewardEditWindow extends Window {
         }
 
         private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException {
-                RaidDAO raidDao = new RaidDB();
                 return raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
@@ -100,7 +99,6 @@ class RaidRewardEditWindow extends Window {
         }
 
         private int removeReward(RaidReward reward) {
-                RaidDAO raidDao = new RaidDB();
                 try {
                         return raidDao.removeReward(reward);
                 } catch (SQLException ex) {
