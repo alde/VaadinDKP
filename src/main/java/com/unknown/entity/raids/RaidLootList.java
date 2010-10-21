@@ -1,13 +1,17 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.dao.ItemDAO;
+import com.unknown.entity.database.ItemDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -54,9 +58,18 @@ public class RaidLootList extends Table implements RaidLootListener {
         }
 
         private void printList() {
-                for (RaidItem item : raid.getRaidItems()) {
-                        Item addItem = ic.addItem(item);
-                        raidListAddRow(addItem, item);
+                ItemDAO itemDao = new ItemDB();
+                ArrayList<RaidItem> temp;
+                try {
+                        temp = itemDao.getItemsForRaid(raid.getId());
+                        System.out.println("Raid Loots: " + temp.size());
+                        for (RaidItem item : temp) {
+                                System.out.println("Loot ... " + item.getName());
+                                Item addItem = ic.addItem(item);
+                                raidListAddRow(addItem, item);
+                        }
+                } catch (SQLException ex) {
+                        Logger.getLogger(RaidLootList.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
 

@@ -35,6 +35,7 @@ public class RaidLootEditWindow extends Window {
         CharacterDAO characterDao;
         ItemDAO itemDao;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
+        private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
 
         public RaidLootEditWindow(Raid raid, RaidItem item) {
                 this.item = item;
@@ -91,9 +92,16 @@ public class RaidLootEditWindow extends Window {
                 listeners.add(listener);
         }
 
+        public void addCharacterInfoListener(CharacterInfoListener lstnr)  {
+                charinfolisteners.add(lstnr);
+        }
+
         private void notifyListeners() {
                 for (RaidLootListener raidListener : listeners) {
                         raidListener.onRaidInfoChanged();
+                }
+                for (CharacterInfoListener cinfoListener : charinfolisteners) {
+                        cinfoListener.onCharacterInfoChange();
                 }
         }
 

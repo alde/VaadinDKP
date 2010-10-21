@@ -67,12 +67,7 @@ public class RaidDB implements RaidDAO {
                         p.setInt(1, raidId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
-                                RaidItem item = new RaidItem();
-                                item.setId(rs.getInt("loots.id"));
-                                item.setLooter(rs.getString("characters.name"));
-                                item.setName(rs.getString("items.name"));
-                                item.setPrice(rs.getDouble("loots.price"));
-                                item.setHeroic(rs.getBoolean("loots.heroic"));
+                                RaidItem item = new RaidItem(rs.getString("items.name"),rs.getString("characters.name"),rs.getInt("loots.id"),rs.getDouble("loots.price"),rs.getBoolean("loots.heroic"));
                                 raidItems.add(item);
                         }
                 } catch (SQLException e) {

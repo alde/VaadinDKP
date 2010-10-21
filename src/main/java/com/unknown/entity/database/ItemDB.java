@@ -11,6 +11,7 @@ import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
+import com.unknown.entity.raids.RaidItem;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -285,5 +286,20 @@ public class ItemDB implements ItemDAO {
                 c.closeStatement();
                 c.close();
                 return success;
+        }
+
+        @Override
+        public ArrayList<RaidItem> getItemsForRaid(int id) throws SQLException {
+                DBConnection c = new DBConnection();
+                ArrayList<RaidItem> items = new ArrayList<RaidItem>();
+                PreparedStatement p = c.prepareStatement("SELECT * FROM loots JOIN items ON loots.item_id = items.id JOIN characters ON loots.character_id = characters.id WHERE loots.raid_id = ?");
+                p.setInt(1, id);
+                ResultSet rs = p.executeQuery();
+                while (rs.next()) {
+                        RaidItem tmp = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.item_id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
+                        items.add(tmp);
+                        System.out.println(rs.toString());
+                }
+                return items;
         }
 }

@@ -150,6 +150,7 @@ public class PopUpControl extends Window {
                  RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
                  info.printInfo();
                  info.addRaidRewardInfoListener(raidRewardList);
+                 info.addCharacterInfoListener(charList);
                  app.getMainWindow().addWindow(info);
         }
 
@@ -169,6 +170,7 @@ public class PopUpControl extends Window {
                  RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
                  info.printInfo();
                  info.addRaidLootInfoListener(raidLootList);
+                 info.addCharacterInfoListener(charList);
                  app.getMainWindow().addWindow(info);
         }
 }

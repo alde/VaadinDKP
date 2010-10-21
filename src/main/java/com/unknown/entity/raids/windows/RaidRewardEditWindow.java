@@ -5,13 +5,10 @@
 package com.unknown.entity.raids.windows;
 
 import com.google.common.collect.ImmutableList;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
-import com.unknown.entity.database.RaidDB;
-import com.unknown.entity.raids.RaidChar;
-import com.unknown.entity.raids.RaidReward;
-import com.unknown.entity.raids.RaidRewardListener;
+import com.unknown.entity.character.CharacterInfoListener;
+import com.unknown.entity.dao.*;
+import com.unknown.entity.database.*;
+import com.unknown.entity.raids.*;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -33,6 +30,7 @@ import java.util.logging.Logger;
 public class RaidRewardEditWindow extends Window {
 
         private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
+        private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
         private final List<RaidChar> chars;
         private final int shares;
         private final RaidReward reward;
@@ -109,6 +107,9 @@ public class RaidRewardEditWindow extends Window {
                 for (RaidRewardListener raidListener : listeners) {
                         raidListener.onRaidInfoChanged();
                 }
+                for (CharacterInfoListener cinfoListener : charinfolisteners) {
+                        cinfoListener.onCharacterInfoChange();
+                }
         }
 
         private int removeReward(RaidReward reward) {
@@ -168,6 +169,9 @@ public class RaidRewardEditWindow extends Window {
 
         public void addRaidRewardInfoListener(RaidRewardListener listener) {
                 listeners.add(listener);
+        }
+        public void addCharacterInfoListener(CharacterInfoListener lstnr)  {
+                charinfolisteners.add(lstnr);
         }
 
         private class RemoveButtonClickListener implements ClickListener {

@@ -19,6 +19,15 @@ public class RaidItem {
 	private String looter;
 	private String name;
 	private double price;
+
+        public RaidItem (String itemname, String looter, int itemid, double price, boolean isheroic) {
+                this.name = itemname;
+                this.looter = looter;
+                this.id = itemid;
+                this.price = price;
+                this.heroic = isheroic;
+        }
+        
 	public void setId(Integer integer) {
 	}
 
@@ -66,6 +75,4 @@ public class RaidItem {
                 ItemDAO itemDao = new ItemDB();
                 return itemDao.getSingleItem(this.name);
         }
-
-
 }

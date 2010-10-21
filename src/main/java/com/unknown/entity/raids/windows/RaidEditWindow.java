@@ -55,8 +55,9 @@ public class RaidEditWindow extends Window {
                 RaidRewardList rrList = new RaidRewardList(raid);
                 hzl.addComponent(rrList);
 
-                hzl.addComponent(getTable(lootList(raid)));
-
+                RaidLootList rlList = new RaidLootList(raid);
+                hzl.addComponent(rlList);
+                
                 Button addReward = new Button("Add Reward");
                 addReward.addListener(new Button.ClickListener() {
 

@@ -9,8 +9,10 @@ import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
+import com.unknown.entity.raids.RaidItem;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,5 +39,7 @@ public interface ItemDAO {
         public void updateDefaultPrice(String slot, double normalprice, double heroicprice);
 
         public int deleteItem(int id) throws SQLException;
+
+        public ArrayList<RaidItem> getItemsForRaid(int id) throws SQLException;
 
 }
