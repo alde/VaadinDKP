@@ -1,6 +1,8 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;

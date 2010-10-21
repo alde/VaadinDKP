@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  *
  * @author alde
  */
-public class RaidRewardEditWindow extends Window implements RaidRewardListener {
+public class RaidRewardEditWindow extends Window {
 
         private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
         private final List<RaidChar> chars;
@@ -39,7 +39,6 @@ public class RaidRewardEditWindow extends Window implements RaidRewardListener {
         private final String oldcomment;
         private final RaidDAO raidDao;
         private final CharacterDAO chardao;
-        private TextField attendants;
 
         public RaidRewardEditWindow(RaidReward reward) {
                 this.reward = reward;
@@ -58,8 +57,8 @@ public class RaidRewardEditWindow extends Window implements RaidRewardListener {
         public void printInfo() {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
-                
-                attendantList();
+
+                final TextField attendants = charList();
                 hzl.addComponent(attendants);
 
                 VerticalLayout vert = new VerticalLayout();
@@ -87,10 +86,6 @@ public class RaidRewardEditWindow extends Window implements RaidRewardListener {
 
                 hzl.addComponent(vert);
                 addComponent(hzl);
-        }
-
-        private void attendantList() {
-                this.attendants = charList();
         }
 
         private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException {
@@ -130,11 +125,6 @@ public class RaidRewardEditWindow extends Window implements RaidRewardListener {
                 for (String s : invalidchars) {
                         addComponent(new Label(s));
                 }
-        }
-
-        @Override
-        public void onRaidInfoChanged() {
-                
         }
 
         private class UpdateButtonClickListener implements ClickListener {
@@ -188,6 +178,7 @@ public class RaidRewardEditWindow extends Window implements RaidRewardListener {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         int success = removeReward(reward);
+                        System.out.println(success + " rewards removed.");
                 }
         }
 

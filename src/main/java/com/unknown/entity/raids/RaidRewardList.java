@@ -5,12 +5,18 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,11 +61,17 @@ public class RaidRewardList extends Table implements RaidRewardListener {
         }
 
         private void printList() {
-                List<RaidReward> rewards = raid.getRaidRewards();
-                System.out.println("++++ ---- " + raid.getRaidRewards());
-                for (RaidReward rreward : rewards) {
-                        Item addItem = addItem(rreward);
-                        raidListAddRow(addItem, rreward);
+                RaidDAO raidDao = new RaidDB();
+                Collection<RaidReward> rewards;
+                try {
+                        rewards = raidDao.getRewardsForRaid(this.raid.getId());
+                        System.out.println("++++ ---- " + raid.getRaidRewards());
+                        for (RaidReward rreward : rewards) {
+                                Item addItem = addItem(rreward);
+                                raidListAddRow(addItem, rreward);
+                        }
+                } catch (SQLException ex) {
+                        Logger.getLogger(RaidRewardList.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
 

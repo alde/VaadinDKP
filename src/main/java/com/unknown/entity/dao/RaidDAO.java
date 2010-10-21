@@ -21,6 +21,8 @@ public interface RaidDAO {
 
         public List<Raid> getRaids();
 
+        public Collection<RaidChar> getCharsForReward(int id) throws SQLException;
+        
         public List<String> getRaidZoneList();
 
         public int addNewRaid(String zone, String comment, String date);
@@ -50,4 +52,6 @@ public interface RaidDAO {
         public int getAttendedRaidsLastThirtyDays(User user);
 
         public int doUpdateLoot(RaidItem item);
+        
+        public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException;
 }

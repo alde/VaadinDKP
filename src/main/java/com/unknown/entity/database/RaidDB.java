@@ -184,7 +184,8 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        private Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException {
+        @Override
+        public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException {
                 System.out.println("getting rewards for raid: " + raidId);
                 Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
@@ -213,7 +214,8 @@ public class RaidDB implements RaidDAO {
 
         }
 
-        private Collection<RaidChar> getCharsForReward(int id) throws SQLException {
+        @Override
+        public Collection<RaidChar> getCharsForReward(int id) throws SQLException {
                 Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
