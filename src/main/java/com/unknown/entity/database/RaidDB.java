@@ -16,12 +16,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -598,5 +595,22 @@ public class RaidDB implements RaidDAO {
                         e.printStackTrace();
                 }
                 return i;
+        }
+
+        @Override
+        public int doUpdateLoot(RaidItem item) {
+                ItemDAO itemDao = new ItemDB();
+                CharacterDAO charDao = new CharacterDB();
+                try {
+                        DBConnection c = new DBConnection();
+                        PreparedStatement p = c.prepareStatement("UPDATE loots SET price=? , item_id=? , character_id=? , heroic=? WHERE id=?");
+                        p.setDouble(1, item.getPrice());
+                        p.setInt(2, itemDao.getItemId(c.getConnection(), item.getName()));
+                        p.setInt(3, charDao.getCharacterId(item.getLooter()));
+                        p.setBoolean(4, item.isHeroic());
+                        p.setInt(5, item.getId());
+                } catch (SQLException ex) {
+                }
+                return 0;
         }
 }

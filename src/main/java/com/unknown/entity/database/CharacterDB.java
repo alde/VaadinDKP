@@ -93,21 +93,21 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-	public int getCharacterId(String charname) throws SQLException {
-		DBConnection c = new DBConnection();
-		int charid=0;
-		try {
-			PreparedStatement pclass = c.prepareStatement("SELECT * FROM characters WHERE name=?");
-			pclass.setString(1, charname);
-			ResultSet rclass = pclass.executeQuery();
-			while (rclass.next()) {
-				charid = rclass.getInt("id");
-			}
-		} finally {
-			c.close();
-		}
-		return charid;
-	}
+        public int getCharacterId(String charname) throws SQLException {
+                DBConnection c = new DBConnection();
+                int charid = 0;
+                try {
+                        PreparedStatement pclass = c.prepareStatement("SELECT * FROM characters WHERE name=?");
+                        pclass.setString(1, charname);
+                        ResultSet rclass = pclass.executeQuery();
+                        while (rclass.next()) {
+                                charid = rclass.getInt("id");
+                        }
+                } finally {
+                        c.close();
+                }
+                return charid;
+        }
 
         private int getSharesForCharacterById(ResultSet rs, ResultSet rss, int shares) throws SQLException {
                 if (rs.getInt("characters.id") == rss.getInt("character_rewards.character_id")) {
@@ -189,7 +189,7 @@ public class CharacterDB implements CharacterDAO {
         @Override
         public int addNewSiteUser(String username, String password, int rank) {
                 Connection c = null;
-                int success=0;
+                int success = 0;
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("INSERT INTO users (name, password, rank) VALUES(?,?,?)");
@@ -211,24 +211,29 @@ public class CharacterDB implements CharacterDAO {
                 return success;
         }
 
-	@Override
-	public ImmutableList<String> getUserNames() {
-		Builder<String> userNameBuilder = ImmutableList.builder();
-		for (User user : getUsers()) {
-			userNameBuilder.add(user.getUsername());
-		}
-		return userNameBuilder.build();
+        @Override
+        public ImmutableList<String> getUserNames() {
+                Builder<String> userNameBuilder = ImmutableList.builder();
+                for (User user : getUsers()) {
+                        userNameBuilder.add(user.getUsername());
+                }
+                return userNameBuilder.build();
 
-	}
+        }
 
         @Override
         public String getAttendanceRaids(User user) {
                 String foo = "";
                 int amountofRaids = raidDao.getTotalRaidsLastThirtyDays();
                 int attendedRaids = raidDao.getAttendedRaidsLastThirtyDays(user);
-                System.out.println("amount fo raids = "+amountofRaids + " -- attended raids = " + attendedRaids);
-                double temp = attendedRaids*100/amountofRaids;
-                foo = ""+temp;
+                System.out.println("amount fo raids = " + amountofRaids + " -- attended raids = " + attendedRaids);
+                double temp = 0;
+                if (amountofRaids == 0) {
+                        temp = 0;
+                } else {
+                        temp = attendedRaids * 100 / amountofRaids;
+                }
+                foo = "" + temp;
                 return foo;
         }
 
@@ -245,7 +250,7 @@ public class CharacterDB implements CharacterDAO {
                         p.setInt(2, charid);
                         int success = p.executeUpdate();
                         System.out.println(success + " items deleted.");
-                 } catch (SQLException e) {
+                } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
                         if (c != null) {
@@ -260,7 +265,7 @@ public class CharacterDB implements CharacterDAO {
 
         @Override
         public void updateLootForCharacter(String itemname, double price, boolean heroic, User user, int lootid) {
-                               Connection c = null;
+                Connection c = null;
 
                 try {
                         c = new DBConnection().getConnection();
@@ -278,7 +283,7 @@ public class CharacterDB implements CharacterDAO {
                         p.setInt(7, lootid);
                         int success = p.executeUpdate();
                         System.out.println(success + " items updated.");
-                 } catch (SQLException e) {
+                } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
                         if (c != null) {

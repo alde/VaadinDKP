@@ -11,6 +11,7 @@ import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.RaidChar;
 import com.unknown.entity.raids.RaidReward;
+import com.unknown.entity.raids.RaidRewardListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -20,6 +21,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,14 +30,16 @@ import java.util.logging.Logger;
  *
  * @author alde
  */
-public class RaidRewardEditWindow extends Window {
+public class RaidRewardEditWindow extends Window implements RaidRewardListener {
 
+        private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
         private final List<RaidChar> chars;
         private final int shares;
         private final RaidReward reward;
         private final String oldcomment;
         private final RaidDAO raidDao;
         private final CharacterDAO chardao;
+        private TextField attendants;
 
         public RaidRewardEditWindow(RaidReward reward) {
                 this.reward = reward;
@@ -54,8 +58,8 @@ public class RaidRewardEditWindow extends Window {
         public void printInfo() {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
-
-                final TextField attendants = charList();
+                
+                attendantList();
                 hzl.addComponent(attendants);
 
                 VerticalLayout vert = new VerticalLayout();
@@ -85,6 +89,10 @@ public class RaidRewardEditWindow extends Window {
                 addComponent(hzl);
         }
 
+        private void attendantList() {
+                this.attendants = charList();
+        }
+
         private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException {
                 return raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
@@ -96,6 +104,16 @@ public class RaidRewardEditWindow extends Window {
                         characters.setValue(characters.getValue().toString() + character.getName() + "\n");
                 }
                 return characters;
+        }
+
+         public void addRaidInfoListener(RaidRewardListener listener) {
+                listeners.add(listener);
+        }
+
+        private void notifyListeners() {
+                for (RaidRewardListener raidListener : listeners) {
+                        raidListener.onRaidInfoChanged();
+                }
         }
 
         private int removeReward(RaidReward reward) {
@@ -112,6 +130,11 @@ public class RaidRewardEditWindow extends Window {
                 for (String s : invalidchars) {
                         addComponent(new Label(s));
                 }
+        }
+
+        @Override
+        public void onRaidInfoChanged() {
+                
         }
 
         private class UpdateButtonClickListener implements ClickListener {
@@ -135,19 +158,26 @@ public class RaidRewardEditWindow extends Window {
                                 List<String> invalidchars = raidDao.findInvalidCharacters(attendantlist, chardao);
                                 if (invalidchars.isEmpty()) {
                                         updateReward(reward, attendantlist, newShares, newComment);
+                                        System.out.println("Blaaaaaaaaaaaaa"+ reward.getComment());
                                 } else {
                                         showInvalidUsers(invalidchars);
+                                        System.out.println(invalidchars.toString());
                                 }
 
                         } catch (SQLException ex) {
                                 Logger.getLogger(RaidRewardEditWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        notifyListeners();
                 }
 
                 private ImmutableList<String> splitCharsToArray(String attendants) {
                         String[] parts = attendants.split("\n");
                         return ImmutableList.of(parts);
                 }
+        }
+
+        public void addRaidRewardInfoListener(RaidRewardListener listener) {
+                listeners.add(listener);
         }
 
         private class RemoveButtonClickListener implements ClickListener {

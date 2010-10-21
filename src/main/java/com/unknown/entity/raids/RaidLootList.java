@@ -22,7 +22,7 @@ public class RaidLootList extends Table implements RaidLootListener {
                 this.raid = raid;
                 this.setSelectable(true);
                 this.setHeight("500px");
-                this.setWidth("300px");
+                this.setWidth("450px");
                 this.addListener(new RewardListClickListener());
                 raidRewardListSetHeaders();
                 printList();
@@ -69,10 +69,12 @@ public class RaidLootList extends Table implements RaidLootListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        RaidReward rreward = (RaidReward) event.getItemId();
-                        PopUpControl pop = new PopUpControl(RaidLootList.this.getApplication());
-                        pop.setRaidLootList(raidLootList);
-                        pop.showProperRaidRewardWindow(rreward);
+                        if (event.isDoubleClick()) {
+                                RaidItem ritem = (RaidItem) event.getItemId();
+                                PopUpControl pop = new PopUpControl(RaidLootList.this.getApplication());
+                                pop.setRaidLootList(raidLootList);
+                                pop.showProperRaidLootWindow(raid, ritem);
+                        }
                 }
         }
 }

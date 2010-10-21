@@ -14,6 +14,7 @@ import com.unknown.entity.items.*;
 import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidChar;
 import com.unknown.entity.raids.RaidInfoListener;
+import com.unknown.entity.raids.RaidLootListener;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -44,7 +45,7 @@ public class RaidLootAddWindow extends Window {
         RaidDAO raidDao;
         ItemDAO itemDao;
         CharacterDAO characterDao;
-        private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
+        private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
 
         RaidLootAddWindow(Raid raid) {
                 this.raid = raid;
@@ -162,12 +163,12 @@ public class RaidLootAddWindow extends Window {
                 return lootlist;
         }
 
-        public void addRaidInfoListener(RaidInfoListener listener) {
+        public void addRaidInfoListener(RaidLootListener listener) {
                 listeners.add(listener);
         }
 
          private void notifyListeners() {
-                for (RaidInfoListener raidListener : listeners) {
+                for (RaidLootListener raidListener : listeners) {
                         raidListener.onRaidInfoChanged();
                 }
         }

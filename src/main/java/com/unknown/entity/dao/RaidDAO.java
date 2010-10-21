@@ -48,4 +48,6 @@ public interface RaidDAO {
         public int getTotalRaidsLastThirtyDays();
 
         public int getAttendedRaidsLastThirtyDays(User user);
+
+        public int doUpdateLoot(RaidItem item);
 }

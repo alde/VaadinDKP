@@ -56,7 +56,7 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
         private void printList() {
                 List<RaidReward> rewards = raid.getRaidRewards();
-                System.out.println("++++ ---- "+ raid.getRaidRewards());
+                System.out.println("++++ ---- " + raid.getRaidRewards());
                 for (RaidReward rreward : rewards) {
                         Item addItem = addItem(rreward);
                         raidListAddRow(addItem, rreward);
@@ -73,11 +73,12 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        RaidReward rreward = (RaidReward) event.getItemId();
-                        PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
-                        pop.setRaidRewardList(raidRewardList);
-                        pop.showProperRaidRewardWindow(rreward);
+                        if (event.isDoubleClick()) {
+                                RaidReward rreward = (RaidReward) event.getItemId();
+                                PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
+                                pop.setRaidRewardList(raidRewardList);
+                                pop.showProperRaidRewardWindow(rreward);
+                        }
                 }
         }
-
 }

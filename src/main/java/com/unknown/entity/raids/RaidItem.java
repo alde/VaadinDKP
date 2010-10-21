@@ -4,6 +4,10 @@
  */
 package com.unknown.entity.raids;
 
+import com.unknown.entity.dao.ItemDAO;
+import com.unknown.entity.database.ItemDB;
+import com.unknown.entity.items.Items;
+
 /**
  *
  * @author bobo
@@ -57,6 +61,11 @@ public class RaidItem {
 	public void setPrice(double price) {
 		this.price = price;
 	}
+
+        public Items toItem() {
+                ItemDAO itemDao = new ItemDB();
+                return itemDao.getSingleItem(this.name);
+        }
 
 
 }

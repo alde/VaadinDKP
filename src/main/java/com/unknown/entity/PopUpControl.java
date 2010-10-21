@@ -149,10 +149,26 @@ public class PopUpControl extends Window {
         private void showRaidRewardEditWindow(RaidReward rreward) {
                  RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
                  info.printInfo();
+                 info.addRaidRewardInfoListener(raidRewardList);
                  app.getMainWindow().addWindow(info);
         }
 
         public void setRaidLootList(RaidLootList raidLootList) {
                 this.raidLootList = raidLootList;
+        }
+
+            public void showProperRaidLootWindow(Raid raid, RaidItem ritem) {
+               if (isAdmin()) {
+                        showRaidLootEditWindow(raid, ritem);
+               } else {
+                        showItemInfoWindow(ritem.toItem());
+               }
+        }
+
+        private void showRaidLootEditWindow(Raid raid, RaidItem ritem) {
+                 RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
+                 info.printInfo();
+                 info.addRaidLootInfoListener(raidLootList);
+                 app.getMainWindow().addWindow(info);
         }
 }

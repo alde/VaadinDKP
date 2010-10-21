@@ -39,6 +39,11 @@ public class RaidList extends Table implements RaidInfoListener {
                 printList();
         }
 
+        @Override
+        public void onRaidInfoChanged() {
+                update();
+        }
+
         private void raidListAddRow(Item addItem, final Raid raid) throws ReadOnlyException, ConversionException {
                 addItem.getItemProperty("Zone").setValue(raid.getName());
                 addItem.getItemProperty("Comment").setValue(raid.getComment());
@@ -52,18 +57,12 @@ public class RaidList extends Table implements RaidInfoListener {
                 this.setContainerDataSource(ic);
         }
 
-        public void clear() {
-                this.removeAllItems();
-        }
-
         public void printList() {
-                //           clear();
                 List<Raid> raids = raidDAO.getRaids();
 
                 for (final Raid raid : raids) {
                         Item addItem = addItem(raid);
                         raidListAddRow(addItem, raid);
-
                 }
         }
 
@@ -78,11 +77,6 @@ public class RaidList extends Table implements RaidInfoListener {
                 } else {
                         return value.toString();
                 }
-        }
-
-        @Override
-        public void onRaidInfoChanged() {
-                update();
         }
 
         private class RaidListClickListener implements ItemClickListener {

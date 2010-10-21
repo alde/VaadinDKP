@@ -190,13 +190,12 @@ public class RaidEditWindow extends Window {
                         final String raidzoneName = zone.getValue().toString();
                         final String raidcomment = comment.getValue().toString();
                         final String raiddate = datum.getValue().toString();
-                        final int success;
                         try {
-                                success = updateRaid(raidzoneName, raidcomment, raiddate);
-                                notifyListeners();
+                                final int success = updateRaid(raidzoneName, raidcomment, raiddate);
                         } catch (SQLException ex) {
                                 Logger.getLogger(RaidEditWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        notifyListeners();
                 }
         }
 
@@ -210,10 +209,12 @@ public class RaidEditWindow extends Window {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        RaidItem ritem = (RaidItem) event.getItemId();
-                        RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
-                        info.printInfo();
-                        getApplication().getMainWindow().addWindow(info);
+                        if (event.isDoubleClick()) {
+                                RaidItem ritem = (RaidItem) event.getItemId();
+                                RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
+                                info.printInfo();
+                                getApplication().getMainWindow().addWindow(info);
+                        }
                 }
         }
 }
