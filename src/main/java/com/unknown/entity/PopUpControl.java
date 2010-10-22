@@ -62,22 +62,23 @@ public class PopUpControl extends Window {
                 CharacterEditWindow info = new CharacterEditWindow(user);
                 try {
                         info.printInfo();
+                        info.addCharacterInfoListener(charList);
+                        info.addCharacterInfoListener(dkpList);
+                        app.getMainWindow().addWindow(info);
                 } catch (SQLException ex) {
                         Logger.getLogger(PopUpControl.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                info.addCharacterInfoListener(charList);
-                info.addCharacterInfoListener(dkpList);
-                app.getMainWindow().addWindow(info);
         }
 
         private void showCharInfoWindow(User user) throws NullPointerException, IllegalArgumentException {
                 CharacterInfoWindow info = new CharacterInfoWindow(user);
                 try {
                         info.printInfo();
+                        app.getMainWindow().addWindow(info);
                 } catch (SQLException ex) {
                         Logger.getLogger(PopUpControl.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                app.getMainWindow().addWindow(info);
+
         }
 
         private boolean isAdmin() {
@@ -132,11 +133,11 @@ public class PopUpControl extends Window {
         }
 
         public void showProperRaidRewardWindow(RaidReward rreward) {
-               if (isAdmin()) {
+                if (isAdmin()) {
                         showRaidRewardEditWindow(rreward);
-               } else {
+                } else {
                         showRaidRewardInfoWindow(rreward);
-               }
+                }
         }
 
         private void showRaidRewardInfoWindow(RaidReward rreward) {
@@ -147,32 +148,32 @@ public class PopUpControl extends Window {
         }
 
         private void showRaidRewardEditWindow(RaidReward rreward) {
-                 RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
-                 info.printInfo();
-                 info.addRaidRewardInfoListener(raidRewardList);
-                 info.addCharacterInfoListener(dkpList);
-                 info.addCharacterInfoListener(charList);
-                 app.getMainWindow().addWindow(info);
+                RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
+                info.printInfo();
+                info.addRaidRewardInfoListener(raidRewardList);
+                info.addCharacterInfoListener(dkpList);
+                info.addCharacterInfoListener(charList);
+                app.getMainWindow().addWindow(info);
         }
 
         public void setRaidLootList(RaidLootList raidLootList) {
                 this.raidLootList = raidLootList;
         }
 
-            public void showProperRaidLootWindow(Raid raid, RaidItem ritem) {
-               if (isAdmin()) {
+        public void showProperRaidLootWindow(Raid raid, RaidItem ritem) {
+                if (isAdmin()) {
                         showRaidLootEditWindow(raid, ritem);
-               } else {
+                } else {
                         showItemInfoWindow(ritem.toItem());
-               }
+                }
         }
 
         private void showRaidLootEditWindow(Raid raid, RaidItem ritem) {
-                 RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
-                 info.printInfo();
-                 info.addRaidLootInfoListener(raidLootList);
-                 info.addCharacterInfoListener(dkpList);
-                 info.addCharacterInfoListener(charList);
-                 app.getMainWindow().addWindow(info);
+                RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
+                info.printInfo();
+                info.addRaidLootInfoListener(raidLootList);
+                info.addCharacterInfoListener(dkpList);
+                info.addCharacterInfoListener(charList);
+                app.getMainWindow().addWindow(info);
         }
 }

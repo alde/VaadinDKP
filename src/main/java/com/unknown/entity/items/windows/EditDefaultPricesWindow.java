@@ -44,6 +44,8 @@ public class EditDefaultPricesWindow extends Window {
                 this.heroic = new TextField("Heroic");
                 this.slot = new ComboBox("Slot");
                 slot.setImmediate(true);
+                slot.setWidth("150px");
+                slot.addStyleName("select-button");
                 normal.setImmediate(true);
                 heroic.setImmediate(true);
                 this.itemDao = new ItemDB();

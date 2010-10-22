@@ -63,7 +63,11 @@ public class ItemAddWindow extends Window {
                 final TextField price = new TextField("Price Normal");
                 final TextField priceheroic = new TextField("Price Heroic");
                 final ComboBox slot = new ComboBox("Slot");
+                slot.setWidth("150px");
+                slot.addStyleName("select-button");
                 final ComboBox type = new ComboBox("Type");
+                type.setWidth("150px");
+                type.addStyleName("select-button");
                 final CheckBox legendary = new CheckBox(" Legendary");
 
                 final List<ItemPrices> defaultprices = prices;

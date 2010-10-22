@@ -49,6 +49,8 @@ public class RaidAddWindow extends Window {
                 VerticalLayout addItem = new VerticalLayout();
 
                 ComboBox zone = raidAddWindowZoneComboBox(zoneList);
+                zone.setWidth("150px");
+                zone.addStyleName("select-button");
                 addItem.addComponent(zone);
 
                 TextField comment = raidAddWindowCommentField();

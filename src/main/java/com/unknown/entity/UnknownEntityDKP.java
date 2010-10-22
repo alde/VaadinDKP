@@ -57,8 +57,9 @@ public class UnknownEntityDKP extends Application {
                 CharacterDAO characterDAO = new CharacterDB();
                 ItemDAO itemDAO = new ItemDB();
 
-                charList = new CharacterList(characterDAO);
+                
                 dkpList = new DkpList(characterDAO);
+                charList = new CharacterList(characterDAO, dkpList);
                 dkpList.setCharacterList(charList);
                 dkpList.addStyleName("small striped");
                 raidList = new RaidList(raidDAO);

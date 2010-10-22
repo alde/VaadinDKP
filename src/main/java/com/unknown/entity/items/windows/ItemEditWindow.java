@@ -56,7 +56,11 @@ public class ItemEditWindow extends Window {
                 addComponent(new Label("Item information"));
                 final TextField name = editInfoName();
                 final ComboBox slot = editInfoSlot();
+                slot.setWidth("150px");
+                slot.addStyleName("select-button");
                 final ComboBox type = editInfoType();
+                type.setWidth("150px");
+                type.addStyleName("select-button");
                 final TextField wowIdfield = editInfoWowIdField();
                 final TextField price = editInfoPriceField();
                 final TextField pricehc = editInfoPriceHcField();

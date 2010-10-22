@@ -83,7 +83,10 @@ public class CharacterEditWindow extends Window {
 
         private void characterInformation() {
                 final TextField name = new TextField("Name: ", user.getUsername());
+                name.setWidth("150px");
                 final ComboBox characterClass = characterEditClassComboBox();
+                characterClass.setWidth("150px");
+                characterClass.addStyleName("select-button");
                 final CheckBox active = new CheckBox("Status: ", user.isActive());
                 addComponent(name);
                 addComponent(characterClass);

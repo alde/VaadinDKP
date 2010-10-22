@@ -48,8 +48,11 @@ public class CharacterAddWindow extends Window {
                 VerticalLayout adduser = new VerticalLayout();
                 addComponent(adduser);
                 TextField nameField = characterAddNameField();
+                nameField.setWidth("150px");
                 adduser.addComponent(nameField);
                 ComboBox classCombo = characterAddCharClassComboBox();
+                classCombo.setWidth("150px");
+                classCombo.addStyleName("select-button");
                 adduser.addComponent(classCombo);
                 CheckBox activeCheck = characterAddIsActive();
 

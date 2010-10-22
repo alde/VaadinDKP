@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.character;
 
+import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.windows.CharacterInfoWindow;
 import com.unknown.entity.character.windows.CharacterEditWindow;
 import com.unknown.entity.dao.CharacterDAO;
@@ -29,10 +30,13 @@ import java.util.logging.Logger;
  */
 public class CharacterList extends HorizontalLayout implements CharacterInfoListener {
 
+        private DkpList dkpList;
+        private CharacterList charList = this;
         CharacterDAO characterDAO;
 
-        public CharacterList(CharacterDAO characherDAO) {
+        public CharacterList(CharacterDAO characherDAO, DkpList dkpList) {
                 this.characterDAO = characherDAO;
+                this.dkpList = dkpList;
         }
 
         private void characterClassImages(List<Role> roles) {
@@ -70,11 +74,6 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                 }
         }
 
-        private boolean isAdmin() {
-                final SiteUser siteUser = (SiteUser) getApplication().getUser();
-                return siteUser != null && siteUser.getLevel() == 1;
-        }
-
         @Override
         public void onCharacterInfoChange() {
                 update();
@@ -105,23 +104,11 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        if (isAdmin()) {
-                                CharacterEditWindow info = new CharacterEditWindow(user);
-                                try {
-                                        info.printInfo();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterList.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                getApplication().getMainWindow().addWindow(info);
-                        } else {
-                                CharacterInfoWindow info = new CharacterInfoWindow(user);
-                                try {
-                                        info.printInfo();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterList.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                getApplication().getMainWindow().addWindow(info);
-                        }
+                        PopUpControl pop = new PopUpControl(getApplication());
+                        pop.setDkpList(dkpList);
+                        pop.setCharacterList(charList);
+                        pop.showProperCharWindow(user);
+
                 }
         }
 }
