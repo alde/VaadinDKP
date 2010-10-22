@@ -5,10 +5,7 @@
 package com.unknown.entity.items;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.items.windows.ItemEditWindow;
-import com.unknown.entity.items.windows.ItemInfoWindow;
 import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.character.SiteUser;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -20,7 +17,7 @@ import java.util.List;
  *
  * @author bobo
  */
-public class ItemList extends Table implements ItemInfoListener{
+public class ItemList extends Table implements ItemInfoListener {
 
         private ItemDAO itemDAO;
         IndexedContainer ic;
@@ -29,6 +26,7 @@ public class ItemList extends Table implements ItemInfoListener{
         public ItemList(ItemDAO itemDAO) {
                 this.itemDAO = itemDAO;
                 this.ic = new IndexedContainer();
+                this.setSizeUndefined();
                 this.setHeight("500px");
                 this.setSelectable(true);
 

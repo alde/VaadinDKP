@@ -35,7 +35,7 @@ public class DkpList extends Table implements CharacterInfoListener {
                 this.ic = new IndexedContainer();
                 dkpListSetColumnHeaders();
                 this.setSelectable(true);
-                this.setWidth("180px");
+                this.setWidth("185px");
                 this.setHeight("500px");
 
                 this.addListener(new dkpListClickListener());

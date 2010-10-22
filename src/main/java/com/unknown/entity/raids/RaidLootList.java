@@ -33,8 +33,9 @@ public class RaidLootList extends Table implements RaidLootListener {
                 this.dkplist = dkplist;
                 this.clist = clist;
                 this.setSelectable(true);
+                this.setSizeUndefined();
                 this.setHeight("500px");
-                this.setWidth("450px");
+//                this.setWidth("450px");
                 this.addListener(new RewardListClickListener());
                 raidRewardListSetHeaders();
                 printList();

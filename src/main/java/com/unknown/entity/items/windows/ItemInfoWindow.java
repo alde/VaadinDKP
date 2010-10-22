@@ -62,9 +62,10 @@ public class ItemInfoWindow extends Window {
                 addComponent(new Label("Looted by"));
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
-                Table Attendants = lootList(item);
-                if (Attendants.size() > 0) {
-                        hzl.addComponent(Attendants);
+                Table lootedby = lootList(item);
+                if (lootedby.size() > 0) {
+                        lootedby.addStyleName("small striped");
+                        hzl.addComponent(lootedby);
                 } else {
                         hzl.addComponent(new Label("Not looted by anyone"));
                 }

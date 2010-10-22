@@ -37,8 +37,8 @@ public class RaidRewardList extends Table implements RaidRewardListener {
                 this.clist = clist;
                 this.raid = raid;
                 this.setSelectable(true);
+                this.setSizeUndefined();
                 this.setHeight("500px");
-                this.setWidth("200px");
                 this.addListener(new RewardListClickListener());
                 raidRewardListSetHeaders();
                 printList();

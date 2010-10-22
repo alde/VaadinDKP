@@ -52,7 +52,11 @@ public class RaidLootEditWindow extends Window {
 
         public void printInfo() {
                 final ComboBox charname = new ComboBox("Name");
+                charname.setWidth("300px");
+                charname.addStyleName("select-button");
                 final ComboBox itemname = new ComboBox("Item");
+                itemname.setWidth("300px");
+                itemname.addStyleName("select-button");
                 final CheckBox heroic = new CheckBox("Heroic");
                 final TextField price = new TextField("Price");
                 final Button deleteButton = new Button("Remove");
@@ -96,7 +100,6 @@ public class RaidLootEditWindow extends Window {
 
         public void addCharacterInfoListener(CharacterInfoListener lstnr)  {
                 charinfolisteners.add(lstnr);
-                System.out.println("#¤#¤# "+lstnr);
         }
 
         private void notifyListeners() {

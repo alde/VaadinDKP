@@ -31,14 +31,11 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -154,6 +151,7 @@ public class CharacterEditWindow extends Window {
                 update.addListener(new updateLootsListener());
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
+                        loots.addStyleName("small striped");
                         addComponent(loots);
                         addComponent(update);
                 } else {
@@ -165,6 +163,7 @@ public class CharacterEditWindow extends Window {
                 Table raids = raidList(user);
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
+                        raids.addStyleName("small striped");
                         addComponent(raids);
                 } else {
                         addComponent(new Label("No raids attended yet."));

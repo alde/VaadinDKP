@@ -54,9 +54,11 @@ public class RaidEditWindow extends Window {
                 hzl.setSpacing(true);
 
                 this.rrList = new RaidRewardList(raid, dkplist, clist);
+                rrList.addStyleName("small striped");
                 hzl.addComponent(rrList);
 
                 this.rlList = new RaidLootList(raid, dkplist, clist);
+                rlList.addStyleName("small striped");
                 hzl.addComponent(rlList);
 
                 Button addReward = new Button("Add Reward");
@@ -83,6 +85,8 @@ public class RaidEditWindow extends Window {
                 for (String zones : zoneList) {
                         zone.addItem(zones);
                 }
+                zone.setWidth("150px");
+                zone.addStyleName("select-button");
                 zone.setImmediate(true);
                 zone.setNullSelectionAllowed(false);
                 zone.setValue(raid.getName());
