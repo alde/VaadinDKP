@@ -183,6 +183,8 @@ public class RaidRewardEditWindow extends Window {
                 public void buttonClick(ClickEvent event) {
                         int success = removeReward(reward);
                         System.out.println(success + " rewards removed.");
+                        notifyListeners();
+                        close();
                 }
         }
 
