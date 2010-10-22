@@ -4,6 +4,8 @@
  */
 package com.unknown.entity.raids.windows;
 
+import com.unknown.entity.character.CharacterList;
+import com.unknown.entity.character.DkpList;
 import com.unknown.entity.raids.*;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -16,11 +18,16 @@ import java.util.List;
  * @author alde
  */
 public class RaidInfoWindow extends Window {
+
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
         private final Raid raid;
+        private final DkpList dkplist;
+        private final CharacterList clist;
 
-        public RaidInfoWindow(Raid raid) {
+        public RaidInfoWindow(Raid raid, DkpList dkplist, CharacterList clist) {
                 this.raid = raid;
+                this.dkplist = dkplist;
+                this.clist = clist;
                 this.setPositionX(600);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
@@ -35,9 +42,9 @@ public class RaidInfoWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
 
-                RaidRewardList rRewardList = new RaidRewardList(raid);
+                RaidRewardList rRewardList = new RaidRewardList(raid, dkplist, clist);
                 hzl.addComponent(rRewardList);
-                RaidLootList rLootList = new RaidLootList(raid);
+                RaidLootList rLootList = new RaidLootList(raid, dkplist, clist);
                 hzl.addComponent(rLootList);
 
                 addComponent(hzl);

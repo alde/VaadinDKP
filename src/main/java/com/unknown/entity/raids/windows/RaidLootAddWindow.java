@@ -4,6 +4,8 @@
  */
 package com.unknown.entity.raids.windows;
 
+import com.unknown.entity.character.CharacterInfoListener;
+import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.dao.RaidDAO;
@@ -46,6 +48,7 @@ public class RaidLootAddWindow extends Window {
         ItemDAO itemDao;
         CharacterDAO characterDao;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
+        private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
 
         RaidLootAddWindow(Raid raid) {
                 this.raid = raid;
@@ -67,7 +70,7 @@ public class RaidLootAddWindow extends Window {
                 final TextField price = new TextField("Price");
                 final ComboBox name = nameComboList();
                 final Button addButton = new Button("Add");
-                
+
                 addComponent(boss);
                 addComponent(loots);
                 addComponent(heroic);
@@ -167,11 +170,19 @@ public class RaidLootAddWindow extends Window {
                 listeners.add(listener);
         }
 
-         private void notifyListeners() {
+        private void notifyListeners() {
                 for (RaidLootListener raidListener : listeners) {
                         raidListener.onRaidInfoChanged();
                 }
+                for (CharacterInfoListener charListener : charinfolisteners) {
+                        charListener.onCharacterInfoChange();
+                }
         }
+
+        void addCharacterInfoListener(CharacterInfoListener listener) {
+                charinfolisteners.add(listener);
+        }
+
         private class LootChangeListener implements ValueChangeListener {
 
                 private final TextField price;

@@ -5,6 +5,8 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.character.CharacterList;
+import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
@@ -14,7 +16,6 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,13 +28,17 @@ public class RaidRewardList extends Table implements RaidRewardListener {
         IndexedContainer ic;
         private final RaidRewardList raidRewardList = this;
         private Raid raid;
+        private final DkpList dkplist;
+        private final CharacterList clist;
 
-        public RaidRewardList(Raid raid) {
+        public RaidRewardList(Raid raid, DkpList dkplist, CharacterList clist) {
                 this.ic = new IndexedContainer();
+                this.dkplist = dkplist;
+                this.clist = clist;
                 this.raid = raid;
                 this.setSelectable(true);
                 this.setHeight("500px");
-                this.setWidth("300px");
+                this.setWidth("200px");
                 this.addListener(new RewardListClickListener());
                 raidRewardListSetHeaders();
                 printList();
@@ -89,6 +94,8 @@ public class RaidRewardList extends Table implements RaidRewardListener {
                                 RaidReward rreward = (RaidReward) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
                                 pop.setRaidRewardList(raidRewardList);
+                                pop.setCharacterList(clist);
+                                pop.setDkpList(dkplist);
                                 pop.showProperRaidRewardWindow(rreward);
                         }
                 }

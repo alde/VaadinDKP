@@ -210,6 +210,21 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
+        public int getItemId(String loot) {
+                DBConnection c = new DBConnection();
+                int itemid = 0;
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM items WHERE name=?");
+                        p.setString(1, loot);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                itemid = rs.getInt("id");
+                        }
+                } catch (SQLException ex) {}
+                return itemid;
+        }
+
+        @Override
         public Items getSingleItem(String name) {
                 Connection c = null;
                 Items item = null;

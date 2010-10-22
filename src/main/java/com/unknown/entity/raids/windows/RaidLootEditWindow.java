@@ -82,9 +82,11 @@ public class RaidLootEditWindow extends Window {
 
                 heroic.setValue(item.isHeroic());
                 price.setValue(item.getPrice());
+                price.setImmediate(true);
+                heroic.setImmediate(true);
 
                 deleteButton.addListener(new DeleteItemListener());
-                updateButton.addListener(new UpdateItemListener());
+                updateButton.addListener(new UpdateItemListener(charname, itemname, price, item.getId(), heroic));
 
         }
 
@@ -94,6 +96,7 @@ public class RaidLootEditWindow extends Window {
 
         public void addCharacterInfoListener(CharacterInfoListener lstnr)  {
                 charinfolisteners.add(lstnr);
+                System.out.println("#¤#¤# "+lstnr);
         }
 
         private void notifyListeners() {
@@ -110,7 +113,6 @@ public class RaidLootEditWindow extends Window {
         }
 
         private class DeleteItemListener implements ClickListener {
-
                 @Override
                 public void buttonClick(ClickEvent event) {
                         try {
@@ -126,17 +128,35 @@ public class RaidLootEditWindow extends Window {
         }
 
         private class UpdateItemListener implements ClickListener {
-
+                private final TextField price;
+                private final CheckBox isheroic;
+                private final int id;
+                private final ComboBox looter;
+                private final ComboBox itemname;
+                
+                
+                UpdateItemListener(ComboBox looter, ComboBox itemname, TextField price, int id, CheckBox isheroic)  {
+                        this.price = price;
+                        this.looter = looter;
+                        this.itemname = itemname;
+                        this.id = id;
+                        this.isheroic = isheroic;
+                }
                 @Override
                 public void buttonClick(ClickEvent event) {
-                                System.out.println("Reward Item ID: " + item.getId());
-                                int success = updateItem(item);
+                        double newprice = Double.parseDouble(price.getValue().toString());
+                        boolean heroic = Boolean.parseBoolean(isheroic.getValue().toString());
+                        String newlooter = looter.getValue().toString();
+                        String newitem = itemname.getValue().toString();
+                                System.out.println("Reward Item ID: " + id);
+                                System.out.println("Reward Item Name: " + newitem + "\nLooter: " + newlooter + "\nPrice: " + newprice + "\nHeroic: " + heroic);
+                                int success = updateItem(id, newlooter, newitem, newprice, heroic);
                                 System.out.println(success + " items updated.");
                                 notifyListeners();
                 }
 
-                private int updateItem(RaidItem item) {
-                        return raidDao.doUpdateLoot(item);
+                private int updateItem(int id, String looter, String itemname, double price, boolean heroic) {
+                        return raidDao.doUpdateLoot(id, looter, itemname, price, heroic);
                 }
         }
 }

@@ -50,8 +50,8 @@ public interface RaidDAO {
         public int getTotalRaidsLastThirtyDays();
 
         public int getAttendedRaidsLastThirtyDays(User user);
-
-        public int doUpdateLoot(RaidItem item);
         
         public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException;
+
+        public int doUpdateLoot(int id, String looter, String itemname, double price, boolean heroic);
 }

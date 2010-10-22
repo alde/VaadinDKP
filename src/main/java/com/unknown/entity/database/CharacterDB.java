@@ -93,7 +93,7 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-        public int getCharacterId(String charname) throws SQLException {
+        public int getCharacterId(String charname) {
                 DBConnection c = new DBConnection();
                 int charid = 0;
                 try {
@@ -103,6 +103,7 @@ public class CharacterDB implements CharacterDAO {
                         while (rclass.next()) {
                                 charid = rclass.getInt("id");
                         }
+                } catch (SQLException ex) {
                 } finally {
                         c.close();
                 }
@@ -270,17 +271,17 @@ public class CharacterDB implements CharacterDAO {
                 try {
                         c = new DBConnection().getConnection();
                         int charid = getCharacterId(user.getUsername());
-                        int itemid = itemDao.getItemId(c, itemname);
+                        int itemid = itemDao.getItemId(itemname);
 
-                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , raid_id=? , mob_id=?, character_id=?, price=?, heroic=? WHERE id=?");
+                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
                         //PreparedStatement p = c.prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
                         p.setInt(1, itemid);
-                        p.setInt(2, 1);
-                        p.setInt(3, 1);
-                        p.setInt(4, charid);
-                        p.setDouble(5, price);
-                        p.setBoolean(6, heroic);
-                        p.setInt(7, lootid);
+                        //p.setInt(2, 1);
+                        //p.setInt(3, 1);
+                        p.setInt(2, charid);
+                        p.setDouble(3, price);
+                        p.setBoolean(4, heroic);
+                        p.setInt(5, lootid);
                         int success = p.executeUpdate();
                         System.out.println(success + " items updated.");
                 } catch (SQLException e) {

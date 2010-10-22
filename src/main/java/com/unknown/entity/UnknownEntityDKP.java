@@ -65,6 +65,8 @@ public class UnknownEntityDKP extends Application {
                 raidList.addStyleName("small");
                 itemList = new ItemList(itemDAO);
                 itemList.addStyleName("small");
+                raidList.setCharList(charList);
+                raidList.setDkpList(dkpList);
 
                 TablePanel tp = new TablePanel(dkpList, itemList, raidList);
                 final HorizontalLayout hzl = tp.HorizontalSegment();

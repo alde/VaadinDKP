@@ -4,22 +4,17 @@
  */
 package com.unknown.entity.raids.windows;
 
+import com.unknown.entity.character.CharacterList;
+import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.*;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property.ConversionException;
-import com.vaadin.data.Property.ReadOnlyException;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
@@ -36,9 +31,15 @@ public class RaidEditWindow extends Window {
 
         private final Raid raid;
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
+        private final DkpList dkplist;
+        private final CharacterList clist;
+        private RaidRewardList rrList;
+        private RaidLootList rlList;
 
-        public RaidEditWindow(Raid raid) {
+        public RaidEditWindow(Raid raid, DkpList dkplist, CharacterList clist) {
                 this.raid = raid;
+                this.dkplist = dkplist;
+                this.clist = clist;
                 this.setPositionX(600);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
@@ -52,38 +53,17 @@ public class RaidEditWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
 
-                RaidRewardList rrList = new RaidRewardList(raid);
+                this.rrList = new RaidRewardList(raid, dkplist, clist);
                 hzl.addComponent(rrList);
 
-                RaidLootList rlList = new RaidLootList(raid);
+                this.rlList = new RaidLootList(raid, dkplist, clist);
                 hzl.addComponent(rlList);
-                
+
                 Button addReward = new Button("Add Reward");
-                addReward.addListener(new Button.ClickListener() {
-
-                        @Override
-                        public void buttonClick(ClickEvent event) {
-                                RaidRewardAddWindow rewardadd = new RaidRewardAddWindow(raid);
-                                rewardadd.printInfo();
-                                getApplication().getMainWindow().addWindow(rewardadd);
-
-                        }
-                });
+                addReward.addListener(new AddRewardClickListener());
                 Button addLoot = new Button("Add loot");
 
-                addLoot.addListener(new Button.ClickListener() {
-
-                        @Override
-                        public void buttonClick(ClickEvent event) {
-                                RaidLootAddWindow rlootadd = new RaidLootAddWindow(raid);
-                                try {
-                                        rlootadd.printInfo();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(RaidEditWindow.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                getApplication().getMainWindow().addWindow(rlootadd);
-                        }
-                });
+                addLoot.addListener(new AddLootClickListener());
 
                 addComponent(hzl);
                 HorizontalLayout vert = new HorizontalLayout();
@@ -91,20 +71,6 @@ public class RaidEditWindow extends Window {
                 vert.addComponent(addLoot);
                 addComponent(vert);
 
-        }
-
-        private void RaidInfoWindowLootListAddRow(Item addItem, RaidItem item) throws ReadOnlyException, ConversionException {
-                addItem.getItemProperty("Name").setValue(item.getLooter());
-                addItem.getItemProperty("Item").setValue(item.getName());
-                addItem.getItemProperty("Price").setValue(item.getPrice());
-                addItem.getItemProperty("Heroic").setValue(item.isHeroic());
-        }
-
-        private void RaidInfoWindowLootListSetHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", String.class, "");
-                tbl.addContainerProperty("Item", String.class, "");
-                tbl.addContainerProperty("Price", Double.class, 0);
-                tbl.addContainerProperty("Heroic", String.class, "");
         }
 
         private void raidInformation() {
@@ -144,26 +110,6 @@ public class RaidEditWindow extends Window {
                 return raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
         }
 
-        private Table lootList(final Raid raid) {
-                Table tbl = new Table();
-                RaidInfoWindowLootListSetHeaders(tbl);
-                tbl.setHeight(150);
-                for (RaidItem item : raid.getRaidItems()) {
-                        Item addItem = tbl.addItem(item);
-                        RaidInfoWindowLootListAddRow(addItem, item);
-                }
-                tbl.addListener(new RaidEditLootListListener(raid));
-                return tbl;
-        }
-
-        private Component getTable(Table rewards) {
-                if (rewards.size() > 0) {
-                        return rewards;
-                } else {
-                        return new Label("No rewards in this raid.");
-                }
-        }
-
         public void addRaidInfoListener(RaidInfoListener listener) {
                 listeners.add(listener);
         }
@@ -200,22 +146,39 @@ public class RaidEditWindow extends Window {
                 }
         }
 
-        private class RaidEditLootListListener implements ItemClickListener {
+        private class AddLootClickListener implements ClickListener {
 
-                private final Raid raid;
-
-                public RaidEditLootListListener(Raid raid) {
-                        this.raid = raid;
+                public AddLootClickListener() {
                 }
 
                 @Override
-                public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
-                                RaidItem ritem = (RaidItem) event.getItemId();
-                                RaidLootEditWindow info = new RaidLootEditWindow(raid, ritem);
-                                info.printInfo();
-                                getApplication().getMainWindow().addWindow(info);
+                public void buttonClick(ClickEvent event) {
+                        RaidLootAddWindow rlootadd = new RaidLootAddWindow(raid);
+                        rlootadd.addCharacterInfoListener(dkplist);
+                        rlootadd.addCharacterInfoListener(clist);
+                        rlootadd.addRaidInfoListener(rlList);
+                        try {
+                                rlootadd.printInfo();
+                        } catch (SQLException ex) {
+                                Logger.getLogger(RaidEditWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        getApplication().getMainWindow().addWindow(rlootadd);
+                }
+        }
+
+        private class AddRewardClickListener implements ClickListener {
+
+                public AddRewardClickListener() {
+                }
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        RaidRewardAddWindow rewardadd = new RaidRewardAddWindow(raid);
+                        rewardadd.addCharacterInfoListener(dkplist);
+                        rewardadd.addCharacterInfoListener(clist);
+                        rewardadd.addRaidInfoListener(rrList);
+                        rewardadd.printInfo();
+                        getApplication().getMainWindow().addWindow(rewardadd);
                 }
         }
 }

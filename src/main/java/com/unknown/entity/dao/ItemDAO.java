@@ -42,4 +42,6 @@ public interface ItemDAO {
 
         public ArrayList<RaidItem> getItemsForRaid(int id) throws SQLException;
 
+        public int getItemId(String name);
+
 }

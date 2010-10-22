@@ -5,12 +5,16 @@
 package com.unknown.entity.raids.windows;
 
 import com.google.common.collect.ImmutableList;
+import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.Raid;
+import com.unknown.entity.raids.RaidChar;
+import com.unknown.entity.raids.RaidLootListener;
 import com.unknown.entity.raids.RaidReward;
+import com.unknown.entity.raids.RaidRewardListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -19,6 +23,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,6 +39,9 @@ public class RaidRewardAddWindow extends Window {
 	Button addButton = new Button("Add");
 	RaidDAO raidDao = new RaidDB();
 	CharacterDAO chardao = new CharacterDB();
+        private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
+        private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
+
 
 	public RaidRewardAddWindow(Raid raid) {
 		this.raid = raid;
@@ -59,13 +67,34 @@ public class RaidRewardAddWindow extends Window {
 		addButton.addListener(new AddRewardListener());
 	}
 
+        public void addRaidInfoListener(RaidRewardListener listener) {
+                listeners.add(listener);
+        }
+
+        private void notifyListeners() {
+                for (RaidRewardListener raidListener : listeners) {
+                        raidListener.onRaidInfoChanged();
+                }
+                for (CharacterInfoListener charListener : charinfolisteners) {
+                        charListener.onCharacterInfoChange();
+                }
+        }
+
+        void addCharacterInfoListener(CharacterInfoListener listener) {
+                charinfolisteners.add(listener);
+        }
 
 	private void addReward(String comment, Integer shares, List<String> attendantlist, Raid raid) {
 			List<String> invalidchars = findInvalidCharacters(attendantlist);
 			if (invalidchars.isEmpty()) {
 				RaidReward raidReward = new RaidReward(comment, -1, raid.getId(), shares);
-				raidReward.addRewardChars(raidDao.getRaidCharsForRaid(attendantlist, raid.getId()));
-				raidDao.addReward(raidReward);
+                                Collection<RaidChar> chars = raidDao.getRaidCharsForRaid(attendantlist, raid.getId());
+				for (RaidChar rc : chars) {
+                                        System.out.println("--- Name: " + rc.getName());
+                                }
+                                raidReward.addRewardChars(chars);
+				System.out.println(raidReward.getRewardChars().toString());
+                                raidDao.addReward(raidReward);
 			} else {
 				showInvalidUsers(invalidchars);
 			}
@@ -89,6 +118,8 @@ public class RaidRewardAddWindow extends Window {
 		public void buttonClick(ClickEvent event) {
 			final ImmutableList<String> attendantlist = splitCharsToArray(attendants.getValue().toString());	
 			addReward(comment.getValue().toString(), Integer.parseInt(shares.getValue().toString()), attendantlist,raid);
+                        notifyListeners();
+                        close();
 		}
 		
 		private ImmutableList<String> splitCharsToArray(String attendants) {

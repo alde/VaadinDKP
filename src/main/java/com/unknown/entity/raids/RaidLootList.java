@@ -1,6 +1,8 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.character.CharacterList;
+import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.vaadin.data.Item;
@@ -22,10 +24,14 @@ public class RaidLootList extends Table implements RaidLootListener {
         IndexedContainer ic;
         private final RaidLootList raidLootList = this;
         private Raid raid;
+        private final DkpList dkplist;
+        private final CharacterList clist;
 
-        public RaidLootList(Raid raid) {
+        public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist) {
                 this.ic = new IndexedContainer();
                 this.raid = raid;
+                this.dkplist = dkplist;
+                this.clist = clist;
                 this.setSelectable(true);
                 this.setHeight("500px");
                 this.setWidth("450px");
@@ -88,6 +94,8 @@ public class RaidLootList extends Table implements RaidLootListener {
                                 RaidItem ritem = (RaidItem) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidLootList.this.getApplication());
                                 pop.setRaidLootList(raidLootList);
+                                pop.setCharacterList(clist);
+                                pop.setDkpList(dkplist);
                                 pop.showProperRaidLootWindow(raid, ritem);
                         }
                 }

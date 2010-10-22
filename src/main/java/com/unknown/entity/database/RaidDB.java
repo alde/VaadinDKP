@@ -67,7 +67,7 @@ public class RaidDB implements RaidDAO {
                         p.setInt(1, raidId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
-                                RaidItem item = new RaidItem(rs.getString("items.name"),rs.getString("characters.name"),rs.getInt("loots.id"),rs.getDouble("loots.price"),rs.getBoolean("loots.heroic"));
+                                RaidItem item = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
                                 raidItems.add(item);
                         }
                 } catch (SQLException e) {
@@ -496,12 +496,11 @@ public class RaidDB implements RaidDAO {
                 Set<RaidChar> chars = new HashSet<RaidChar>();
                 final CharacterDB characterDB = new CharacterDB();
                 for (String string : attendantlist) {
-                        try {
-                                int characterId = characterDB.getCharacterId(string);
-                                chars.add(getRaidChar(characterId, raidId));
-                        } catch (SQLException ex) {
-                                Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+
+                        int characterId = characterDB.getCharacterId(string);
+                        System.out.println("Name: "+string + "ID: " +characterId);
+                        chars.add(getRaidChar(characterId, raidId));
+
                 }
                 return chars;
 
@@ -511,7 +510,7 @@ public class RaidDB implements RaidDAO {
                 DBConnection c = new DBConnection();
                 RaidChar rchar = new RaidChar();
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
+                        PreparedStatement p = c.prepareStatement(" SELECT DISTINCT * FROM rewards JOIN character_rewards JOIN characters WHERE rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=? AND character_rewards.character_id=characters.id");
                         p.setInt(1, raidId);
                         p.setInt(2, charId);
                         ResultSet rs = p.executeQuery();
@@ -595,19 +594,28 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public int doUpdateLoot(RaidItem item) {
+        public int doUpdateLoot(int id, String looter, String itemname, double price, boolean heroic) {
                 ItemDAO itemDao = new ItemDB();
                 CharacterDAO charDao = new CharacterDB();
+                int itemid = itemDao.getItemId(itemname);
+                int charid = charDao.getCharacterId(looter);
+                System.out.println("Itemid: " + itemid + " Charid: " + charid);
+                int success = 0;
+                DBConnection c = new DBConnection();
                 try {
-                        DBConnection c = new DBConnection();
-                        PreparedStatement p = c.prepareStatement("UPDATE loots SET price=? , item_id=? , character_id=? , heroic=? WHERE id=?");
-                        p.setDouble(1, item.getPrice());
-                        p.setInt(2, itemDao.getItemId(c.getConnection(), item.getName()));
-                        p.setInt(3, charDao.getCharacterId(item.getLooter()));
-                        p.setBoolean(4, item.isHeroic());
-                        p.setInt(5, item.getId());
+                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
+                        p.setInt(1, itemid);
+                        p.setInt(2, charid);
+                        p.setDouble(3, price);
+                        p.setBoolean(4, heroic);
+                        p.setInt(5, id);
+                        System.out.println(p.toString());
+                        success = p.executeUpdate();
+                        System.out.println(success + " items updated.");
                 } catch (SQLException ex) {
+                        ex.printStackTrace();
                 }
-                return 0;
+                c.close();
+                return success;
         }
 }
