@@ -38,12 +38,6 @@ public class CharacterDB implements CharacterDAO {
 
         @Override
         public List<User> getUsers() {
-                try {
-                        Class.forName("com.mysql.jdbc.Driver");
-                } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
                 Connection c = null;
                 List<User> users = new ArrayList<User>();
                 try {
@@ -61,13 +55,7 @@ public class CharacterDB implements CharacterDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
 
                 return users;
@@ -141,6 +129,8 @@ public class CharacterDB implements CharacterDAO {
                                 itemlist.add(charitem);
                         }
                 } catch (SQLException e) {
+                } finally {
+                        closeConnection(c);
                 }
                 return itemlist;
         }
@@ -201,13 +191,7 @@ public class CharacterDB implements CharacterDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }
@@ -254,13 +238,7 @@ public class CharacterDB implements CharacterDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
         }
 
@@ -287,13 +265,15 @@ public class CharacterDB implements CharacterDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
+                }
+        }
+
+        private void closeConnection(Connection c) {
+                try {
+                        c.close();
+                } catch (SQLException ex) {
+                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
 
@@ -334,9 +314,7 @@ public class CharacterDB implements CharacterDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return update;
         }
@@ -369,13 +347,7 @@ public class CharacterDB implements CharacterDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }

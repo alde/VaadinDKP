@@ -32,11 +32,6 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public List<Raid> getRaids() {
-                try {
-                        Class.forName("com.mysql.jdbc.Driver");
-                } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 Connection c = null;
                 List<Raid> raids = new ArrayList<Raid>();
                 try {
@@ -53,6 +48,8 @@ public class RaidDB implements RaidDAO {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
+                } finally {
+                        closeConnection(c);
                 }
                 return raids;
         }
@@ -73,9 +70,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
 
                 return raidItems;
@@ -99,6 +94,8 @@ public class RaidDB implements RaidDAO {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
+                } finally {
+                        closeConnection(c);
                 }
 
                 return raidChars;
@@ -119,13 +116,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
                 return zones;
         }
@@ -153,13 +144,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
                 return result;
         }
@@ -201,9 +186,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return raidRewards;
 
@@ -232,9 +215,7 @@ public class RaidDB implements RaidDAO {
                         e.printStackTrace();
 
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return raidChars;
         }
@@ -255,9 +236,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }
@@ -284,9 +263,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }
@@ -348,9 +325,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return bosses;
         }
@@ -376,9 +351,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
         }
 
@@ -408,9 +381,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }
@@ -432,7 +403,6 @@ public class RaidDB implements RaidDAO {
         }
 
         private RaidReward doAddReward(RaidReward reward) throws SQLException {
-                int rewardid = 0;
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -453,7 +423,6 @@ public class RaidDB implements RaidDAO {
         private void doAddCharacterReward(RaidReward reward) throws SQLException {
                 DBConnection c = new DBConnection();
                 try {
-                        int success = 0;
                         PreparedStatement p = c.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
                         for (RaidChar eachid : reward.getRewardChars()) {
                                 p.setInt(1, reward.getId());
@@ -477,9 +446,7 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }
@@ -498,7 +465,7 @@ public class RaidDB implements RaidDAO {
                 for (String string : attendantlist) {
 
                         int characterId = characterDB.getCharacterId(string);
-                        System.out.println("Name: "+string + "ID: " +characterId);
+                        System.out.println("Name: " + string + "ID: " + characterId);
                         chars.add(getRaidChar(characterId, raidId));
 
                 }
@@ -523,6 +490,8 @@ public class RaidDB implements RaidDAO {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
+                } finally {
+                        c.close();
                 }
 
                 return rchar;
@@ -552,9 +521,9 @@ public class RaidDB implements RaidDAO {
                 String enddate = dt.toYearMonthDay().toString();
                 System.out.println("Today: " + enddate);
                 System.out.println("30 Days ago: " + startdate);
-
+                DBConnection c = new DBConnection();
                 try {
-                        DBConnection c = new DBConnection();
+
                         PreparedStatement p = c.prepareStatement("SELECT * FROM raids WHERE date BETWEEN ? AND ?");
                         p.setString(1, startdate);
                         p.setString(2, enddate);
@@ -563,8 +532,10 @@ public class RaidDB implements RaidDAO {
                         while (rs.next()) {
                                 i++;
                         }
-                        c.close();
+
                 } catch (SQLException e) {
+                } finally {
+                        c.close();
                 }
                 return i;
         }
@@ -575,8 +546,8 @@ public class RaidDB implements RaidDAO {
                 DateTime dt = new DateTime();
                 String startdate = dt.toYearMonthDay().minusDays(30).toString();
                 String enddate = dt.toYearMonthDay().toString();
+                DBConnection c = new DBConnection();
                 try {
-                        DBConnection c = new DBConnection();
                         PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
                         p.setInt(1, user.getId());
                         p.setString(2, startdate);
@@ -586,9 +557,11 @@ public class RaidDB implements RaidDAO {
                         while (rs.next()) {
                                 i++;
                         }
-                        c.close();
+                        
                 } catch (SQLException e) {
                         e.printStackTrace();
+                } finally {
+                        c.close();
                 }
                 return i;
         }
@@ -614,8 +587,17 @@ public class RaidDB implements RaidDAO {
                         System.out.println(success + " items updated.");
                 } catch (SQLException ex) {
                         ex.printStackTrace();
+                } finally {
+                        c.close();
                 }
-                c.close();
                 return success;
+        }
+
+        private void closeConnection(Connection c) {
+                try {
+                        c.close();
+                } catch (SQLException ex) {
+                        Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
 }

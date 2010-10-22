@@ -30,11 +30,6 @@ public class ItemDB implements ItemDAO {
 
         @Override
         public List<Items> getItems() {
-                try {
-                        Class.forName("com.mysql.jdbc.Driver");
-                } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 Connection c = null;
                 List<Items> items = new ArrayList<Items>();
                 try {
@@ -58,6 +53,8 @@ public class ItemDB implements ItemDAO {
                                 items.add(tempitem);
                         }
                 } catch (SQLException e) {
+                } finally {
+                        closeConnection(c);
                 }
                 return items;
         }
@@ -80,6 +77,8 @@ public class ItemDB implements ItemDAO {
                                 looters.add(templooter);
                         }
                 } catch (SQLException e) {
+                } finally {
+                        closeConnection(c);
                 }
 
                 return looters;
@@ -103,9 +102,7 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return prices;
         }
@@ -132,13 +129,7 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(ItemDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
                 return success;
         }
@@ -164,9 +155,7 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return result;
         }
@@ -190,9 +179,7 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                c.close();
-                        }
+                        closeConnection(c);
                 }
                 return price;
         }
@@ -220,7 +207,10 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 itemid = rs.getInt("id");
                         }
-                } catch (SQLException ex) {}
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
                 return itemid;
         }
 
@@ -251,13 +241,7 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(ItemDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
                 return item;
         }
@@ -277,13 +261,7 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
-                        if (c != null) {
-                                try {
-                                        c.close();
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(ItemDB.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
+                        closeConnection(c);
                 }
         }
 
@@ -315,6 +293,15 @@ public class ItemDB implements ItemDAO {
                         items.add(tmp);
                         System.out.println(rs.toString());
                 }
+                c.close();
                 return items;
+        }
+
+        private void closeConnection(Connection c) {
+                try {
+                        c.close();
+                } catch (SQLException ex) {
+                        Logger.getLogger(ItemDB.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
 }
