@@ -4,16 +4,10 @@
  */
 package com.unknown.entity.character.windows;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.Role;
-import com.unknown.entity.character.CharacterInfoListener;
-import com.unknown.entity.character.CharacterItem;
-import com.unknown.entity.character.User;
-import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.ItemDB;
-import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.character.*;
+import com.unknown.entity.dao.*;
+import com.unknown.entity.database.*;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.raids.Raid;
 import com.vaadin.data.Item;
@@ -36,6 +30,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -87,14 +83,16 @@ public class CharacterEditWindow extends Window {
                 final ComboBox characterClass = characterEditClassComboBox();
                 characterClass.setWidth("150px");
                 characterClass.addStyleName("select-button");
-                final CheckBox active = new CheckBox("Status: ", user.isActive());
+                String activeStatus = (user.isActive() ? "Active" : "Inactive");
+                final CheckBox active = new CheckBox("Status: " + activeStatus);
+                active.setValue(user.isActive());
                 addComponent(name);
                 addComponent(characterClass);
                 addComponent(active);
 
                 Button updateButton = characterEditUpdateButton(name, characterClass, active);
                 Button deleteButton = new Button("Delete Character");
-                deleteButton.addListener(new DeleteButtonClickListener());
+                deleteButton.addListener(new DeleteButtonClickListener(user));
                 HorizontalLayout hzl = new HorizontalLayout();
                 Label warning = new Label();
                 warning.setWidth("220px");
@@ -237,6 +235,7 @@ public class CharacterEditWindow extends Window {
                 for (CharacterInfoListener characterListener : listeners) {
                         characterListener.onCharacterInfoChange();
                 }
+                update();
         }
 
         private void removeLootFromCharacter(Item item) {
@@ -245,6 +244,15 @@ public class CharacterEditWindow extends Window {
 
         private void updateLootForCharacter(Item item, int lootid) {
                 charDao.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
+        }
+
+        private void update() {
+                this.removeAllComponents();
+                try {
+                        printInfo();
+                } catch (SQLException ex) {
+                        Logger.getLogger(CharacterEditWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
 
         private class updateBtnClickListener implements ClickListener {
@@ -269,14 +277,19 @@ public class CharacterEditWindow extends Window {
                 }
         }
 
-        private static class DeleteButtonClickListener implements ClickListener {
+        private class DeleteButtonClickListener implements ClickListener {
 
-                public DeleteButtonClickListener() {
+                final User user;
+
+                public DeleteButtonClickListener(User user) {
+                        this.user = user;
                 }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        throw new UnsupportedOperationException("Not supported yet.");
+                        charDao.deleteCharacter(user);
+                        notifyListeners();
+                        close();
                 }
         }
 

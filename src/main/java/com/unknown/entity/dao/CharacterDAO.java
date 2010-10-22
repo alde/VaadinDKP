@@ -40,4 +40,6 @@ public interface CharacterDAO {
         public void removeLootFromCharacter(String itemname, User user);
 
         public void updateLootForCharacter(String itemname, double price, boolean heroic, User user, int lootid);
+
+        public void deleteCharacter(User user);
 }

@@ -5,10 +5,9 @@
 package com.unknown.entity.character;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.character.windows.CharacterInfoWindow;
-import com.unknown.entity.character.windows.CharacterEditWindow;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.Role;
+import com.vaadin.Application;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -16,13 +15,10 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -33,10 +29,12 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         private DkpList dkpList;
         private CharacterList charList = this;
         CharacterDAO characterDAO;
+        private Application app;
 
         public CharacterList(CharacterDAO characherDAO, DkpList dkpList) {
                 this.characterDAO = characherDAO;
                 this.dkpList = dkpList;
+                this.app = getApplication();
         }
 
         private void characterClassImages(List<Role> roles) {
@@ -50,8 +48,9 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         }
 
         private Button characterListByRole(final User user) {
-                final Button userBtn = new Button(user.toString());
-                userBtn.setStyleName(Button.STYLE_LINK);
+                Button userBtn = null;
+                userBtn = new Button(user.toString());
+                userBtn.addStyleName(Button.STYLE_LINK);
                 userBtn.addListener(new charListClickListener(user));
                 return userBtn;
         }
@@ -69,8 +68,10 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         private void addUsersForRole(Role r, VerticalLayout roleList) {
                 for (final User user : characterDAO.getUsersWithRole(r)) {
-                        Button userBtn = characterListByRole(user);
-                        roleList.addComponent(userBtn);
+                        
+                                Button userBtn = characterListByRole(user);
+                                roleList.addComponent(userBtn);
+                        
                 }
         }
 
@@ -108,7 +109,6 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                         pop.setDkpList(dkpList);
                         pop.setCharacterList(charList);
                         pop.showProperCharWindow(user);
-
                 }
         }
 }

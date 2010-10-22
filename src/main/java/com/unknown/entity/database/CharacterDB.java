@@ -277,6 +277,24 @@ public class CharacterDB implements CharacterDAO {
                 }
         }
 
+        @Override
+        public void deleteCharacter(User user) {
+                Connection c = null;
+                int success = 0;
+                try {
+                        c = new DBConnection().getConnection();
+                        PreparedStatement p = c.prepareStatement("DELETE FROM characters WHERE id=?");
+                        p.setInt(1, user.getId());
+                        success = p.executeUpdate();
+                        System.out.println("deleteCharacter("+user.getUsername()+") :" + success);
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        closeConnection(c);
+                }
+
+        }
+
         private static class HasRolePredicate implements Predicate<User> {
 
                 private final Role role;
