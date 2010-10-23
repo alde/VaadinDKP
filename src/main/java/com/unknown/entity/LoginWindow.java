@@ -4,6 +4,7 @@
  */
 package com.unknown.entity;
 
+import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.dao.ILoginDao;
 import com.unknown.entity.dao.LoginDao;
@@ -26,6 +27,7 @@ public class LoginWindow extends Window {
         private TextField password = new TextField("Password");
         private Button submit = new Button("Login");
         private List<MyLoginListener> listeners = new ArrayList<MyLoginListener>();
+        private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
         private ILoginDao loginDao = new LoginDao();
 
         public LoginWindow() {
@@ -91,5 +93,12 @@ public class LoginWindow extends Window {
                 for (MyLoginListener loginListener : listeners) {
                         loginListener.onLogin();
                 }
+                for (CharacterInfoListener characterListener : charlisteners) {
+                        characterListener.onCharacterInfoChange();
+                }
+        }
+
+        public void addCharacterInfoListener(CharacterInfoListener charlistener) {
+                charlisteners.add(charlistener);
         }
 }

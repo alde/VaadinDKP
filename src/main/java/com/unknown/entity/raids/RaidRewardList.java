@@ -70,7 +70,7 @@ public class RaidRewardList extends Table implements RaidRewardListener {
                 Collection<RaidReward> rewards;
                 try {
                         rewards = raidDao.getRewardsForRaid(this.raid.getId());
-                        System.out.println("++++ ---- " + raid.getRaidRewards());
+                        // System.out.println("++++ ---- " + raid.getRaidRewards());
                         for (RaidReward rreward : rewards) {
                                 Item addItem = addItem(rreward);
                                 raidListAddRow(addItem, rreward);
@@ -81,7 +81,7 @@ public class RaidRewardList extends Table implements RaidRewardListener {
         }
 
         private void raidListAddRow(Item addItem, RaidReward rreward) {
-                System.out.println(rreward.getComment());
+                // System.out.println(rreward.getComment());
                 addItem.getItemProperty("Comment").setValue(rreward.getComment());
                 addItem.getItemProperty("Shares").setValue(rreward.getShares());
         }

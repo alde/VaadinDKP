@@ -8,6 +8,7 @@ import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.*;
+import com.unknown.entity.items.ItemList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -26,6 +27,7 @@ public class RaidList extends Table implements RaidInfoListener {
         private final RaidList raidList = this;
         private CharacterList clist;
         private DkpList dkplist;
+        private ItemList itemList;
 
         public RaidList(RaidDAO raidDAO) {
                 this.raidDAO = raidDAO;
@@ -48,6 +50,9 @@ public class RaidList extends Table implements RaidInfoListener {
         }
         public void setDkpList(DkpList dkplist) {
                 this.dkplist = dkplist;
+        }
+        public void setItemList(ItemList itemList) {
+                this.itemList = itemList;
         }
 
         @Override
@@ -100,6 +105,7 @@ public class RaidList extends Table implements RaidInfoListener {
                                 pop.setRaidList(raidList);
                                 pop.setCharacterList(clist);
                                 pop.setDkpList(dkplist);
+                                pop.setItemList(itemList);
                                 pop.showProperRaidWindow(raid);
                         }
                 }

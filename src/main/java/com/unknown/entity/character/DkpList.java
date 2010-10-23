@@ -7,6 +7,9 @@ package com.unknown.entity.character;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.Armor;
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.items.ItemList;
+import com.unknown.entity.raids.RaidList;
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -28,17 +31,25 @@ public class DkpList extends Table implements CharacterInfoListener {
         private IndexedContainer ic;
         private DkpList dkpList = this;
         private CharacterList charList;
+        private Application app;
+        private ItemList itemList;
+        private RaidList raidList;
 
-
-        public DkpList(CharacterDAO characterDAO) {
+        public DkpList(CharacterDAO characterDAO, Application app) {
                 this.characterDAO = characterDAO;
                 this.ic = new IndexedContainer();
+                this.app = app;
                 dkpListSetColumnHeaders();
                 this.setSelectable(true);
                 this.setWidth("185px");
                 this.setHeight("500px");
 
                 this.addListener(new dkpListClickListener());
+        }
+
+        public void setLists(ItemList itemList, RaidList raidList) {
+                this.itemList = itemList;
+                this.raidList = raidList;
         }
 
         private void dkpListSetColumnHeaders() throws UnsupportedOperationException {
@@ -69,6 +80,15 @@ public class DkpList extends Table implements CharacterInfoListener {
                 printList();
         }
 
+        private boolean isAdmin() {
+                final SiteUser siteUser = (SiteUser) app.getUser();
+                if (siteUser != null) {
+                        return true;
+                } else {
+                        return false;
+                }
+        }
+
         public void printList() {
                 clear();
                 List<User> users = characterDAO.getUsers();
@@ -80,8 +100,13 @@ public class DkpList extends Table implements CharacterInfoListener {
                         }
                 });
                 for (final User user : users) {
-                        Item addItem = addItem(user);
-                        dkpListAddRow(addItem, user);
+                        if (user.isActive()) {
+                                Item addItem = addItem(user);
+                                dkpListAddRow(addItem, user);
+                        } else if (isAdmin()) {
+                                Item addItem = addItem(user);
+                                dkpListAddRow(addItem, user);
+                        }
                 }
         }
 
@@ -105,7 +130,7 @@ public class DkpList extends Table implements CharacterInfoListener {
         }
 
         public void setCharacterList(CharacterList charList) {
-                this. charList = charList;
+                this.charList = charList;
         }
 
         private class dkpListClickListener implements ItemClickListener {
@@ -118,6 +143,8 @@ public class DkpList extends Table implements CharacterInfoListener {
                         if (event.isDoubleClick()) {
                                 User user = (User) event.getItemId();
                                 PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
+                                pop.setItemList(itemList);
+                                pop.setRaidList(raidList);
                                 pop.setDkpList(dkpList);
                                 pop.setCharacterList(charList);
                                 pop.showProperCharWindow(user);

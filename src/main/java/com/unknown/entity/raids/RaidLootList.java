@@ -69,9 +69,9 @@ public class RaidLootList extends Table implements RaidLootListener {
                 ArrayList<RaidItem> temp;
                 try {
                         temp = itemDao.getItemsForRaid(raid.getId());
-                        System.out.println("Raid Loots: " + temp.size());
+                        // System.out.println("Raid Loots: " + temp.size());
                         for (RaidItem item : temp) {
-                                System.out.println("Loot ... " + item.getName());
+                                // System.out.println("Loot ... " + item.getName());
                                 Item addItem = ic.addItem(item);
                                 raidListAddRow(addItem, item);
                         }

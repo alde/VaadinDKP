@@ -149,10 +149,10 @@ public class RaidRewardEditWindow extends Window {
                                 List<String> invalidchars = raidDao.findInvalidCharacters(attendantlist, chardao);
                                 if (invalidchars.isEmpty()) {
                                         updateReward(reward, attendantlist, newShares, newComment);
-                                        System.out.println("Blaaaaaaaaaaaaa"+ reward.getComment());
+                                        // System.out.println("Blaaaaaaaaaaaaa"+ reward.getComment());
                                 } else {
                                         showInvalidUsers(invalidchars);
-                                        System.out.println(invalidchars.toString());
+                                        // System.out.println(invalidchars.toString());
                                 }
 
                         } catch (SQLException ex) {
@@ -182,7 +182,7 @@ public class RaidRewardEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         int success = removeReward(reward);
-                        System.out.println(success + " rewards removed.");
+                        // System.out.println(success + " rewards removed.");
                         notifyListeners();
                         close();
                 }

@@ -7,6 +7,7 @@ package com.unknown.entity.panel;
 import com.unknown.entity.character.windows.AddNewUserWindow;
 import com.unknown.entity.items.windows.EditDefaultPricesWindow;
 import com.unknown.entity.LoginWindow;
+import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.character.windows.CharacterAddWindow;
@@ -23,6 +24,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +42,8 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button editDefaultBtn = new Button("Edit Default prices");
         private final Button addUserBtn = new Button("Add User");
         private final Button logOutButton = new Button("");
+        private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
+
         RaidList raidList = null;
         CharacterList characterList = null;
         DkpList dkpList = null;
@@ -50,11 +55,21 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 this.setSpacing(true);
         }
 
+        private void notifyListeners() {
+                for (CharacterInfoListener characterListener : listeners) {
+                        characterListener.onCharacterInfoChange();
+                }
+        }
+
+        public void addCharacterInfoListener(CharacterInfoListener listener) {
+                listeners.add(listener);
+        }
+
         private void styleLoginLogout() {
-                loginBtn.setIcon(new ThemeResource("../ue/img/key3.png"));
+                loginBtn.setIcon(new ThemeResource("../shared/key.png"));
                 loginBtn.setStyle(Button.STYLE_LINK);
                 logOutButton.setStyle(Button.STYLE_LINK);
-                logOutButton.setIcon(new ThemeResource("../ue/img/key3.png"));
+                logOutButton.setIcon(new ThemeResource("../shared/key.png"));
         }
 
         private void setListeners() {
@@ -160,7 +175,10 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                                 LoginWindow loginWindow = new LoginWindow();
                                 loginWindow.addLoginListener(AdminPanel.this);
                                 getMainWindow().addWindow(loginWindow);
+                                loginWindow.addCharacterInfoListener(characterList);
+                                loginWindow.addCharacterInfoListener(dkpList);
                                 loginWindow.attach();
+                                
                         } else {
                                 getMainWindow().addComponent(new Label("User: " + (getApplication() != null ? getApplication().getUser() : "")));
                         }
@@ -173,6 +191,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 public void buttonClick(ClickEvent event) {
                         if (getMainWindow().getApplication().getUser() != null) {
                                 getMainWindow().getApplication().setUser(null);
+                                notifyListeners();
                                 login();
                         }
                 }

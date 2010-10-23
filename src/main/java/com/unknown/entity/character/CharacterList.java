@@ -7,6 +7,8 @@ package com.unknown.entity.character;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.Role;
+import com.unknown.entity.items.ItemList;
+import com.unknown.entity.raids.RaidList;
 import com.vaadin.Application;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
@@ -29,6 +31,8 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         private DkpList dkpList;
         private CharacterList charList = this;
         CharacterDAO characterDAO;
+        private RaidList raidList;
+        private ItemList itemList;
         private Application app;
 
         public CharacterList(CharacterDAO characherDAO, DkpList dkpList, Application app) {
@@ -37,28 +41,20 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                 this.app = app;
         }
 
+
+        public void setLists(ItemList itemList, RaidList raidList) {
+                this.itemList = itemList;
+                this.raidList = raidList;
+        }
+
         private void characterClassImages(List<Role> roles) {
                 for (Role r : roles) {
                         VerticalLayout roleList = new VerticalLayout();
                         addComponent(roleList);
-                        Embedded e = new Embedded("", new ThemeResource("../ue/img/" + r.toString().toLowerCase() + ".png"));
+                        Embedded e = new Embedded("", new ThemeResource("../shared/" + r.toString().toLowerCase() + ".png"));
                         roleList.addComponent(e);
                         addUsersForRole(r, roleList);
                 }
-        }
-
-        private Button characterListByRole(final User user) {
-                Button userBtn = null;
-                if (isAdmin() && user.isActive()) {
-                        userBtn = new Button(user.toString());
-                } else if (isAdmin() && !user.isActive()) {
-                        userBtn = new Button("-"+user.toString());
-                } else if (!isAdmin() && user.isActive()) {
-                        userBtn = new Button(user.toString());
-                }
-                userBtn.addStyleName(Button.STYLE_LINK);
-                userBtn.addListener(new charListClickListener(user));
-                return userBtn;
         }
 
         private void clear() {
@@ -74,9 +70,18 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         private void addUsersForRole(Role r, VerticalLayout roleList) {
                 for (final User user : characterDAO.getUsersWithRole(r)) {
-
-                        Button userBtn = characterListByRole(user);
-                        roleList.addComponent(userBtn);
+                        if (user.isActive()) {
+                                Button userBtn = new Button(user.toString());
+                                userBtn.addStyleName(Button.STYLE_LINK);
+                                userBtn.addListener(new charListClickListener(user));
+                                roleList.addComponent(userBtn);
+                        } else if (isAdmin()) {
+                                System.out.println(user.getUsername() + " is inactive!");
+                                Button userBtn = new Button("--" + user.toString());
+                                userBtn.addStyleName(Button.STYLE_LINK);
+                                userBtn.addListener(new charListClickListener(user));
+                                roleList.addComponent(userBtn);
+                        }
 
                 }
         }
@@ -121,6 +126,8 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                 @Override
                 public void buttonClick(ClickEvent event) {
                         PopUpControl pop = new PopUpControl(getApplication());
+                        pop.setItemList(itemList);
+                        pop.setRaidList(raidList);
                         pop.setDkpList(dkpList);
                         pop.setCharacterList(charList);
                         pop.showProperCharWindow(user);

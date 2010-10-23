@@ -146,8 +146,11 @@ public class CharacterDB implements CharacterDAO {
                 int totalshares = 0;
                 ResultSet rsloot = ploot.executeQuery();
                 while (rsloot.next()) {
-                        dkp_spent = getDkpSpentForCharacterById(rsloot, rs, dkp_spent);
-                        loot_value = loot_value + rsloot.getDouble("loots.price");
+                        if (rsloot.getBoolean("characters.active")) {
+                                dkp_spent = getDkpSpentForCharacterById(rsloot, rs, dkp_spent);
+                                loot_value = loot_value + rsloot.getDouble("loots.price");
+                        }
+
                 }
                 PreparedStatement ps = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters WHERE character_rewards.reward_id=rewards.id AND characters.id=?");
                 ps.setInt(1, rs.getInt("characters.id"));
@@ -155,9 +158,11 @@ public class CharacterDB implements CharacterDAO {
                 ResultSet rss = ps.executeQuery();
                 while (rss.next()) {
                         shares = getSharesForCharacterById(rs, rss, shares);
+
                         totalshares += rss.getInt("rewards.number_of_shares");
+
                 }
-                if (totalshares != 0) {
+                if (totalshares > 0) {
                         share_value = loot_value / totalshares;
                 } else {
                         share_value = 0;
@@ -211,7 +216,7 @@ public class CharacterDB implements CharacterDAO {
                 String foo = "";
                 int amountofRaids = raidDao.getTotalRaidsLastThirtyDays();
                 int attendedRaids = raidDao.getAttendedRaidsLastThirtyDays(user);
-                System.out.println("amount fo raids = " + amountofRaids + " -- attended raids = " + attendedRaids);
+                // System.out.println("amount fo raids = " + amountofRaids + " -- attended raids = " + attendedRaids);
                 double temp = 0;
                 if (amountofRaids == 0) {
                         temp = 0;
@@ -234,7 +239,7 @@ public class CharacterDB implements CharacterDAO {
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
                         int success = p.executeUpdate();
-                        System.out.println(success + " items deleted.");
+                        // System.out.println(success + " items deleted.");
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -261,7 +266,7 @@ public class CharacterDB implements CharacterDAO {
                         p.setBoolean(4, heroic);
                         p.setInt(5, lootid);
                         int success = p.executeUpdate();
-                        System.out.println(success + " items updated.");
+                        // System.out.println(success + " items updated.");
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -286,7 +291,7 @@ public class CharacterDB implements CharacterDAO {
                         PreparedStatement p = c.prepareStatement("DELETE FROM characters WHERE id=?");
                         p.setInt(1, user.getId());
                         success = p.executeUpdate();
-                        System.out.println("deleteCharacter("+user.getUsername()+") :" + success);
+                        // System.out.println("deleteCharacter("+user.getUsername()+") :" + success);
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {

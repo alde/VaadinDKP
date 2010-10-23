@@ -4,16 +4,23 @@
  */
 package com.unknown.entity.character.windows;
 
+import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.items.ItemList;
+import com.unknown.entity.items.Items;
 import com.unknown.entity.raids.Raid;
+import com.unknown.entity.raids.RaidList;
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
@@ -30,16 +37,21 @@ public class CharacterInfoWindow extends Window {
 
         private RaidDAO raidDao;
         private final User user;
+        private Application app;
+        private ItemList itemList;
+        private RaidList raidList;
 
-        public CharacterInfoWindow(User user) {
+        public CharacterInfoWindow(User user, Application app, RaidList raidList, ItemList itemList) {
                 this.user = user;
+                this.app = app;
+                this.raidList = raidList;
+                this.itemList = itemList;
                 this.raidDao = new RaidDB();
                 this.addStyleName("opaque");
                 this.setCaption("Character information: " + user.getUsername());
                 this.setPositionX(200);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
-
         }
 
         public void printInfo() throws SQLException {
@@ -152,6 +164,7 @@ public class CharacterInfoWindow extends Window {
                         Item addItem = tbl.addItem(charitem.getId());
                         characterInfoLootTableAddRow(addItem, charitem);
                 }
+                tbl.addListener(new LootListClickListener());
                 return tbl;
         }
 
@@ -165,6 +178,7 @@ public class CharacterInfoWindow extends Window {
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }
+                tbl.addListener(new RaidListClickListener());
                 return tbl;
         }
 
@@ -174,5 +188,38 @@ public class CharacterInfoWindow extends Window {
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance +"% of raids the last 30 days.");
                 addComponent(attended);
+        }
+
+        private class LootListClickListener implements ItemClickListener {
+
+                public LootListClickListener() {
+                }
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+
+                        if (event.isDoubleClick()) {
+                                Items item = (Items) event.getItemId();
+                                PopUpControl pop = new PopUpControl(app);
+                                pop.setItemList(itemList);
+                                pop.showProperItemWindow(item);
+                        }
+                }
+        }
+
+        private class RaidListClickListener implements ItemClickListener {
+
+                public RaidListClickListener() {
+                }
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                         if (event.isDoubleClick()) {
+                                Raid item = (Raid) event.getItemId();
+                                PopUpControl pop = new PopUpControl(app);
+                                pop.setRaidList(raidList);
+                                pop.showProperRaidWindow(item);
+                        }
+                }
         }
 }

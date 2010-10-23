@@ -119,9 +119,9 @@ public class RaidLootEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         try {
-                                System.out.println("Reward Item ID: " + item.getId());
+                                // System.out.println("Reward Item ID: " + item.getId());
                                 int success = deleteItem(item);
-                                System.out.println(success + "items deleted.");
+                                // System.out.println(success + "items deleted.");
                                 notifyListeners();
                         } catch (SQLException ex) {
                                 Logger.getLogger(RaidLootEditWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,10 +151,10 @@ public class RaidLootEditWindow extends Window {
                         boolean heroic = Boolean.parseBoolean(isheroic.getValue().toString());
                         String newlooter = looter.getValue().toString();
                         String newitem = itemname.getValue().toString();
-                                System.out.println("Reward Item ID: " + id);
-                                System.out.println("Reward Item Name: " + newitem + "\nLooter: " + newlooter + "\nPrice: " + newprice + "\nHeroic: " + heroic);
+                                // System.out.println("Reward Item ID: " + id);
+                                // System.out.println("Reward Item Name: " + newitem + "\nLooter: " + newlooter + "\nPrice: " + newprice + "\nHeroic: " + heroic);
                                 int success = updateItem(id, newlooter, newitem, newprice, heroic);
-                                System.out.println(success + " items updated.");
+                                // System.out.println(success + " items updated.");
                                 notifyListeners();
                 }
 

@@ -8,6 +8,7 @@ import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
+import com.unknown.entity.XmlParser;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.Items;
@@ -20,14 +21,18 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +53,7 @@ public class ItemEditWindow extends Window {
                 this.addStyleName("opaque");
                 this.setCaption("Edit item: " + item.getName());
                 this.setPositionX(400);
-                this.setPositionY(100);
+                this.setPositionY(50);
                 this.getContent().setSizeUndefined();
         }
 
@@ -67,8 +72,12 @@ public class ItemEditWindow extends Window {
                 final TextField wowIdfieldhc = editInfoWowIdHcField();
 
                 addComponent(name);
-                addComponent(slot);
-                addComponent(type);
+                HorizontalLayout hzl = new HorizontalLayout();
+                hzl.addComponent(slot);
+                hzl.addComponent(type);
+                hzl.setSpacing(true);
+                addComponent(hzl);
+
                 itemEditGrid(wowIdfield, wowIdfieldhc, price, pricehc);
 
                 final CheckBox islegendary = new CheckBox("Legendary", item.isLegendary());
@@ -77,7 +86,7 @@ public class ItemEditWindow extends Window {
                 Button deleteButton = new Button("Delete Item");
                 deleteButton.addListener(new DeleteButtonClickListener(item));
                 updateButton.addListener(new UpdateButtonClickListener(name, slot, type, wowIdfield, wowIdfieldhc, price, pricehc, islegendary));
-                HorizontalLayout hzl = new HorizontalLayout();
+                hzl = new HorizontalLayout();
                 Label warning = new Label();
                 warning.setWidth("220px");
                 warning.setValue("Can NOT be reverted.");
@@ -89,23 +98,32 @@ public class ItemEditWindow extends Window {
                 hzl.setMargin(true, false, true, false);
                 addComponent(hzl);
                 itemLootedByTable();
+                try {
+                        itemTooltips(item);
+                } catch (IOException ex) {
+                        Logger.getLogger(ItemEditWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
 
         private void itemEditGrid(final TextField wowIdfield, final TextField wowIdfieldhc, final TextField price, final TextField pricehc) throws OutOfBoundsException, OverlapsException {
-                GridLayout gl = new GridLayout(3, 4);
+                GridLayout gl = new GridLayout(3, 3);
                 gl.setWidth("500px");
-                gl.addComponent(new Label("Normal "), 1, 0);
-                gl.addComponent(new Label("Heroic "), 2, 0);
+
+                Link normal = new Link("Normal", new ExternalResource("http://www.wowhead.com/item="+item.getWowId()));
+                normal.setTargetName("_blank");
+                Link heroic = new Link("Heroic", new ExternalResource("http://www.wowhead.com/item="+item.getWowId_hc()));
+                heroic.setTargetName("_blank");
+                
+                gl.addComponent(normal, 1, 0);
+                gl.addComponent(heroic, 2, 0);
                 gl.addComponent(new Label("WowID: "), 0, 1);
-                Button wowIdBtn = editInfoWowIdButton();
-                gl.addComponent(wowIdBtn, 1, 1);
-                gl.addComponent(wowIdfield, 1, 2);
-                Button wowIdBtnhc = editInfoWowIdHcButton();
-                gl.addComponent(wowIdBtnhc, 2, 1);
-                gl.addComponent(wowIdfieldhc, 2, 2);
-                gl.addComponent(new Label("Price: "), 0, 3);
-                gl.addComponent(price, 1, 3);
-                gl.addComponent(pricehc, 2, 3);
+
+                gl.addComponent(wowIdfield, 1, 1);
+                gl.addComponent(wowIdfieldhc, 2, 1);
+                
+                gl.addComponent(new Label("Price: "), 0, 2);
+                gl.addComponent(price, 1, 2);
+                gl.addComponent(pricehc, 2, 2);
                 addComponent(gl);
         }
 
@@ -130,25 +148,11 @@ public class ItemEditWindow extends Window {
                 return wowIdfieldhc;
         }
 
-        private Button editInfoWowIdHcButton() {
-                final Button wowIdBtnhc = new Button("" + item.getWowId_hc());
-                wowIdBtnhc.setStyleName(Button.STYLE_LINK);
-                wowIdBtnhc.addListener(new WowIdHcButtonClickListener());
-                return wowIdBtnhc;
-        }
-
         private TextField editInfoWowIdField() throws ReadOnlyException, ConversionException {
                 final TextField wowIdfield = new TextField();
                 wowIdfield.setImmediate(true);
                 wowIdfield.setValue("" + item.getWowId());
                 return wowIdfield;
-        }
-
-        private Button editInfoWowIdButton() {
-                final Button wowIdBtn = new Button("" + item.getWowId());
-                wowIdBtn.setStyleName(Button.STYLE_LINK);
-                wowIdBtn.addListener(new WowIdButtonClickListener());
-                return wowIdBtn;
         }
 
         private ComboBox editInfoType() throws ConversionException, ReadOnlyException, UnsupportedOperationException {
@@ -241,6 +245,26 @@ public class ItemEditWindow extends Window {
                 }
         }
 
+        private void itemTooltips(Items item) throws IOException {
+                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
+                HorizontalLayout hzl = new HorizontalLayout();
+                XmlParser xml = new XmlParser("" + item.getWowId());
+                String normalTooltip = xml.parseXmlTooltip();
+                normalTooltip = normalTooltip.replace("href", "target=\"_blank\" href");
+                CustomLayout csnormal = new CustomLayout(new ByteArrayInputStream(normalTooltip.getBytes()));
+                csnormal.setWidth("250px");
+                hzl.addComponent(csnormal);
+                if (item.getWowId() != item.getWowId_hc() && item.getWowId_hc() != 0) {
+                        xml = new XmlParser("" + item.getWowId_hc());
+                        String hcTooltip = xml.parseXmlTooltip();
+                        hcTooltip = hcTooltip.replace("href", "target=\"_blank\" href");
+                        CustomLayout cshc = new CustomLayout(new ByteArrayInputStream(hcTooltip.getBytes()));
+                        cshc.setWidth("250px");
+                        hzl.addComponent(cshc);
+                }
+                addComponent(hzl);
+        }
+
         private class UpdateButtonClickListener implements ClickListener {
 
                 private final TextField name;
@@ -274,7 +298,7 @@ public class ItemEditWindow extends Window {
                         final double newpricehc = Double.parseDouble(pricehc.getValue().toString());
                         final boolean legendary = (Boolean) islegendary.getValue();
                         final int success = updateItem(newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc, legendary);
-                        System.out.println("New Price Heroic" + newpricehc);
+                        // System.out.println("New Price Heroic" + newpricehc);
                         addComponent(new Label("Success: " + success));
                         notifyListeners();
                         close();
@@ -295,7 +319,7 @@ public class ItemEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         String url = "http://www.wowhead.com/item=" + item.getWowId();
-                        System.out.println(url);
+                        // System.out.println(url);
                         open(new ExternalResource(url), "_blank");
                 }
         }

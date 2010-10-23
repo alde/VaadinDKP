@@ -40,7 +40,7 @@ public class RaidDB implements RaidDAO {
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 final Raid raid = new Raid(rs.getString("zones.name"), rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
-                                System.out.println("getting stuff for raid: " + raid.getId());
+                                // System.out.println("getting stuff for raid: " + raid.getId());
                                 raid.addRaidItems(getItemsForRaid(raid.getId()));
                                 raid.addRaidChars(getCharsForRaid(raid.getId()));
                                 raid.addRaidRewards(getRewardsForRaid(raid.getId()));
@@ -166,7 +166,7 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException {
-                System.out.println("getting rewards for raid: " + raidId);
+                // System.out.println("getting rewards for raid: " + raidId);
                 Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
                 try {
@@ -181,7 +181,7 @@ public class RaidDB implements RaidDAO {
                                 rrewards.setShares(rs.getInt("rewards.number_of_shares"));
                                 rrewards.addRewardChars(getCharsForReward(rrewards.getId()));
                                 raidRewards.add(rrewards);
-                                System.out.println("rreward" + rrewards.toString());
+                                // System.out.println("rreward" + rrewards.toString());
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
@@ -209,7 +209,7 @@ public class RaidDB implements RaidDAO {
                                 rchar.setShares(rs.getInt("rewards.number_of_shares"));
                                 rchar.setRaidId(rs.getInt("rewards.raid_id"));
                                 raidChars.add(rchar);
-                                System.out.println("rchar" + rchar.toString());
+                                // System.out.println("rchar" + rchar.toString());
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
@@ -465,7 +465,7 @@ public class RaidDB implements RaidDAO {
                 for (String string : attendantlist) {
 
                         int characterId = characterDB.getCharacterId(string);
-                        System.out.println("Name: " + string + "ID: " + characterId);
+                        // System.out.println("Name: " + string + "ID: " + characterId);
                         chars.add(getRaidChar(characterId, raidId));
 
                 }
@@ -519,8 +519,8 @@ public class RaidDB implements RaidDAO {
                 DateTime dt = new DateTime();
                 String startdate = dt.toYearMonthDay().minusDays(30).toString();
                 String enddate = dt.toYearMonthDay().toString();
-                System.out.println("Today: " + enddate);
-                System.out.println("30 Days ago: " + startdate);
+                // System.out.println("Today: " + enddate);
+                // System.out.println("30 Days ago: " + startdate);
                 DBConnection c = new DBConnection();
                 try {
 
@@ -528,7 +528,7 @@ public class RaidDB implements RaidDAO {
                         p.setString(1, startdate);
                         p.setString(2, enddate);
                         ResultSet rs = p.executeQuery();
-                        System.out.println(p);
+                        // System.out.println(p);
                         while (rs.next()) {
                                 i++;
                         }
@@ -553,7 +553,7 @@ public class RaidDB implements RaidDAO {
                         p.setString(2, startdate);
                         p.setString(3, enddate);
                         ResultSet rs = p.executeQuery();
-                        System.out.println(p);
+                        // System.out.println(p);
                         while (rs.next()) {
                                 i++;
                         }
@@ -572,7 +572,7 @@ public class RaidDB implements RaidDAO {
                 CharacterDAO charDao = new CharacterDB();
                 int itemid = itemDao.getItemId(itemname);
                 int charid = charDao.getCharacterId(looter);
-                System.out.println("Itemid: " + itemid + " Charid: " + charid);
+                // System.out.println("Itemid: " + itemid + " Charid: " + charid);
                 int success = 0;
                 DBConnection c = new DBConnection();
                 try {
@@ -582,9 +582,9 @@ public class RaidDB implements RaidDAO {
                         p.setDouble(3, price);
                         p.setBoolean(4, heroic);
                         p.setInt(5, id);
-                        System.out.println(p.toString());
+                        // System.out.println(p.toString());
                         success = p.executeUpdate();
-                        System.out.println(success + " items updated.");
+                        // System.out.println(success + " items updated.");
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {

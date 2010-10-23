@@ -48,8 +48,8 @@ public class UnknownEntityDKP extends Application {
                 window = new Window("Unknown Entity DKP");
                 setMainWindow(window);
                 Drawings();
-                setTheme("chameleon-dark");
-//                setTheme("ue");
+//                setTheme("chameleon-dark");
+                setTheme("dark");
         }
 
         private void Drawings() {
@@ -59,7 +59,7 @@ public class UnknownEntityDKP extends Application {
                 ItemDAO itemDAO = new ItemDB();
 
                 
-                dkpList = new DkpList(characterDAO);
+                dkpList = new DkpList(characterDAO, this);
                 charList = new CharacterList(characterDAO, dkpList, this);
                 charList.attach();
                 dkpList.setCharacterList(charList);
@@ -70,6 +70,10 @@ public class UnknownEntityDKP extends Application {
                 itemList.addStyleName("small striped");
                 raidList.setCharList(charList);
                 raidList.setDkpList(dkpList);
+                charList.setLists(itemList, raidList);
+                dkpList.setLists(itemList, raidList);
+                itemList.setLists(charList, dkpList, raidList);
+                raidList.setItemList(itemList);
 
                 TablePanel tp = new TablePanel(dkpList, itemList, raidList);
                 final HorizontalLayout hzl = tp.HorizontalSegment();
@@ -80,6 +84,8 @@ public class UnknownEntityDKP extends Application {
                 adminPanel.setItemList(itemList);
                 adminPanel.setCharacterList(charList);
                 adminPanel.setDkpList(dkpList);
+                adminPanel.addCharacterInfoListener(charList);
+                adminPanel.addCharacterInfoListener(dkpList);
 
                 // Character List based on Character Class
                 characterListOnCharacterClass();

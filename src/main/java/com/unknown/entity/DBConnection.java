@@ -125,12 +125,12 @@ public final class DBConnection {
     }
 
     private void printError(File f) {
-        System.out.println("please create " + f.getAbsolutePath());
-        System.out.println("format: db.url = mydomain.com ");
-        System.out.println("db.username= nils");
-        System.out.println("db.db = mydb");
-        System.out.println("db.port=1234");
-        System.out.println("db.password = secret");
+        // System.out.println("please create " + f.getAbsolutePath());
+        // System.out.println("format: db.url = mydomain.com ");
+        // System.out.println("db.username= nils");
+        // System.out.println("db.db = mydb");
+        // System.out.println("db.port=1234");
+        // System.out.println("db.password = secret");
     }
 
     private boolean verifyProperties(Properties prop) {

@@ -76,7 +76,7 @@ public class AddNewUserWindow extends Window {
                         if (checkPassword()) {
                                 String hashedpassword = hashPassword(password.getValue().toString());
                                 int success = characterDao.addNewSiteUser(username.getValue().toString(), hashedpassword, 1);
-                                System.out.println(success + " user added");
+                                // System.out.println(success + " user added");
                         } else {
                                 Label err = new Label("Passwords must match!");
                                 err.addStyleName("error");

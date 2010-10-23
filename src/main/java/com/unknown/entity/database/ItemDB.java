@@ -257,7 +257,7 @@ public class ItemDB implements ItemDAO {
                         p.setDouble(2, heroicprice);
                         p.setString(3, slot);
                         success = p.executeUpdate();
-                        System.out.println("Default prices changed for " + success + " slots");
+                        // System.out.println("Default prices changed for " + success + " slots");
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -291,7 +291,7 @@ public class ItemDB implements ItemDAO {
                 while (rs.next()) {
                         RaidItem tmp = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.item_id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
                         items.add(tmp);
-                        System.out.println(rs.toString());
+                        // System.out.println(rs.toString());
                 }
                 c.close();
                 return items;

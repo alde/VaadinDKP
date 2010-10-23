@@ -222,7 +222,7 @@ public class CharacterEditWindow extends Window {
                 characterLootTableSetColumnHeaders();
                 for (CharacterItem charitem : user.getCharItems()) {
                         Item addItem = ic.addItem(charitem);
-                        System.out.println(addItem);
+                        // System.out.println(addItem);
                         characterLootTableSetRow(addItem, charitem);
                 }
         }
@@ -270,7 +270,7 @@ public class CharacterEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         int success = updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
-                        System.out.println("" + success);
+                        // System.out.println("" + success);
                         notifyListeners();
 
                         close();

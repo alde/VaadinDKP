@@ -5,7 +5,10 @@
 package com.unknown.entity.items;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.character.CharacterList;
+import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.ItemDAO;
+import com.unknown.entity.raids.RaidList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -22,6 +25,9 @@ public class ItemList extends Table implements ItemInfoListener {
         private ItemDAO itemDAO;
         IndexedContainer ic;
         private final ItemList itemList = this;
+        private CharacterList charLiist;
+        private RaidList raidList;
+        private DkpList dkpList;
 
         public ItemList(ItemDAO itemDAO) {
                 this.itemDAO = itemDAO;
@@ -31,6 +37,12 @@ public class ItemList extends Table implements ItemInfoListener {
                 this.setSelectable(true);
 
                 this.addListener(new ItemListClickListener());
+        }
+
+        public void setLists(CharacterList charList, DkpList dkpList, RaidList raidList) {
+                this.charLiist = charList;
+                this.dkpList = dkpList;
+                this.raidList = raidList;
         }
 
         private void itemListAddRow(Item addItem, final Items item) throws ConversionException, ReadOnlyException {
@@ -107,6 +119,9 @@ public class ItemList extends Table implements ItemInfoListener {
                                 Items item = (Items) event.getItemId();
                                 PopUpControl pop = new PopUpControl(ItemList.this.getApplication());
                                 pop.setItemList(itemList);
+                                pop.setDkpList(dkpList);
+                                pop.setCharacterList(charLiist);
+                                pop.setRaidList(raidList);
                                 pop.showProperItemWindow(item);
                         }
                 }
