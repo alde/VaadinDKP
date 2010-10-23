@@ -222,11 +222,6 @@
                   <artifactId>superimmediatetextfield</artifactId>
                   <version>1.0.0</version>
                 </dependency>
-                <dependency>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok-maven</artifactId>
-                        <version>0.9.3.1</version>
-                </dependency>
         </dependencies>
 
 </project>

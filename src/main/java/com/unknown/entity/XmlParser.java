@@ -7,7 +7,6 @@ package com.unknown.entity;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lombok.SneakyThrows;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -27,8 +26,6 @@ public class XmlParser {
         public XmlParser(String wowidstring) {
                 this.wowIdString = wowidstring;
         }
-
-        @SneakyThrows
         public String parseXmlTooltip() {
 
                 String output = "";
