@@ -19,6 +19,7 @@ import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 /**
@@ -42,6 +43,7 @@ public class ItemInfoWindow extends Window {
                 itemInformation();
                 itemGrid();
                 itemLootedByTable();
+
         }
 
         private GridLayout itemGridLayout(final Button wowIdBtn, final Button wowIdBtnhc) throws OverlapsException, OutOfBoundsException {
@@ -51,6 +53,7 @@ public class ItemInfoWindow extends Window {
                 gl.addComponent(new Label("Heroic "), 2, 0);
                 gl.addComponent(new Label("WowID: "), 0, 1);
                 gl.addComponent(wowIdBtn, 1, 1);
+
                 gl.addComponent(wowIdBtnhc, 2, 1);
                 gl.addComponent(new Label("Price: "), 0, 2);
                 gl.addComponent(new Label("" + item.getPrice()), 1, 2);
@@ -86,10 +89,14 @@ public class ItemInfoWindow extends Window {
         }
 
         private void itemInformation() {
-                addComponent(new Label("Item information"));
-                addComponent(new Label("Name: " + item.getName()));
-                addComponent(new Label("Slot: " + item.getSlot()));
-                addComponent(new Label("Type: " + item.getType()));
+                VerticalLayout vrt = new VerticalLayout();
+                vrt.addComponent(new Label("Item information"));
+          
+                Label name = new Label("Name: <a href=\"http://www.wowhead.com/item=" + item.getWowId() + " target=\"_blank\"\">[" + item.getName() + "]</a>", Label.CONTENT_XHTML);
+                vrt.addComponent(name);
+                vrt.addComponent(new Label("Slot: " + item.getSlot()));
+                vrt.addComponent(new Label("Type: " + item.getType()));
+                addComponent(vrt);
         }
 
         private Table lootList(Items item) {

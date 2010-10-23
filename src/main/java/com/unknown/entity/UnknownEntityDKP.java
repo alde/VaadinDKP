@@ -49,6 +49,7 @@ public class UnknownEntityDKP extends Application {
                 setMainWindow(window);
                 Drawings();
                 setTheme("chameleon-dark");
+//                setTheme("ue");
         }
 
         private void Drawings() {
@@ -59,7 +60,8 @@ public class UnknownEntityDKP extends Application {
 
                 
                 dkpList = new DkpList(characterDAO);
-                charList = new CharacterList(characterDAO, dkpList);
+                charList = new CharacterList(characterDAO, dkpList, this);
+                charList.attach();
                 dkpList.setCharacterList(charList);
                 dkpList.addStyleName("small striped");
                 raidList = new RaidList(raidDAO);

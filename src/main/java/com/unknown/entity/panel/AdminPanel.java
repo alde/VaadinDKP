@@ -84,6 +84,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         this.addComponent(addUserBtn);
                 } else {
                         addComponent(loginBtn);
+
                 }
         }
 

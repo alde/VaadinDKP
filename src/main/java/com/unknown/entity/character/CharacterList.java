@@ -31,10 +31,10 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         CharacterDAO characterDAO;
         private Application app;
 
-        public CharacterList(CharacterDAO characherDAO, DkpList dkpList) {
+        public CharacterList(CharacterDAO characherDAO, DkpList dkpList, Application app) {
                 this.characterDAO = characherDAO;
                 this.dkpList = dkpList;
-                this.app = getApplication();
+                this.app = app;
         }
 
         private void characterClassImages(List<Role> roles) {
@@ -49,7 +49,13 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         private Button characterListByRole(final User user) {
                 Button userBtn = null;
-                userBtn = new Button(user.toString());
+                if (isAdmin() && user.isActive()) {
+                        userBtn = new Button(user.toString());
+                } else if (isAdmin() && !user.isActive()) {
+                        userBtn = new Button("-"+user.toString());
+                } else if (!isAdmin() && user.isActive()) {
+                        userBtn = new Button(user.toString());
+                }
                 userBtn.addStyleName(Button.STYLE_LINK);
                 userBtn.addListener(new charListClickListener(user));
                 return userBtn;
@@ -68,10 +74,19 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         private void addUsersForRole(Role r, VerticalLayout roleList) {
                 for (final User user : characterDAO.getUsersWithRole(r)) {
-                        
-                                Button userBtn = characterListByRole(user);
-                                roleList.addComponent(userBtn);
-                        
+
+                        Button userBtn = characterListByRole(user);
+                        roleList.addComponent(userBtn);
+
+                }
+        }
+
+        private boolean isAdmin() {
+                final SiteUser siteUser = (SiteUser) app.getUser();
+                if (siteUser != null) {
+                        return true;
+                } else {
+                        return false;
                 }
         }
 
