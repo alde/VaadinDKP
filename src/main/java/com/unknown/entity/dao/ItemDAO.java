@@ -32,8 +32,6 @@ public interface ItemDAO {
 
         public Object getItemPrice(String itemname, boolean heroic) throws SQLException;
 
-        public int getItemId(Connection c, String loot) throws SQLException;
-
         public Items getSingleItem(String name);
 
         public void updateDefaultPrice(String slot, double normalprice, double heroicprice);
@@ -43,5 +41,7 @@ public interface ItemDAO {
         public ArrayList<RaidItem> getItemsForRaid(int id) throws SQLException;
 
         public int getItemId(String name);
+
+        public Items getItemById(int id);
 
 }

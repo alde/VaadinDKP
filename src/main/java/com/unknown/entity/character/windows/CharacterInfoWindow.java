@@ -7,14 +7,10 @@ package com.unknown.entity.character.windows;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
-import com.unknown.entity.database.RaidDB;
-import com.unknown.entity.items.ItemList;
-import com.unknown.entity.items.Items;
-import com.unknown.entity.raids.Raid;
-import com.unknown.entity.raids.RaidList;
+import com.unknown.entity.dao.*;
+import com.unknown.entity.database.*;
+import com.unknown.entity.items.*;
+import com.unknown.entity.raids.*;
 import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
@@ -160,8 +156,10 @@ public class CharacterInfoWindow extends Window {
                 Table tbl = new Table();
                 characterInfoLootTableSetHeaders(tbl);
                 tbl.setHeight("150px");
+                ItemDAO itemDao = new ItemDB();
                 for (CharacterItem charitem : user.getCharItems()) {
-                        Item addItem = tbl.addItem(charitem.getId());
+                        Items temp = itemDao.getItemById(charitem.getId());
+                        Item addItem = tbl.addItem(temp);
                         characterInfoLootTableAddRow(addItem, charitem);
                 }
                 tbl.addListener(new LootListClickListener());

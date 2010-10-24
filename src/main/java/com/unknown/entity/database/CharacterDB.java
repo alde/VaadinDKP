@@ -234,7 +234,7 @@ public class CharacterDB implements CharacterDAO {
                 try {
                         c = new DBConnection().getConnection();
                         int charid = getCharacterId(user.getUsername());
-                        int itemid = itemDao.getItemId(c, itemname);
+                        int itemid = itemDao.getItemId(itemname);
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
                         p.setInt(1, itemid);
                         p.setInt(2, charid);

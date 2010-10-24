@@ -337,7 +337,7 @@ public class RaidDB implements RaidDAO {
                         c = new DBConnection().getConnection();
                         CharacterDAO characterDao = new CharacterDB();
                         ItemDAO itemDao = new ItemDB();
-                        int itemid = itemDao.getItemId(c, loot);
+                        int itemid = itemDao.getItemId(loot);
                         int charid = characterDao.getCharacterId(name);
                         int mobid = getMobId(c, boss);
                         PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, mob_id, character_id, price, heroic) VALUES(?,?,?,?,?,?)");

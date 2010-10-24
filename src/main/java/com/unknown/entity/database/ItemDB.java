@@ -185,18 +185,6 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public int getItemId(Connection c, String loot) throws SQLException {
-                PreparedStatement p = c.prepareStatement("SELECT * FROM items WHERE name=?");
-                p.setString(1, loot);
-                ResultSet rs = p.executeQuery();
-                int itemid = 0;
-                while (rs.next()) {
-                        itemid = rs.getInt("id");
-                }
-                return itemid;
-        }
-
-        @Override
         public int getItemId(String loot) {
                 DBConnection c = new DBConnection();
                 int itemid = 0;
@@ -225,16 +213,7 @@ public class ItemDB implements ItemDAO {
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 String temp = rs.getString("type");
-                                Type tempType;
-                                if (temp.toString().equals("Hunter, Shaman, Warrior")) {
-                                        tempType = Type.protector;
-                                } else if (temp.toString().equals("Death Knight, Druid, Mage, Rogue")) {
-                                        tempType = Type.vanquisher;
-                                } else if (temp.toString().equals("Paladin, Priest, Warlock")) {
-                                        tempType = Type.conqueror;
-                                } else {
-                                        tempType = Type.valueOf(temp);
-                                }
+                                Type tempType = typeFromString(temp);
                                 item = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getBoolean("isLegendary"));
                                 item.addLooterList(getLootersFormItems(rs.getInt("id")));
                         }
@@ -303,5 +282,40 @@ public class ItemDB implements ItemDAO {
                 } catch (SQLException ex) {
                         Logger.getLogger(ItemDB.class.getName()).log(Level.SEVERE, null, ex);
                 }
+        }
+
+        @Override
+        public Items getItemById(int id) {
+                DBConnection c = new DBConnection();
+                Items tmp=null;
+                try {
+                        PreparedStatement ps = c.prepareStatement("SELECT DISTINCT * FROM items WHERE id=?");
+                        ps.setInt(1, id);
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                                String temp = rs.getString("type");
+                                Type tempType = typeFromString(temp);
+                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("prioe_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getBoolean("isLegendary"));
+                        }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return tmp;
+        }
+
+        private Type typeFromString(String temp) {
+                Type tempType;
+                if (temp.toString().equals("Hunter, Shaman, Warrior")) {
+                        tempType = Type.protector;
+                } else if (temp.toString().equals("Death Knight, Druid, Mage, Rogue")) {
+                        tempType = Type.vanquisher;
+                } else if (temp.toString().equals("Paladin, Priest, Warlock")) {
+                        tempType = Type.conqueror;
+                } else {
+                        tempType = Type.valueOf(temp);
+                }
+                return tempType;
         }
 }
