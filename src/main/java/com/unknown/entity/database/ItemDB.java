@@ -284,7 +284,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("prioe_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType);
+                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType);
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();

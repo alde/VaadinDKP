@@ -59,7 +59,7 @@ public class PopUpControl extends Window {
         }
 
         private void showCharEditWindow(User user) throws IllegalArgumentException, NullPointerException {
-                CharacterEditWindow info = new CharacterEditWindow(user);
+                CharacterEditWindow info = new CharacterEditWindow(user, app, raidList, itemList);
                 try {
                         info.printInfo();
                         info.addCharacterInfoListener(charList);

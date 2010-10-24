@@ -4,16 +4,22 @@
  */
 package com.unknown.entity.character.windows;
 
+import com.unknown.entity.PopUpControl;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.*;
 import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
+import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.raids.Raid;
+import com.unknown.entity.raids.RaidList;
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -30,8 +36,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -46,9 +50,15 @@ public class CharacterEditWindow extends Window {
         private CharacterDAO charDao;
         private IndexedContainer ic;
         private Table loots;
+        private Application app;
+        private ItemList itemList;
+        private RaidList raidList;
 
-        public CharacterEditWindow(User user) {
+        public CharacterEditWindow(User user, Application app, RaidList raidList, ItemList itemList) {
                 this.user = user;
+                this.app = app;
+                this.raidList = raidList;
+                this.itemList = itemList;
                 this.raidDao = new RaidDB();
                 this.charDao = new CharacterDB();
                 this.itemDao = new ItemDB();
@@ -155,6 +165,7 @@ public class CharacterEditWindow extends Window {
                         loots.addStyleName("small striped");
                         addComponent(loots);
                         addComponent(update);
+                        loots.addListener(new LootClickListener());
                 } else {
                         addComponent(new Label("No items looted yet."));
                 }
@@ -165,7 +176,9 @@ public class CharacterEditWindow extends Window {
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
                         raids.addStyleName("small striped");
+                        raids.setWidth("220px");
                         addComponent(raids);
+                        raids.addListener(new RaidListClickListener());
                 } else {
                         addComponent(new Label("No raids attended yet."));
                 }
@@ -188,7 +201,7 @@ public class CharacterEditWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("Shares: "));
-                Label shares = new Label(""+user.getShares());
+                Label shares = new Label("" + user.getShares());
                 shares.addStyleName("color");
                 hzl.addComponent(shares);
                 addComponent(hzl);
@@ -196,7 +209,7 @@ public class CharacterEditWindow extends Window {
                 hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP Earned: "));
-                Label dkpearned = new Label(""+user.getDKPEarned());
+                Label dkpearned = new Label("" + user.getDKPEarned());
                 dkpearned.addStyleName("color");
                 hzl.addComponent(dkpearned);
                 addComponent(hzl);
@@ -204,7 +217,7 @@ public class CharacterEditWindow extends Window {
                 hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP Spent: "));
-                Label dkpspent = new Label(""+user.getDKPSpent());
+                Label dkpspent = new Label("" + user.getDKPSpent());
                 dkpspent.addStyleName("color");
                 hzl.addComponent(dkpspent);
                 addComponent(hzl);
@@ -212,7 +225,7 @@ public class CharacterEditWindow extends Window {
                 hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP: "));
-                Label dkp = new Label(""+user.getDKP());
+                Label dkp = new Label("" + user.getDKP());
                 dkp.addStyleName("color");
                 hzl.addComponent(dkp);
                 addComponent(hzl);
@@ -235,7 +248,6 @@ public class CharacterEditWindow extends Window {
                 for (CharacterInfoListener characterListener : listeners) {
                         characterListener.onCharacterInfoChange();
                 }
-                update();
         }
 
         private void removeLootFromCharacter(Item item) {
@@ -244,15 +256,6 @@ public class CharacterEditWindow extends Window {
 
         private void updateLootForCharacter(Item item, int lootid) {
                 charDao.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
-        }
-
-        private void update() {
-                this.removeAllComponents();
-                try {
-                        printInfo();
-                } catch (SQLException ex) {
-                        Logger.getLogger(CharacterEditWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
         }
 
         private class updateBtnClickListener implements ClickListener {
@@ -270,9 +273,7 @@ public class CharacterEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         int success = updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
-                        // System.out.println("" + success);
                         notifyListeners();
-
                         close();
                 }
         }
@@ -323,6 +324,37 @@ public class CharacterEditWindow extends Window {
                         doUpdateLoots();
                         notifyListeners();
                         close();
+                }
+        }
+
+        private class LootClickListener implements ItemClickListener {
+
+                public LootClickListener() {
+                }
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                        ItemDAO itemDao = new ItemDB();
+                        CharacterItem citem = (CharacterItem) event.getItemId();
+                        Items temp = itemDao.getSingleItem(citem.getName());
+                        PopUpControl pop = new PopUpControl(app);
+                        pop.setItemList(itemList);
+                        pop.showProperItemWindow(temp);
+                }
+        }
+
+        private class RaidListClickListener implements ItemClickListener {
+
+                public RaidListClickListener() {
+                }
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                        Raid item = (Raid) event.getItemId();
+                        PopUpControl pop = new PopUpControl(app);
+                        pop.setItemList(itemList);
+                        pop.setRaidList(raidList);
+                        pop.showProperRaidWindow(item);
                 }
         }
 }

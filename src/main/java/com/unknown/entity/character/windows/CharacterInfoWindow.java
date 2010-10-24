@@ -122,15 +122,15 @@ public class CharacterInfoWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("Shares: "));
-                Label shares = new Label(""+user.getShares());
+                Label shares = new Label("" + user.getShares());
                 shares.addStyleName("color");
                 hzl.addComponent(shares);
                 addComponent(hzl);
-                
+
                 hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP Earned: "));
-                Label dkpearned = new Label(""+user.getDKPEarned());
+                Label dkpearned = new Label("" + user.getDKPEarned());
                 dkpearned.addStyleName("color");
                 hzl.addComponent(dkpearned);
                 addComponent(hzl);
@@ -138,7 +138,7 @@ public class CharacterInfoWindow extends Window {
                 hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP Spent: "));
-                Label dkpspent = new Label(""+user.getDKPSpent());
+                Label dkpspent = new Label("" + user.getDKPSpent());
                 dkpspent.addStyleName("color");
                 hzl.addComponent(dkpspent);
                 addComponent(hzl);
@@ -146,7 +146,7 @@ public class CharacterInfoWindow extends Window {
                 hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP: "));
-                Label dkp = new Label(""+user.getDKP());
+                Label dkp = new Label("" + user.getDKP());
                 dkp.addStyleName("color");
                 hzl.addComponent(dkp);
                 addComponent(hzl);
@@ -156,10 +156,9 @@ public class CharacterInfoWindow extends Window {
                 Table tbl = new Table();
                 characterInfoLootTableSetHeaders(tbl);
                 tbl.setHeight("150px");
-                ItemDAO itemDao = new ItemDB();
                 for (CharacterItem charitem : user.getCharItems()) {
-                        Items temp = itemDao.getItemById(charitem.getId());
-                        Item addItem = tbl.addItem(temp);
+                        System.out.println(charitem.toString());
+                        Item addItem = tbl.addItem(charitem);
                         characterInfoLootTableAddRow(addItem, charitem);
                 }
                 tbl.addListener(new LootListClickListener());
@@ -171,6 +170,7 @@ public class CharacterInfoWindow extends Window {
                 tbl.addContainerProperty("Comment", String.class, "");
                 tbl.addContainerProperty("Date", String.class, "");
                 tbl.setHeight("150px");
+                tbl.setWidth("220px");
                 for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
                         Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
@@ -184,7 +184,7 @@ public class CharacterInfoWindow extends Window {
                 CharacterDAO charDao = new CharacterDB();
                 String attendance = charDao.getAttendanceRaids(user);
                 Label attended = new Label();
-                attended.setValue("Attended " + attendance +"% of raids the last 30 days.");
+                attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
                 addComponent(attended);
         }
 
@@ -197,10 +197,12 @@ public class CharacterInfoWindow extends Window {
                 public void itemClick(ItemClickEvent event) {
 
                         if (event.isDoubleClick()) {
-                                Items item = (Items) event.getItemId();
+                                ItemDAO itemDao = new ItemDB();
+                                CharacterItem citem = (CharacterItem) event.getItemId();
+                                Items temp = itemDao.getSingleItem(citem.getName());
                                 PopUpControl pop = new PopUpControl(app);
                                 pop.setItemList(itemList);
-                                pop.showProperItemWindow(item);
+                                pop.showProperItemWindow(temp);
                         }
                 }
         }
@@ -212,7 +214,7 @@ public class CharacterInfoWindow extends Window {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                         if (event.isDoubleClick()) {
+                        if (event.isDoubleClick()) {
                                 Raid item = (Raid) event.getItemId();
                                 PopUpControl pop = new PopUpControl(app);
                                 pop.setRaidList(raidList);
