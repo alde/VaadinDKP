@@ -213,3 +213,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .icontiny { background: none no-repeat scroll left center transparent; padding-left: 18px !important; }
 .wowclass { background: none no-repeat scroll left center transparent; padding-left: 23px !important; padding-top: 3px; padding-bottom: 3px;}
 
+.textfieldfont{
+        font-size: 10px;
+        color: #000000 !important;
+}

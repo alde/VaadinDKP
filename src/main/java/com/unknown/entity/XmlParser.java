@@ -20,28 +20,33 @@ public class XmlParser {
 
         private String startString = "http://www.wowhead.com/item=";
         private String endString = "&xml";
-        private String wowIdString;
+        private String query;
         private Element root;
 
-        public XmlParser(String wowidstring) {
-                this.wowIdString = wowidstring;
-        }
-        public String parseXmlTooltip() {
-
-                String output = "";
+        public XmlParser(String query) {
+                this.query = query;
                 try {
-                        if (!wowIdString.isEmpty()) {
-                                rootXmlElement(startString + wowIdString + endString);
-                                if (!isErrorXml(root).equalsIgnoreCase("Item not found!")) {
-                                        output = findElement(root, "htmlTooltip");
-                                } else {
-                                        output = "Item not found!";
-                                }
-                        }
+                        rootXmlElement(startString + query + endString);
                 } catch (JDOMException ex) {
                         Logger.getLogger(XmlParser.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                         Logger.getLogger(XmlParser.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+
+        public boolean isEmpty() {
+                return isEmpty();
+        }
+
+        public String parseXmlTooltip() {
+
+                String output = "";
+                if (!query.isEmpty()) {
+                        if (!isErrorXml(root).equalsIgnoreCase("Item not found!")) {
+                                output = findElement(root, "htmlTooltip");
+                        } else {
+                                output = "Item not found!";
+                        }
                 }
                 return output;
         }
@@ -53,10 +58,7 @@ public class XmlParser {
         }
 
         public String findElement(Element root, String targetElement) {
-                final String tooltip = root.getChild("item").getChild(targetElement).getText();
-                // System.out.println(tooltip);
-
-                return tooltip;
+                return root.getChild("item").getChild(targetElement).getText();
 
         }
 
@@ -67,5 +69,93 @@ public class XmlParser {
                 } else {
                         return "";
                 }
+        }
+
+        public String parseXmlWowid() {
+                String url = findElement(root, "link");
+                url = url.replace("http://www.wowhead.com/item=", "");
+                return url;
+        }
+
+        public String parseXmlType() {
+                String foo = "";
+                if (!query.isEmpty()) {
+                        if (!isErrorXml(root).equalsIgnoreCase("Item not found!")) {
+                                foo = findElement(root, "class");
+                                if (foo.equals("Armor")) {
+                                        foo = findElement(root, "subclass");
+                                        if (foo.contains("Armor")) {
+                                                foo = foo.replace(" Armor", "");
+                                        } else if (foo.contains("Shields")) {
+                                                foo = "Shields";
+                                        } else {
+                                                foo = "Other";
+                                        }
+                                } else if (foo.equals("Miscellaneous")) {
+                                        if (findElement(root, "subclass").equalsIgnoreCase("Armor Tokens")) {
+                                                foo = findElement(root, "name");
+                                                if (foo.startsWith("Vanquisher")) {
+                                                        foo = "vanquisher";
+                                                } else if (foo.startsWith("Conqueror")) {
+                                                        foo = "conqueror";
+                                                } else if (foo.startsWith("Protector")) {
+                                                        foo = "protector";
+                                                } else {
+                                                        foo = "Other";
+                                                }
+                                        }
+                                } else if (foo.equals("Quest")) {
+                                        foo = "Other";
+                                }
+                        } else {
+                                foo = "Item not found!";
+                        }
+                }
+                return foo;
+        }
+
+        public String parseXmlSlots() {
+                String foo = "";
+                String backup = "Other";
+                if (!query.isEmpty()) {
+                        String type = parseXmlType();
+                        if (!isErrorXml(root).equalsIgnoreCase("Item not found!")) {
+                                foo = findElement(root, "class");
+                                if (type.toString().contains("vanquisher") || type.toString().contains("conqueror") || type.toString().contains("protector")) {
+                                        foo = "Tier";
+                                } else {
+                                        String temp = findElement(root, "inventorySlot").replace("-", "").replace(" ", "").replace("HeldInOffhand", "OffHand");
+                                        if (!temp.isEmpty()) {
+                                                foo = temp;
+                                        }
+                                        String s = checkEnum(foo) ;
+                                        if (s.isEmpty()) {
+                                                foo = backup;
+                                        } else {
+                                                foo = s;
+                                        }
+                                }
+                        } else {
+                                foo = "Item not found!";
+                        }
+                }
+                return foo;
+        }
+
+        public String checkEnum(String str) {
+                for (Slots me : Slots.values()) {
+                        if (me.name().equalsIgnoreCase(str)) {
+                                return me.toString();
+                        }
+                }
+                return "";
+        }
+
+        public String parseXmlUrl() {
+                return findElement(root, "link");
+        }
+
+        public String parseXmlName() {
+                return findElement(root, "name");
         }
 }

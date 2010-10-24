@@ -8,21 +8,23 @@ import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
-import com.unknown.entity.items.DefaultPrices;
-import com.unknown.entity.items.ItemInfoListener;
-import com.unknown.entity.items.ItemPrices;
+import com.unknown.entity.XmlParser;
+import com.unknown.entity.items.*;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.terminal.ExternalResource;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,14 @@ import java.util.logging.Logger;
 public class ItemAddWindow extends Window {
 
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
+        private TextField name;
+        private TextField wowid;
+        private TextField wowidheroic;
+        private TextField price;
+        private TextField priceheroic;
+        private ComboBox slot;
+        private ComboBox type;
+        private CustomLayout cl;
 
         public ItemAddWindow() {
                 this.setCaption("Add Item");
@@ -57,37 +67,48 @@ public class ItemAddWindow extends Window {
 
                 VerticalLayout addItem = new VerticalLayout();
                 addComponent(addItem);
-                final TextField name = new TextField("Name");
-                final TextField wowid = new TextField("WowID Normal");
-                final TextField wowidheroic = new TextField("WowID Heroic");
-                final TextField price = new TextField("Price Normal");
-                final TextField priceheroic = new TextField("Price Heroic");
-                final ComboBox slot = new ComboBox("Slot");
-                slot.setWidth("150px");
-                slot.addStyleName("select-button");
-                final ComboBox type = new ComboBox("Type");
-                type.setWidth("150px");
-                type.addStyleName("select-button");
-                // final CheckBox legendary = new CheckBox(" Legendary");
+                this.name = new TextField("Name");
+                this.name.setStyleName("textfieldfont");
+                this.name.setWidth("150px");
+                this.wowid = new TextField("WowID Normal");
+                this.wowid.setStyleName("textfieldfont");
+                this.wowid.setWidth("150px");
+                this.wowidheroic = new TextField("WowID Heroic");
+                this.wowidheroic.setStyleName("textfieldfont");
+                this.wowidheroic.setWidth("150px");
+                this.price = new TextField("Price Normal");
+                this.price.setStyleName("textfieldfont");
+                this.price.setWidth("150px");
+                this.priceheroic = new TextField("Price Heroic");
+                this.priceheroic.setStyleName("textfieldfont");
+                this.priceheroic.setWidth("150px");
+                this.slot = new ComboBox("Slot");
+                this.slot.setStyleName("textfieldfont");
+                this.slot.setWidth("150px");
+                this.slot.addStyleName("select-button");
+                this.type = new ComboBox("Type");
+                this.type.setStyleName("textfieldfont");
+                this.type.setWidth("150px");
+                this.type.addStyleName("select-button");
 
                 final List<ItemPrices> defaultprices = prices;
 
-                name.setImmediate(true);
-                name.focus();
-                wowid.setImmediate(true);
-                wowidheroic.setImmediate(true);
-                price.setImmediate(true);
-                priceheroic.setImmediate(true);
-                slot.setImmediate(true);
-                type.setImmediate(true);
+                this.name.setImmediate(true);
+                this.name.focus();
+                this.wowid.setImmediate(true);
+                this.wowidheroic.setImmediate(true);
+                this.price.setImmediate(true);
+                this.priceheroic.setImmediate(true);
+                this.slot.setImmediate(true);
+                this.type.setImmediate(true);
 
-                itemAddWIndowAddComponents(addItem, name, wowid, wowidheroic, slot, type, price, priceheroic);
+                itemAddWIndowAddComponents(addItem);
 
                 for (Slots slots : Slots.values()) {
-                        slot.addItem(slots);
+                        this.slot.addItem(slots);
                 }
                 for (Type types : Type.values()) {
-                        type.addItem(types);
+                        this.type.addItem(types);
                 }
 
                 slot.addListener(new SlotComboBoxValueChangeListener(slot, defaultprices, price, priceheroic));
@@ -103,8 +124,16 @@ public class ItemAddWindow extends Window {
                 addItem.addComponent(hzl);
         }
 
-        private void itemAddWIndowAddComponents(VerticalLayout addItem, final TextField name, final TextField wowid, final TextField wowidheroic, final ComboBox slot, final ComboBox type, final TextField price, final TextField priceheroic) {
-                addItem.addComponent(name);
+        private void itemAddWIndowAddComponents(VerticalLayout addItem) {
+                HorizontalLayout hzl = new HorizontalLayout();
+                hzl.addComponent(name);
+                VerticalLayout vrt = new VerticalLayout();
+                Button queryButton = new Button();
+                queryButton.setIcon(new ThemeResource("../shared/query.png"));
+                queryButton.setStyle(Button.STYLE_LINK);
+                queryButton.addListener(new QueryListener(name, vrt));
+                hzl.addComponent(queryButton);
+                addItem.addComponent(hzl);
                 addItem.addComponent(wowid);
                 addItem.addComponent(wowidheroic);
                 addItem.addComponent(slot);
@@ -167,7 +196,6 @@ public class ItemAddWindow extends Window {
                 private final TextField priceheroic;
                 private final ComboBox slot;
                 private final ComboBox type;
-                
 
                 public AddButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type) {
                         this.name = name;
@@ -202,12 +230,44 @@ public class ItemAddWindow extends Window {
 
         private class CloseButtonClickListener implements ClickListener {
 
-                public CloseButtonClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        close();
+                }
+        }
+
+        private class QueryListener implements ClickListener {
+
+                private TextField name;
+                private VerticalLayout vrt;
+
+                public QueryListener(TextField name, VerticalLayout vrt) {
+                        this.name = name;
+                        this.vrt = vrt;
                 }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        close();
+                        String query = name.getValue().toString();
+                        query = query.replace(" ", "%20");
+                        XmlParser xml = new XmlParser(query);
+                        String foo = xml.parseXmlType();
+                        vrt.removeAllComponents();
+                        addComponent(vrt);
+                        if (!foo.equalsIgnoreCase("Item not found!")) {
+                                type.setValue(Type.valueOf(foo));
+                                foo = xml.parseXmlSlots();
+                                slot.setValue(Slots.valueOf(foo));
+                                foo = xml.parseXmlWowid();
+                                wowid.setValue(foo);
+                                String itemname = xml.parseXmlName();
+                                String url = xml.parseXmlUrl();
+                                Link seealso = new Link(itemname, new ExternalResource(url+"#see-also"));
+                                seealso.setTargetName("_blank");
+                                vrt.addComponent(seealso);
+                        } else {
+                                vrt.addComponent(new Label("Item not found!"));
+                        }
                 }
         }
 }
