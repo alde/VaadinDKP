@@ -94,11 +94,11 @@ public class XmlParser {
                                 } else if (foo.equals("Miscellaneous")) {
                                         if (findElement(root, "subclass").equalsIgnoreCase("Armor Tokens")) {
                                                 foo = findElement(root, "name");
-                                                if (foo.startsWith("Vanquisher")) {
+                                                if (foo.contains("Vanquisher")) {
                                                         foo = "vanquisher";
-                                                } else if (foo.startsWith("Conqueror")) {
+                                                } else if (foo.contains("Conqueror")) {
                                                         foo = "conqueror";
-                                                } else if (foo.startsWith("Protector")) {
+                                                } else if (foo.contains("Protector")) {
                                                         foo = "protector";
                                                 } else {
                                                         foo = "Other";

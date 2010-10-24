@@ -106,7 +106,6 @@ public class ItemInfoWindow extends Window {
                 XmlParser xml = new XmlParser("" + item.getWowId());
                 String normalTooltip = xml.parseXmlTooltip();
                 normalTooltip = normalTooltip.replace("href", "target=\"_blank\" href");
-                System.out.println(normalTooltip);
                 CustomLayout csnormal = new CustomLayout(new ByteArrayInputStream(normalTooltip.getBytes()));
                 csnormal.setWidth("200px");
                 hzl.addComponent(csnormal);
@@ -114,7 +113,6 @@ public class ItemInfoWindow extends Window {
                         xml = new XmlParser("" + item.getWowId_hc());
                         String hcTooltip = xml.parseXmlTooltip();
                         hcTooltip=hcTooltip.replace("href", "target=\"_blank\" href");
-                        System.out.println(hcTooltip);
                         CustomLayout cshc = new CustomLayout(new ByteArrayInputStream(hcTooltip.getBytes()));
                         cshc.setWidth("200px");
                         hzl.addComponent(cshc);

@@ -17,6 +17,7 @@ public enum Slots {
         Trinket,
         OffHand,
         OneHand,
+        MainHand,
         TwoHand,
         Ranged,
         Shield,

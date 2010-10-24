@@ -32,7 +32,7 @@ public class ItemList extends Table implements ItemInfoListener {
         public ItemList(ItemDAO itemDAO) {
                 this.itemDAO = itemDAO;
                 this.ic = new IndexedContainer();
-                this.setSizeUndefined();
+                this.setWidth("600px");
                 this.setHeight("500px");
                 this.setSelectable(true);
 

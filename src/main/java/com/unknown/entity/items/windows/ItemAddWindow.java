@@ -251,15 +251,21 @@ public class ItemAddWindow extends Window {
                         String query = name.getValue().toString();
                         query = query.replace(" ", "%20");
                         XmlParser xml = new XmlParser(query);
-                        String foo = xml.parseXmlType();
+                        String typeFromXml = xml.parseXmlType();
                         vrt.removeAllComponents();
                         addComponent(vrt);
-                        if (!foo.equalsIgnoreCase("Item not found!")) {
-                                type.setValue(Type.valueOf(foo));
-                                foo = xml.parseXmlSlots();
-                                slot.setValue(Slots.valueOf(foo));
-                                foo = xml.parseXmlWowid();
-                                wowid.setValue(foo);
+                        if (!typeFromXml.equalsIgnoreCase("Item not found!")) {
+                                String tooltip = xml.parseXmlTooltip();
+                                String wowidFromXml = xml.parseXmlWowid();
+                                if (tooltip.contains(("Heroic")) ) {
+                                        wowidheroic.setValue(wowidFromXml);
+                                } else {
+                                        wowid.setValue(wowidFromXml);
+                                }
+                                type.setValue(Type.valueOf(typeFromXml));
+                                String slotsFromXml = xml.parseXmlSlots();
+                                slot.setValue(Slots.valueOf(slotsFromXml));
+                                
                                 String itemname = xml.parseXmlName();
                                 String url = xml.parseXmlUrl();
                                 Link seealso = new Link(itemname, new ExternalResource(url+"#see-also"));

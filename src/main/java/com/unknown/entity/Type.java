@@ -50,13 +50,7 @@ public enum Type{
 
                 @Override
                 public String toString() {
-                        return "Weapon";
-                }
-        },
-        Weapon {
-                @Override
-                public String toString() {
-                        return "Weapon";
+                        return "Weapons";
                 }
         },
         protector {

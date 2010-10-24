@@ -292,7 +292,6 @@ public class ItemEditWindow extends Window {
                         final double newprice = Double.parseDouble(price.getValue().toString());
                         final double newpricehc = Double.parseDouble(pricehc.getValue().toString());
                         final int success = updateItem(newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc);
-                        // System.out.println("New Price Heroic" + newpricehc);
                         addComponent(new Label("Success: " + success));
                         notifyListeners();
                         close();

@@ -72,6 +72,7 @@ public class TablePanel {
                 vertItem.addComponent(itemList);
                 HorizontalLayout hzl = new HorizontalLayout();
                 SuperImmediateTextField itemname = itemNameFilterField();
+                itemname.setStyleName("textfieldfont");
                 ComboBox itemslot = itemSlotFilterBox();
                 ComboBox itemtype = itemTypeFilterBox();
                 hzl.addComponent(itemname);

@@ -76,7 +76,6 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                                 userBtn.addListener(new charListClickListener(user));
                                 roleList.addComponent(userBtn);
                         } else if (isAdmin()) {
-                                System.out.println(user.getUsername() + " is inactive!");
                                 Button userBtn = new Button("--" + user.toString());
                                 userBtn.addStyleName(Button.STYLE_LINK);
                                 userBtn.addListener(new charListClickListener(user));
