@@ -7,7 +7,6 @@ package com.unknown.entity.items;
 
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.Type;
-import com.unknown.entity.character.CharacterItem;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,10 +25,9 @@ public class Items {
     private Type type;
     private int wowid_hc;
     private double price_hc;
-    private boolean isLegendary = false;
     private List<ItemLooter> looterList = new ArrayList<ItemLooter>();
 
-    public Items(int id, String itemname, int wowid, double price, int wowid_hc, double price_hc, String slot, Type type, boolean isLegendary) {
+    public Items(int id, String itemname, int wowid, double price, int wowid_hc, double price_hc, String slot, Type type) {
             this.id = id;
             this.itemname = itemname;
             this.wowid = wowid;
@@ -38,7 +36,6 @@ public class Items {
             this.price_hc = price_hc;
             this.slot = slot;
             this.type = type;
-            this.isLegendary = isLegendary;
     }
 
     public int getId() {
@@ -65,9 +62,6 @@ public class Items {
     }
     public Type getType() {
         return type;
-    }
-    public boolean isLegendary() {
-        return isLegendary;
     }
 
     public void addLooterList(Collection<ItemLooter> looters) {

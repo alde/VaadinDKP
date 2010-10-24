@@ -19,7 +19,6 @@ import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
@@ -80,12 +79,10 @@ public class ItemEditWindow extends Window {
 
                 itemEditGrid(wowIdfield, wowIdfieldhc, price, pricehc);
 
-                final CheckBox islegendary = new CheckBox("Legendary", item.isLegendary());
-
                 Button updateButton = new Button("Update Item");
                 Button deleteButton = new Button("Delete Item");
                 deleteButton.addListener(new DeleteButtonClickListener(item));
-                updateButton.addListener(new UpdateButtonClickListener(name, slot, type, wowIdfield, wowIdfieldhc, price, pricehc, islegendary));
+                updateButton.addListener(new UpdateButtonClickListener(name, slot, type, wowIdfield, wowIdfieldhc, price, pricehc));
                 hzl = new HorizontalLayout();
                 Label warning = new Label();
                 warning.setWidth("220px");
@@ -198,10 +195,10 @@ public class ItemEditWindow extends Window {
                 addComponent(hzl);
         }
 
-        private int updateItem(String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, boolean legendary) {
+        private int updateItem(String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc) {
 
                 ItemDAO itemDao = new ItemDB();
-                return itemDao.updateItem(item, newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc, legendary);
+                return itemDao.updateItem(item, newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc);
         }
 
         private int deleteItem(Items item) throws SQLException {
@@ -274,9 +271,8 @@ public class ItemEditWindow extends Window {
                 private final TextField wowIdfieldhc;
                 private final TextField price;
                 private final TextField pricehc;
-                private final CheckBox islegendary;
 
-                public UpdateButtonClickListener(TextField name, ComboBox slot, ComboBox type, TextField wowIdfield, TextField wowIdfieldhc, TextField price, TextField pricehc, CheckBox islegendary) {
+                public UpdateButtonClickListener(TextField name, ComboBox slot, ComboBox type, TextField wowIdfield, TextField wowIdfieldhc, TextField price, TextField pricehc) {
                         this.name = name;
                         this.slot = slot;
                         this.type = type;
@@ -284,7 +280,6 @@ public class ItemEditWindow extends Window {
                         this.wowIdfieldhc = wowIdfieldhc;
                         this.price = price;
                         this.pricehc = pricehc;
-                        this.islegendary = islegendary;
                 }
 
                 @Override
@@ -296,31 +291,11 @@ public class ItemEditWindow extends Window {
                         final int newwowidhc = Integer.parseInt(wowIdfieldhc.getValue().toString());
                         final double newprice = Double.parseDouble(price.getValue().toString());
                         final double newpricehc = Double.parseDouble(pricehc.getValue().toString());
-                        final boolean legendary = (Boolean) islegendary.getValue();
-                        final int success = updateItem(newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc, legendary);
+                        final int success = updateItem(newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc);
                         // System.out.println("New Price Heroic" + newpricehc);
                         addComponent(new Label("Success: " + success));
                         notifyListeners();
                         close();
-                }
-        }
-
-        private class WowIdHcButtonClickListener implements ClickListener {
-
-                @Override
-                public void buttonClick(ClickEvent event) {
-                        String url = "http://www.wowhead.com/item=" + item.getWowId_hc();
-                        open(new ExternalResource(url), "_new");
-                }
-        }
-
-        private class WowIdButtonClickListener implements ClickListener {
-
-                @Override
-                public void buttonClick(ClickEvent event) {
-                        String url = "http://www.wowhead.com/item=" + item.getWowId();
-                        // System.out.println(url);
-                        open(new ExternalResource(url), "_blank");
                 }
         }
 

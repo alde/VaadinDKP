@@ -68,7 +68,7 @@ public class ItemAddWindow extends Window {
                 final ComboBox type = new ComboBox("Type");
                 type.setWidth("150px");
                 type.addStyleName("select-button");
-                final CheckBox legendary = new CheckBox(" Legendary");
+                // final CheckBox legendary = new CheckBox(" Legendary");
 
                 final List<ItemPrices> defaultprices = prices;
 
@@ -80,9 +80,8 @@ public class ItemAddWindow extends Window {
                 priceheroic.setImmediate(true);
                 slot.setImmediate(true);
                 type.setImmediate(true);
-                legendary.setImmediate(true);
 
-                itemAddWIndowAddComponents(addItem, name, wowid, wowidheroic, slot, type, price, priceheroic, legendary);
+                itemAddWIndowAddComponents(addItem, name, wowid, wowidheroic, slot, type, price, priceheroic);
 
                 for (Slots slots : Slots.values()) {
                         slot.addItem(slots);
@@ -94,7 +93,7 @@ public class ItemAddWindow extends Window {
                 slot.addListener(new SlotComboBoxValueChangeListener(slot, defaultprices, price, priceheroic));
 
                 final Button btn = new Button("Add");
-                btn.addListener(new AddButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type, legendary));
+                btn.addListener(new AddButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type));
                 final Button cbtn = new Button("Close");
                 cbtn.addListener(new CloseButtonClickListener());
                 HorizontalLayout hzl = new HorizontalLayout();
@@ -104,7 +103,7 @@ public class ItemAddWindow extends Window {
                 addItem.addComponent(hzl);
         }
 
-        private void itemAddWIndowAddComponents(VerticalLayout addItem, final TextField name, final TextField wowid, final TextField wowidheroic, final ComboBox slot, final ComboBox type, final TextField price, final TextField priceheroic, final CheckBox legendary) {
+        private void itemAddWIndowAddComponents(VerticalLayout addItem, final TextField name, final TextField wowid, final TextField wowidheroic, final ComboBox slot, final ComboBox type, final TextField price, final TextField priceheroic) {
                 addItem.addComponent(name);
                 addItem.addComponent(wowid);
                 addItem.addComponent(wowidheroic);
@@ -112,12 +111,11 @@ public class ItemAddWindow extends Window {
                 addItem.addComponent(type);
                 addItem.addComponent(price);
                 addItem.addComponent(priceheroic);
-                addItem.addComponent(legendary);
         }
 
-        private int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, boolean isLegendary) throws SQLException {
+        private int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type) throws SQLException {
                 ItemDAO itemDao = new ItemDB();
-                return itemDao.addItem(name, wowid, wowid_hc, price, price_hc, slot, type, isLegendary);
+                return itemDao.addItem(name, wowid, wowid_hc, price, price_hc, slot, type);
         }
 
         public void addItemInfoListener(ItemInfoListener listener) {
@@ -169,9 +167,9 @@ public class ItemAddWindow extends Window {
                 private final TextField priceheroic;
                 private final ComboBox slot;
                 private final ComboBox type;
-                private final CheckBox legendary;
+                
 
-                public AddButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type, CheckBox legendary) {
+                public AddButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type) {
                         this.name = name;
                         this.wowid = wowid;
                         this.wowidheroic = wowidheroic;
@@ -179,7 +177,6 @@ public class ItemAddWindow extends Window {
                         this.priceheroic = priceheroic;
                         this.slot = slot;
                         this.type = type;
-                        this.legendary = legendary;
                 }
 
                 @Override
@@ -191,10 +188,9 @@ public class ItemAddWindow extends Window {
                         final double ipriceheroic = Double.parseDouble(priceheroic.getValue().toString());
                         final String islot = slot.getValue().toString();
                         final String itype = type.getValue().toString();
-                        final boolean isLegendary = Boolean.parseBoolean(legendary.getValue().toString());
                         int success = 0;
                         try {
-                                success = addItem(iname, iwowid, iwowidheroic, iprice, ipriceheroic, islot, itype, isLegendary);
+                                success = addItem(iname, iwowid, iwowidheroic, iprice, ipriceheroic, islot, itype);
                         } catch (SQLException ex) {
                                 Logger.getLogger(ItemAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
