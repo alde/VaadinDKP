@@ -4,6 +4,8 @@
  */
 package com.unknown.entity.raids.windows;
 
+import com.unknown.entity.dao.CharacterDAO;
+import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.raids.RaidChar;
 import com.unknown.entity.raids.RaidRewardListener;
 import com.vaadin.data.Item;
@@ -53,16 +55,21 @@ public class RewardAttendantsWindow extends Window {
 			Item addItem = tbl.addItem(rchar);
 			RaidCharWindowCharListAddRow(addItem, rchar);
 		}
+                tbl.addStyleName("striped");
 		return tbl;
 	}
 
         private void RaidCharWindowCharListSetHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", String.class, "");
+                tbl.addContainerProperty("Name", Label.class, "");
                 tbl.addContainerProperty("Shares", Integer.class, "");
         }
 
         private void RaidCharWindowCharListAddRow(Item addItem, RaidChar rchar) throws ReadOnlyException, ConversionException {
-                addItem.getItemProperty("Name").setValue(rchar.getName());
+                Label charname = new Label(rchar.getName());
+                CharacterDAO charDao = new CharacterDB();
+                String charclass = charDao.getRoleForCharacter(rchar.getName());
+                charname.addStyleName(charclass.replace(" ", "").toLowerCase());
+                addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Shares").setValue(rchar.getShares());
         }
 

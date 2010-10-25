@@ -157,10 +157,10 @@ public class CharacterDB implements CharacterDAO {
 
                 ResultSet rss = ps.executeQuery();
                 while (rss.next()) {
-                        shares = getSharesForCharacterById(rs, rss, shares);
-
-                        totalshares += rss.getInt("rewards.number_of_shares");
-
+                        if (rss.getBoolean("characters.active")) {
+                                shares = getSharesForCharacterById(rs, rss, shares);
+                                totalshares += rss.getInt("rewards.number_of_shares");
+                        }
                 }
                 if (totalshares > 0) {
                         share_value = loot_value / totalshares;
@@ -178,7 +178,26 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-        public Collection<User> getUsersWithRole(final Role role) {
+        public String getRoleForCharacter(String name) {
+                DBConnection c = new DBConnection();
+                String foo = "";
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id WHERE characters.name=?");
+                        p.setString(1, name);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                foo = rs.getString("character_classes.name");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return foo;
+        }
+
+        @Override
+        public Collection<User> getUsersWithRole(
+                final Role role) {
                 return Collections2.filter(getUsers(), new HasRolePredicate(role));
         }
 
@@ -248,7 +267,8 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-        public void updateLootForCharacter(String itemname, double price, boolean heroic, User user, int lootid) {
+        public void updateLootForCharacter(String itemname, double price, boolean heroic, User user,
+                int lootid) {
                 Connection c = null;
 
                 try {

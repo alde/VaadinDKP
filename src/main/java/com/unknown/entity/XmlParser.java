@@ -63,9 +63,13 @@ public class XmlParser {
         }
 
         private String isErrorXml(Element root) {
-                String error = root.getChildText("error");
-                if (error != null) {
-                        return error;
+                if (root != null) {
+                        String error = root.getChildText("error");
+                        if (error != null) {
+                                return error;
+                        } else {
+                                return "";
+                        }
                 } else {
                         return "";
                 }
@@ -128,7 +132,7 @@ public class XmlParser {
                                         if (!temp.isEmpty()) {
                                                 foo = temp;
                                         }
-                                        String s = checkEnum(foo) ;
+                                        String s = checkEnum(foo);
                                         if (s.isEmpty()) {
                                                 foo = backup;
                                         } else {

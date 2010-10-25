@@ -104,9 +104,6 @@ public class DkpList extends Table implements CharacterInfoListener {
                         if (user.isActive()) {
                                 Item addItem = addItem(user);
                                 dkpListAddRow(addItem, user);
-                        } else if (isAdmin()) {
-                                Item addItem = addItem(user);
-                                dkpListAddRow(addItem, user);
                         }
                 }
         }
