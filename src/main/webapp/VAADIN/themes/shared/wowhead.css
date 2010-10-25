@@ -276,5 +276,5 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 /* Paladin */
 .v-nativebutton-paladin, v-nativebutton-paladin:active, v-nativebutton-paladin:focus {outline: none; border: none; }
 .v-nativebutton-paladin:hover { font-style: italic; }
-.v-nativebutton-paladin .v-nativebutton-caption {font-size: 12px; color: #ff88FF; }
-.paladin {color: #ff88FF;}
+.v-nativebutton-paladin .v-nativebutton-caption {font-size: 12px; color: #F58CBA; }
+.paladin {color: #F58CBA;}
