@@ -103,6 +103,7 @@ public class RaidEditWindow extends Window {
                 datum.setImmediate(true);
                 Date date = new Date();
                 datum.setDateFormat("yyyy-MM-dd HH:mm");
+                datum.setResolution(DateField.RESOLUTION_MIN);
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                 datum.setValue(dateFormat.format(date));
 
@@ -117,8 +118,7 @@ public class RaidEditWindow extends Window {
 
                 addComponent(hzl);
                 addComponent(updateButton);
-
-                updateButton.addListener(new UpdateButtonListener(zone, comment, datum));
+                updateButton.addListener(new UpdateButtonListener(zone, comment, dateFormat.format(datum.getValue())));
         }
 
         private int updateRaid(String raidzoneName, String raidcomment, String raiddate) throws SQLException {
@@ -140,9 +140,9 @@ public class RaidEditWindow extends Window {
 
                 private final ComboBox zone;
                 private final TextField comment;
-                private final DateField datum;
-
-                public UpdateButtonListener(ComboBox zone, TextField comment, DateField datum) {
+                private final String datum;
+                
+                public UpdateButtonListener(ComboBox zone, TextField comment, String datum) {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;
@@ -152,7 +152,7 @@ public class RaidEditWindow extends Window {
                 public void buttonClick(ClickEvent event) {
                         final String raidzoneName = zone.getValue().toString();
                         final String raidcomment = comment.getValue().toString();
-                        final String raiddate = datum.getValue().toString();
+                        final String raiddate = datum;
                         try {
                                 final int success = updateRaid(raidzoneName, raidcomment, raiddate);
                         } catch (SQLException ex) {

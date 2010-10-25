@@ -32,7 +32,7 @@ public class ItemList extends Table implements ItemInfoListener {
         public ItemList(ItemDAO itemDAO) {
                 this.itemDAO = itemDAO;
                 this.ic = new IndexedContainer();
-                this.setWidth("600px");
+                this.setSizeUndefined();
                 this.setHeight("500px");
                 this.setSelectable(true);
 
@@ -88,16 +88,19 @@ public class ItemList extends Table implements ItemInfoListener {
         public void filterSlot(Object value) {
                 ic.removeContainerFilters("Slot");
                 ic.addContainerFilter("Slot", filterString(value), true, false);
+                this.requestRepaint();
         }
 
         public void filterType(Object value) {
                 ic.removeContainerFilters("Type");
                 ic.addContainerFilter("Type", filterString(value), true, false);
+                this.requestRepaint();
         }
 
         public void filterName(Object value) {
                 ic.removeContainerFilters("Name");
                 ic.addContainerFilter("Name", filterString(value), true, false);
+                this.requestRepaint();
         }
 
         @Override

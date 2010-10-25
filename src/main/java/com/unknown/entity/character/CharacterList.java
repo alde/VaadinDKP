@@ -16,6 +16,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +41,6 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                 this.dkpList = dkpList;
                 this.app = app;
         }
-
 
         public void setLists(ItemList itemList, RaidList raidList) {
                 this.itemList = itemList;
@@ -71,8 +71,10 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         private void addUsersForRole(Role r, VerticalLayout roleList) {
                 for (final User user : characterDAO.getUsersWithRole(r)) {
                         if (user.isActive()) {
-                                Button userBtn = new Button(user.toString());
+                                NativeButton userBtn = new NativeButton(user.toString());
                                 userBtn.addStyleName(Button.STYLE_LINK);
+                                String charclass = user.getRole().toString().replace(" ", "").toLowerCase();
+                                userBtn.addStyleName(charclass);
                                 userBtn.addListener(new charListClickListener(user));
                                 roleList.addComponent(userBtn);
                         } else if (isAdmin()) {
@@ -102,7 +104,6 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         public void update() {
                 printList();
         }
-
         private static class ToStringComparator implements Comparator<Role> {
 
                 public ToStringComparator() {

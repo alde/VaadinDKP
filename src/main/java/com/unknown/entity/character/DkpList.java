@@ -14,6 +14,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,7 +54,7 @@ public class DkpList extends Table implements CharacterInfoListener {
         }
 
         private void dkpListSetColumnHeaders() throws UnsupportedOperationException {
-                ic.addContainerProperty("Name", String.class, "");
+                ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Armor", Armor.class, "");
                 this.setContainerDataSource(ic);
                 this.setColumnCollapsingAllowed(true);
@@ -111,7 +112,9 @@ public class DkpList extends Table implements CharacterInfoListener {
         }
 
         private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException {
-                addItem.getItemProperty("Name").setValue(user.getUsername());
+                Label charname = new Label(user.getUsername());
+                charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
+                addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Armor").setValue(user.getArmor());
                 addItem.getItemProperty("DKP").setValue(user.getDKP());
         }

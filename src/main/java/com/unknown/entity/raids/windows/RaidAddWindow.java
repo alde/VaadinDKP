@@ -85,7 +85,8 @@ public class RaidAddWindow extends Window {
 
         private Button raidAddWindowAddButton(final ComboBox zone, final TextField comment, final DateField datum) {
                 final Button btn = new Button("Add");
-                btn.addListener(new AddButtonClickListener(zone, comment, datum));
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                btn.addListener(new AddButtonClickListener(zone, comment, dateFormat.format(datum.getValue())));
                 return btn;
         }
 
@@ -93,9 +94,9 @@ public class RaidAddWindow extends Window {
                 final DateField datum = new DateField("Date");
                 datum.setImmediate(true);
                 Date date = new Date();
+
                 datum.setDateFormat("yyyy-MM-dd HH:mm");
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                datum.setValue(dateFormat.format(date));
+                datum.setValue(date);
                 return datum;
         }
 
@@ -137,21 +138,24 @@ public class RaidAddWindow extends Window {
 
                 private final ComboBox zone;
                 private final TextField comment;
-                private final DateField datum;
+                private final String datum;
 
-                public AddButtonClickListener(ComboBox zone, TextField comment, DateField datum) {
+                public AddButtonClickListener(ComboBox zone, TextField comment, String datum) {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;
+                        System.out.println(this.datum);
+
+
                 }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
                         String rzone = zone.getValue().toString();
                         String rcomment = comment.getValue().toString();
-                        String rdate = datum.getValue().toString();
+                        String rdate = datum;
+                        System.out.println(rdate);
                         int success = addRaid(rzone, rcomment, rdate);
-//                        addComponent(new Label("Update :" + success));
                         notifyListeners();
                         close();
                 }

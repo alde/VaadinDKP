@@ -121,14 +121,14 @@ public class ItemAddWindow extends Window {
                 this.priceheroic = new TextField("Price Heroic");
                 this.priceheroic.setStyleName("textfieldfont");
                 this.priceheroic.setWidth("150px");
+
                 this.slot = new ComboBox("Slot");
                 this.slot.setStyleName("textfieldfont");
                 this.slot.setWidth("150px");
-                this.slot.addStyleName("select-button");
+
                 this.type = new ComboBox("Type");
                 this.type.setStyleName("textfieldfont");
                 this.type.setWidth("150px");
-                this.type.addStyleName("select-button");
         }
 
         private void itemAddWIndowAddComponents(VerticalLayout addItem) {
