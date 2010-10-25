@@ -63,7 +63,7 @@ public class RaidLootAddWindow extends Window {
         }
 
         public void printInfo() throws SQLException {
-                final ComboBox boss = bossListComboBox();
+//                final ComboBox boss = bossListComboBox();
                 HashSet<Items> lootlist = getLootList();
                 final ComboBox loots = lootListComboBox(lootlist);
                 final CheckBox heroic = new CheckBox("Heroic");
@@ -71,35 +71,35 @@ public class RaidLootAddWindow extends Window {
                 final ComboBox name = nameComboList();
                 final Button addButton = new Button("Add");
 
-                addComponent(boss);
+//                addComponent(boss);
                 addComponent(loots);
                 addComponent(heroic);
                 addComponent(price);
                 addComponent(name);
                 addComponent(addButton);
 
-                setImmediates(price, heroic, loots, boss, name);
-                setListeners(loots, price, heroic, addButton, boss, name);
+                setImmediates(price, heroic, loots,name);
+                setListeners(loots, price, heroic, addButton,name);
 
         }
 
-        private void setListeners(final ComboBox loots, final TextField price, final CheckBox heroic, final Button addButton, final ComboBox boss, final ComboBox name) {
+        private void setListeners(final ComboBox loots, final TextField price, final CheckBox heroic, final Button addButton, final ComboBox name) {
                 loots.addListener(new LootChangeListener(price, loots, heroic));
                 heroic.addListener(new HeroicChangeListener(price, loots, heroic));
-                addButton.addListener(new AddRaidListener(boss, name, loots, heroic, price));
+                addButton.addListener(new AddRaidListener(name, loots, heroic, price));
         }
 
-        private void setImmediates(final TextField price, final CheckBox heroic, final ComboBox loots, final ComboBox boss, final ComboBox name) {
+        private void setImmediates(final TextField price, final CheckBox heroic, final ComboBox loots, final ComboBox name) {
                 price.setImmediate(true);
                 heroic.setImmediate(true);
                 loots.setImmediate(true);
-                boss.setImmediate(true);
+//                boss.setImmediate(true);
                 name.setImmediate(true);
         }
 
-        private void addRaidLoot(String boss, String name, String loot, boolean isheroic, double price) {
+        private void addRaidLoot(String name, String loot, boolean isheroic, double price) {
                 try {
-                        raidDao.addLootToRaid(raid, boss, name, loot, isheroic, price);
+                        raidDao.addLootToRaid(raid, name, loot, isheroic, price);
                 } catch (SQLException ex) {
                         Logger.getLogger(RaidLootAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -107,6 +107,8 @@ public class RaidLootAddWindow extends Window {
 
         private ComboBox nameComboList() throws UnsupportedOperationException {
                 final ComboBox name = new ComboBox("Name");
+                name.setWidth("300px");
+                name.addStyleName("select-button");
                 HashSet<RaidChar> charlist = new HashSet<RaidChar>();
                 TreeSet<String> sortedlist = new TreeSet<String>();
                 charlist.addAll(raid.getRaidChars());
@@ -135,7 +137,9 @@ public class RaidLootAddWindow extends Window {
         }
 
         private ComboBox lootListComboBox(HashSet<Items> lootlist) throws UnsupportedOperationException {
-                ComboBox loots = new ComboBox();
+                ComboBox loots = new ComboBox("Item");
+                loots.setWidth("300px");
+                loots.addStyleName("select-button");
                 for (Items eachitem : lootlist) {
                         loots.addItem(eachitem.getName());
                 }
@@ -147,18 +151,18 @@ public class RaidLootAddWindow extends Window {
                 return (Double) itemDao.getItemPrice(itemname, isheroic);
         }
 
-        private ComboBox bossListComboBox() throws ConversionException, ReadOnlyException, UnsupportedOperationException, SQLException {
-                List<String> bosslist = new ArrayList<String>();
-                bosslist = raidDao.getBossesForRaid(raid);
-                ComboBox boss = new ComboBox();
-                for (String eachboss : bosslist) {
-                        boss.addItem(eachboss);
-                }
-                boss.setNullSelectionAllowed(false);
-                Collection<?> itemIds = boss.getItemIds();
-                boss.setValue(itemIds.iterator().next());
-                return boss;
-        }
+//        private ComboBox bossListComboBox() throws ConversionException, ReadOnlyException, UnsupportedOperationException, SQLException {
+//                List<String> bosslist = new ArrayList<String>();
+//                bosslist = raidDao.getBossesForRaid(raid);
+//                ComboBox boss = new ComboBox();
+//                for (String eachboss : bosslist) {
+//                        boss.addItem(eachboss);
+//                }
+//                boss.setNullSelectionAllowed(false);
+//                Collection<?> itemIds = boss.getItemIds();
+//                boss.setValue(itemIds.iterator().next());
+//                return boss;
+//        }
 
         private HashSet<Items> getLootList() {
                 HashSet<Items> lootlist = new HashSet<Items>();
@@ -221,14 +225,13 @@ public class RaidLootAddWindow extends Window {
 
         private class AddRaidListener implements ClickListener {
 
-                private final ComboBox boss;
                 private final ComboBox name;
                 private final ComboBox loots;
                 private final CheckBox heroic;
                 private final TextField price;
 
-                public AddRaidListener(ComboBox boss, ComboBox name, ComboBox loots, CheckBox heroic, TextField price) {
-                        this.boss = boss;
+                public AddRaidListener(ComboBox name, ComboBox loots, CheckBox heroic, TextField price) {
+            
                         this.name = name;
                         this.loots = loots;
                         this.heroic = heroic;
@@ -237,7 +240,7 @@ public class RaidLootAddWindow extends Window {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        addRaidLoot(boss.getValue().toString(), name.getValue().toString(), loots.getValue().toString(), Boolean.parseBoolean(heroic.getValue().toString()), Double.parseDouble(price.getValue().toString()));
+                        addRaidLoot(name.getValue().toString(), loots.getValue().toString(), Boolean.parseBoolean(heroic.getValue().toString()), Double.parseDouble(price.getValue().toString()));
                         notifyListeners();
                 }
         }

@@ -11,13 +11,6 @@ public enum Type{
                         return "Shields";
                 }
         },
-        Trinkets {
-
-                @Override
-                public String toString() {
-                        return "Trinket";
-                }
-        },
         Cloth {
 
                 @Override

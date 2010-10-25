@@ -310,28 +310,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public List<String> getBossesForRaid(Raid raid) throws SQLException {
-                Connection c = null;
-                List<String> bosses = new ArrayList<String>();
-                try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM mobs JOIN zones WHERE mobs.zone_id=zones.id AND zones.name=?");
-                        p.setString(1, raid.getName());
-                        ResultSet rs = p.executeQuery();
-                        while (rs.next()) {
-                                String foo = rs.getString("mobs.name");
-                                bosses.add(foo);
-                        }
-                } catch (SQLException e) {
-                        e.printStackTrace();
-                } finally {
-                        closeConnection(c);
-                }
-                return bosses;
-        }
-
-        @Override
-        public void addLootToRaid(Raid raid, String boss, String name, String loot, boolean heroic, double price) throws SQLException {
+        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) throws SQLException {
                 Connection c = null;
                 try {
                         c = new DBConnection().getConnection();
@@ -339,31 +318,19 @@ public class RaidDB implements RaidDAO {
                         ItemDAO itemDao = new ItemDB();
                         int itemid = itemDao.getItemId(loot);
                         int charid = characterDao.getCharacterId(name);
-                        int mobid = getMobId(c, boss);
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, mob_id, character_id, price, heroic) VALUES(?,?,?,?,?,?)");
+                        PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, character_id, price, heroic) VALUES(?,?,?,?,?)");
                         ps.setInt(1, itemid);
                         ps.setInt(2, raid.getId());
-                        ps.setInt(3, mobid);
-                        ps.setInt(4, charid);
-                        ps.setDouble(5, price);
-                        ps.setBoolean(6, heroic);
+//                        ps.setInt(3, mobid);
+                        ps.setInt(3, charid);
+                        ps.setDouble(4, price);
+                        ps.setBoolean(5, heroic);
                         ps.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
                         closeConnection(c);
                 }
-        }
-
-        private int getMobId(Connection c, String boss) throws SQLException {
-                PreparedStatement p = c.prepareStatement("SELECT * FROM mobs WHERE name=?");
-                p.setString(1, boss);
-                ResultSet rs = p.executeQuery();
-                int bossid = 0;
-                while (rs.next()) {
-                        bossid = rs.getInt("id");
-                }
-                return bossid;
         }
 
         @Override
@@ -557,7 +524,7 @@ public class RaidDB implements RaidDAO {
                         while (rs.next()) {
                                 i++;
                         }
-                        
+
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -598,6 +565,32 @@ public class RaidDB implements RaidDAO {
                         c.close();
                 } catch (SQLException ex) {
                         Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+
+        @Override
+        public void removeZone(String zone) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("DELETE FROM zones WHERE name=?");
+                        p.setString(1, zone);
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public void addZone(String zone) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("INSERT INTO zones (name) VALUES(?)");
+                        p.setString(1, zone);
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
                 }
         }
 }

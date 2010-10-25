@@ -13,12 +13,16 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,8 +98,16 @@ public class RaidEditWindow extends Window {
                 final TextField comment = new TextField("Comment: ", raid.getComment());
                 comment.setImmediate(true);
 
-                final TextField datum = new TextField("Date: ", raid.getDate());
+
+                final DateField datum = new DateField("Date");
                 datum.setImmediate(true);
+                Date date = new Date();
+                datum.setDateFormat("yyyy-MM-dd HH:mm");
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                datum.setValue(dateFormat.format(date));
+
+//                final TextField datum = new TextField("Date: ", raid.getDate());
+//                datum.setImmediate(true);
 
                 Button updateButton = new Button("Update");
 
@@ -128,9 +140,9 @@ public class RaidEditWindow extends Window {
 
                 private final ComboBox zone;
                 private final TextField comment;
-                private final TextField datum;
+                private final DateField datum;
 
-                public UpdateButtonListener(ComboBox zone, TextField comment, TextField datum) {
+                public UpdateButtonListener(ComboBox zone, TextField comment, DateField datum) {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;

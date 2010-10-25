@@ -89,9 +89,7 @@ public class RaidRewardAddWindow extends Window {
 			if (invalidchars.isEmpty()) {
 				RaidReward raidReward = new RaidReward(comment, -1, raid.getId(), shares);
                                 Collection<RaidChar> chars = raidDao.getRaidCharsForRaid(attendantlist, raid.getId());
-				for (RaidChar rc : chars) {
-                                        // System.out.println("--- Name: " + rc.getName());
-                                }
+		
                                 raidReward.addRewardChars(chars);
 				// System.out.println(raidReward.getRewardChars().toString());
                                 raidDao.addReward(raidReward);

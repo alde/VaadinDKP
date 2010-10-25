@@ -21,7 +21,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
@@ -45,7 +44,7 @@ public class ItemAddWindow extends Window {
         private TextField priceheroic;
         private ComboBox slot;
         private ComboBox type;
-        private CustomLayout cl;
+        private VerticalLayout vrt;
 
         public ItemAddWindow() {
                 this.setCaption("Add Item");
@@ -66,30 +65,9 @@ public class ItemAddWindow extends Window {
                 }
 
                 VerticalLayout addItem = new VerticalLayout();
+                vrt = new VerticalLayout();
                 addComponent(addItem);
-                this.name = new TextField("Name");
-                this.name.setStyleName("textfieldfont");
-                this.name.setWidth("150px");
-                this.wowid = new TextField("WowID Normal");
-                this.wowid.setStyleName("textfieldfont");
-                this.wowid.setWidth("150px");
-                this.wowidheroic = new TextField("WowID Heroic");
-                this.wowidheroic.setStyleName("textfieldfont");
-                this.wowidheroic.setWidth("150px");
-                this.price = new TextField("Price Normal");
-                this.price.setStyleName("textfieldfont");
-                this.price.setWidth("150px");
-                this.priceheroic = new TextField("Price Heroic");
-                this.priceheroic.setStyleName("textfieldfont");
-                this.priceheroic.setWidth("150px");
-                this.slot = new ComboBox("Slot");
-                this.slot.setStyleName("textfieldfont");
-                this.slot.setWidth("150px");
-                this.slot.addStyleName("select-button");
-                this.type = new ComboBox("Type");
-                this.type.setStyleName("textfieldfont");
-                this.type.setWidth("150px");
-                this.type.addStyleName("select-button");
+                itemSetters();
 
                 final List<ItemPrices> defaultprices = prices;
 
@@ -114,20 +92,48 @@ public class ItemAddWindow extends Window {
                 slot.addListener(new SlotComboBoxValueChangeListener(slot, defaultprices, price, priceheroic));
 
                 final Button btn = new Button("Add");
-                btn.addListener(new AddButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type));
+                btn.addListener(new AddButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type, vrt));
                 final Button cbtn = new Button("Close");
                 cbtn.addListener(new CloseButtonClickListener());
+                final Button clearButton = new Button("Clear");
+                clearButton.addListener(new ClearButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type, vrt));
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
                 hzl.addComponent(btn);
                 hzl.addComponent(cbtn);
+                hzl.addComponent(clearButton);
                 addItem.addComponent(hzl);
+        }
+
+        private void itemSetters() {
+                this.name = new TextField("Name");
+                this.name.setStyleName("textfieldfont");
+                this.name.setWidth("150px");
+                this.wowid = new TextField("WowID Normal");
+                this.wowid.setStyleName("textfieldfont");
+                this.wowid.setWidth("150px");
+                this.wowidheroic = new TextField("WowID Heroic");
+                this.wowidheroic.setStyleName("textfieldfont");
+                this.wowidheroic.setWidth("150px");
+                this.price = new TextField("Price Normal");
+                this.price.setStyleName("textfieldfont");
+                this.price.setWidth("150px");
+                this.priceheroic = new TextField("Price Heroic");
+                this.priceheroic.setStyleName("textfieldfont");
+                this.priceheroic.setWidth("150px");
+                this.slot = new ComboBox("Slot");
+                this.slot.setStyleName("textfieldfont");
+                this.slot.setWidth("150px");
+                this.slot.addStyleName("select-button");
+                this.type = new ComboBox("Type");
+                this.type.setStyleName("textfieldfont");
+                this.type.setWidth("150px");
+                this.type.addStyleName("select-button");
         }
 
         private void itemAddWIndowAddComponents(VerticalLayout addItem) {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.addComponent(name);
-                VerticalLayout vrt = new VerticalLayout();
                 Button queryButton = new Button();
                 queryButton.setIcon(new ThemeResource("../shared/query.png"));
                 queryButton.setStyle(Button.STYLE_LINK);
@@ -196,8 +202,9 @@ public class ItemAddWindow extends Window {
                 private final TextField priceheroic;
                 private final ComboBox slot;
                 private final ComboBox type;
+                private final VerticalLayout vert;
 
-                public AddButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type) {
+                public AddButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type, VerticalLayout vert) {
                         this.name = name;
                         this.wowid = wowid;
                         this.wowidheroic = wowidheroic;
@@ -205,11 +212,24 @@ public class ItemAddWindow extends Window {
                         this.priceheroic = priceheroic;
                         this.slot = slot;
                         this.type = type;
+                        this.vert = vert;
                 }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
                         final String iname = (String) name.getValue();
+                        if (wowid.getValue().toString().isEmpty()) {
+                                wowid.setValue("0");
+                        }
+                        if (wowidheroic.getValue().toString().isEmpty()) {
+                                wowidheroic.setValue("0");
+                        }
+                        if (price.getValue().toString().isEmpty()) {
+                                price.setValue("0");
+                        }
+                        if (priceheroic.getValue().toString().isEmpty()) {
+                                priceheroic.setValue("0");
+                        }
                         final int iwowid = Integer.parseInt(wowid.getValue().toString());
                         final int iwowidheroic = Integer.parseInt(wowidheroic.getValue().toString());
                         final double iprice = Double.parseDouble(price.getValue().toString());
@@ -219,12 +239,17 @@ public class ItemAddWindow extends Window {
                         int success = 0;
                         try {
                                 success = addItem(iname, iwowid, iwowidheroic, iprice, ipriceheroic, islot, itype);
+
+                                if (success < 0) {
+                                        vert.addComponent(new Label("Item already in database\n"+iname));
+                                } else {
+                                        notifyListeners();
+                                        close();
+                                }
                         } catch (SQLException ex) {
                                 Logger.getLogger(ItemAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        addComponent(new Label("Update :" + success));
-                        notifyListeners();
-                        close();
+
                 }
         }
 
@@ -257,7 +282,7 @@ public class ItemAddWindow extends Window {
                         if (!typeFromXml.equalsIgnoreCase("Item not found!")) {
                                 String tooltip = xml.parseXmlTooltip();
                                 String wowidFromXml = xml.parseXmlWowid();
-                                if (tooltip.contains(("Heroic")) ) {
+                                if (tooltip.contains(("Heroic"))) {
                                         wowidheroic.setValue(wowidFromXml);
                                 } else {
                                         wowid.setValue(wowidFromXml);
@@ -265,15 +290,52 @@ public class ItemAddWindow extends Window {
                                 type.setValue(Type.valueOf(typeFromXml));
                                 String slotsFromXml = xml.parseXmlSlots();
                                 slot.setValue(Slots.valueOf(slotsFromXml));
-                                
+
                                 String itemname = xml.parseXmlName();
+                                name.setValue(itemname);
                                 String url = xml.parseXmlUrl();
-                                Link seealso = new Link(itemname, new ExternalResource(url+"#see-also"));
+                                Link seealso = new Link(itemname, new ExternalResource(url + "#see-also"));
                                 seealso.setTargetName("_blank");
+                                vrt.addComponent(new Label("See also for non-queryable wow-id:"));
                                 vrt.addComponent(seealso);
                         } else {
                                 vrt.addComponent(new Label("Item not found!"));
                         }
+                }
+        }
+
+        private static class ClearButtonClickListener implements ClickListener {
+
+                private final TextField name;
+                private final TextField wowid;
+                private final TextField wowidheroic;
+                private final TextField price;
+                private final TextField priceheroic;
+                private final ComboBox slot;
+                private final ComboBox type;
+                private final VerticalLayout vert;
+
+                public ClearButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type, VerticalLayout vert) {
+                        this.name = name;
+                        this.wowid = wowid;
+                        this.wowidheroic = wowidheroic;
+                        this.price = price;
+                        this.priceheroic = priceheroic;
+                        this.slot = slot;
+                        this.type = type;
+                        this.vert = vert;
+                }
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        name.setValue("");
+                        wowid.setValue("");
+                        wowidheroic.setValue("");
+                        price.setValue("");
+                        priceheroic.setValue("");
+                        slot.setValue("Other");
+                        type.setValue("Other");
+                        vert.removeAllComponents();
                 }
         }
 }

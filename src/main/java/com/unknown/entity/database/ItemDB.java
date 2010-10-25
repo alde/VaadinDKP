@@ -131,16 +131,20 @@ public class ItemDB implements ItemDAO {
 
                 try {
                         c = new DBConnection().getConnection();
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO items (name, wowid_normal, wowid_heroic, price_normal, price_heroic, slot, type) VALUES(?,?,?,?,?,?,?)");
-                        ps.setString(1, name);
-                        ps.setInt(2, wowid);
-                        ps.setInt(3, wowid_hc);
-                        ps.setDouble(4, price);
-                        ps.setDouble(5, price_hc);
-                        ps.setString(6, slot);
-                        ps.setString(7, type);
+                        if (!itemAlreadyInDatabase(name)) {
+                                PreparedStatement ps = c.prepareStatement("INSERT INTO items (name, wowid_normal, wowid_heroic, price_normal, price_heroic, slot, type) VALUES(?,?,?,?,?,?,?)");
+                                ps.setString(1, name);
+                                ps.setInt(2, wowid);
+                                ps.setInt(3, wowid_hc);
+                                ps.setDouble(4, price);
+                                ps.setDouble(5, price_hc);
+                                ps.setString(6, slot);
+                                ps.setString(7, type);
 
-                        result = ps.executeUpdate();
+                                result = ps.executeUpdate();
+                        } else {
+                                result = -1;
+                        }
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -306,5 +310,14 @@ public class ItemDB implements ItemDAO {
                         tempType = Type.valueOf(temp);
                 }
                 return tempType;
+        }
+
+        private boolean itemAlreadyInDatabase(String name) {
+                Items item = getSingleItem(name);
+                if (item != null) {
+                        return true;
+                } else {
+                        return false;
+                }
         }
 }

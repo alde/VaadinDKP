@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author bobo
+ * @author alde
  */
 public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
@@ -41,9 +41,9 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button addItmBtn = new Button("Add Item");
         private final Button editDefaultBtn = new Button("Edit Default prices");
         private final Button addUserBtn = new Button("Add User");
+        private final Button editZoneBtn = new Button("Edit Zones");
         private final Button logOutButton = new Button("");
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
-
         RaidList raidList = null;
         CharacterList characterList = null;
         DkpList dkpList = null;
@@ -79,6 +79,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 addItmBtn.addListener(new AddItemListener());
                 editDefaultBtn.addListener(new EditDefaultsListener());
                 addUserBtn.addListener(new AddUserListener());
+                editZoneBtn.addListener(new EditZonesListener());
                 logOutButton.addListener(new LogOutListener());
         }
 
@@ -96,6 +97,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         this.addComponent(addItmBtn);
                         this.addComponent(addRaidBtn);
                         this.addComponent(editDefaultBtn);
+                        this.addComponent(editZoneBtn);
                         this.addComponent(addUserBtn);
                 } else {
                         addComponent(loginBtn);
@@ -178,7 +180,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                                 loginWindow.addCharacterInfoListener(characterList);
                                 loginWindow.addCharacterInfoListener(dkpList);
                                 loginWindow.attach();
-                                
+
                         } else {
                                 getMainWindow().addComponent(new Label("User: " + (getApplication() != null ? getApplication().getUser() : "")));
                         }
@@ -218,6 +220,17 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         AddNewUserWindow newUser = new AddNewUserWindow();
                         newUser.printInfo();
                         getMainWindow().addWindow(newUser);
+                }
+        }
+
+        private class EditZonesListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+
+                        EditZonesWindow editZones = new EditZonesWindow();
+                        editZones.printInfo();
+                        getMainWindow().addWindow(editZones);
                 }
         }
 }

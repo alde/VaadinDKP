@@ -31,9 +31,7 @@ public interface RaidDAO {
 
         public int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException;
 
-        public List<String> getBossesForRaid(Raid raid) throws SQLException;
-
-        public void addLootToRaid(Raid raid, String boss, String name, String loot, boolean heroic, double price) throws SQLException;
+        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) throws SQLException;
 
         public int removeReward(RaidReward reward) throws SQLException;
 
@@ -54,4 +52,8 @@ public interface RaidDAO {
         public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException;
 
         public int doUpdateLoot(int id, String looter, String itemname, double price, boolean heroic);
+
+        public void removeZone(String zone);
+
+        public void addZone(String zoneName);
 }

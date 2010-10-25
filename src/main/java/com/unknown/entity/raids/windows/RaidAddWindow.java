@@ -16,6 +16,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import java.text.DateFormat;
@@ -49,14 +50,14 @@ public class RaidAddWindow extends Window {
                 VerticalLayout addItem = new VerticalLayout();
 
                 ComboBox zone = raidAddWindowZoneComboBox(zoneList);
-                zone.setWidth("150px");
+                zone.setWidth("300px");
                 zone.addStyleName("select-button");
                 addItem.addComponent(zone);
 
                 TextField comment = raidAddWindowCommentField();
                 addItem.addComponent(comment);
 
-                TextField datum = raidAddWindowDateField();
+                DateField datum = raidAddWindowDateField();
                 addItem.addComponent(datum);
 
                 Button addButton = raidAddWindowAddButton(zone, comment, datum);
@@ -82,16 +83,17 @@ public class RaidAddWindow extends Window {
                 return cbtn;
         }
 
-        private Button raidAddWindowAddButton(final ComboBox zone, final TextField comment, final TextField datum) {
+        private Button raidAddWindowAddButton(final ComboBox zone, final TextField comment, final DateField datum) {
                 final Button btn = new Button("Add");
                 btn.addListener(new AddButtonClickListener(zone, comment, datum));
                 return btn;
         }
 
-        private TextField raidAddWindowDateField() throws ConversionException, ReadOnlyException {
-                final TextField datum = new TextField("Date");
+        private DateField raidAddWindowDateField() throws ConversionException, ReadOnlyException {
+                final DateField datum = new DateField("Date");
                 datum.setImmediate(true);
                 Date date = new Date();
+                datum.setDateFormat("yyyy-MM-dd HH:mm");
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                 datum.setValue(dateFormat.format(date));
                 return datum;
@@ -135,9 +137,9 @@ public class RaidAddWindow extends Window {
 
                 private final ComboBox zone;
                 private final TextField comment;
-                private final TextField datum;
+                private final DateField datum;
 
-                public AddButtonClickListener(ComboBox zone, TextField comment, TextField datum) {
+                public AddButtonClickListener(ComboBox zone, TextField comment, DateField datum) {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;
@@ -149,8 +151,9 @@ public class RaidAddWindow extends Window {
                         String rcomment = comment.getValue().toString();
                         String rdate = datum.getValue().toString();
                         int success = addRaid(rzone, rcomment, rdate);
-                        addComponent(new Label("Update :" + success));
+//                        addComponent(new Label("Update :" + success));
                         notifyListeners();
+                        close();
                 }
         }
 }
