@@ -43,11 +43,11 @@ public class RaidInfoWindow extends Window {
                 hzl.setSpacing(true);
 
                 RaidRewardList rRewardList = new RaidRewardList(raid, dkplist, clist);
-                rRewardList.addStyleName("small striped");
+                rRewardList.addStyleName("striped");
                 hzl.addComponent(rRewardList);
 
                 RaidLootList rLootList = new RaidLootList(raid, dkplist, clist);
-                rLootList.addStyleName("small striped");
+                rLootList.addStyleName("striped");
                 hzl.addComponent(rLootList);
 
                 addComponent(hzl);

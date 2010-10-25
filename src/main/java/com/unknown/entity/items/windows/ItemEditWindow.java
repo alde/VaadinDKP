@@ -187,7 +187,7 @@ public class ItemEditWindow extends Window {
                 hzl.setSpacing(true);
                 Table lootedby = lootList(item);
                 if (lootedby.size() > 0) {
-                        lootedby.addStyleName("small striped");
+                        lootedby.addStyleName("striped");
                         hzl.addComponent(lootedby);
                 } else {
                         hzl.addComponent(new Label("Not looted by anyone"));

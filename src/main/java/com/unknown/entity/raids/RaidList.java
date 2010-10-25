@@ -33,7 +33,7 @@ public class RaidList extends Table implements RaidInfoListener {
                 this.raidDAO = raidDAO;
                 this.ic = new IndexedContainer();
                 this.setSelectable(true);
-                                this.setSizeUndefined();
+                this.setSizeUndefined();
                 this.setHeight("500px");
                 this.addListener(new RaidListClickListener());
                 raidListSetHeaders();
@@ -48,9 +48,11 @@ public class RaidList extends Table implements RaidInfoListener {
         public void setCharList(CharacterList clist) {
                 this.clist = clist;
         }
+
         public void setDkpList(DkpList dkplist) {
                 this.dkplist = dkplist;
         }
+
         public void setItemList(ItemList itemList) {
                 this.itemList = itemList;
         }

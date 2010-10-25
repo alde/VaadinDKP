@@ -48,7 +48,6 @@ public class UnknownEntityDKP extends Application {
                 window = new Window("Unknown Entity DKP");
                 setMainWindow(window);
                 Drawings();
-//                setTheme("chameleon-dark");
                 setTheme("dark");
         }
 
@@ -63,11 +62,11 @@ public class UnknownEntityDKP extends Application {
                 charList = new CharacterList(characterDAO, dkpList, this);
                 charList.attach();
                 dkpList.setCharacterList(charList);
-                dkpList.addStyleName("small striped");
+                dkpList.addStyleName("striped");
                 raidList = new RaidList(raidDAO);
-                raidList.addStyleName("small striped");
+                raidList.addStyleName("striped");
                 itemList = new ItemList(itemDAO);
-                itemList.addStyleName("small striped");
+                itemList.addStyleName("striped");
                 raidList.setCharList(charList);
                 raidList.setDkpList(dkpList);
                 charList.setLists(itemList, raidList);

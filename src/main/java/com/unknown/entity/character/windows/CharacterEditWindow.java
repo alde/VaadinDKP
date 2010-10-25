@@ -162,7 +162,7 @@ public class CharacterEditWindow extends Window {
                 update.addListener(new updateLootsListener());
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
-                        loots.addStyleName("small striped");
+                        loots.addStyleName("striped");
                         addComponent(loots);
                         addComponent(update);
                         loots.addListener(new LootClickListener());
@@ -175,7 +175,7 @@ public class CharacterEditWindow extends Window {
                 Table raids = raidList(user);
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
-                        raids.addStyleName("small striped");
+                        raids.addStyleName("striped");
                         raids.setWidth("220px");
                         addComponent(raids);
                         raids.addListener(new RaidListClickListener());

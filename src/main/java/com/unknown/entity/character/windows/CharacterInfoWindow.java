@@ -100,7 +100,7 @@ public class CharacterInfoWindow extends Window {
                 Table loots = lootList(user);
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
-                        loots.addStyleName("small striped");
+                        loots.addStyleName("striped");
                         addComponent(lootList(user));
                 } else {
                         addComponent(new Label("No items looted yet."));
@@ -111,7 +111,7 @@ public class CharacterInfoWindow extends Window {
                 Table raids = raidList(user);
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
-                        raids.addStyleName("small striped");
+                        raids.addStyleName("striped");
                         addComponent(raids);
                 } else {
                         addComponent(new Label("No raids attended yet."));
