@@ -5,6 +5,7 @@
 package com.unknown.entity.character.windows;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.XmlParser;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
 import com.unknown.entity.dao.*;
@@ -36,6 +37,8 @@ public class CharacterInfoWindow extends Window {
         private Application app;
         private ItemList itemList;
         private RaidList raidList;
+        private Table loots;
+        private int longest;
 
         public CharacterInfoWindow(User user, Application app, RaidList raidList, ItemList itemList) {
                 this.user = user;
@@ -43,6 +46,7 @@ public class CharacterInfoWindow extends Window {
                 this.raidList = raidList;
                 this.itemList = itemList;
                 this.raidDao = new RaidDB();
+                this.longest = 1;
                 this.addStyleName("opaque");
                 this.setCaption("Character information: " + user.getUsername());
                 this.setPositionX(200);
@@ -63,13 +67,18 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
-                addItem.getItemProperty("Name").setValue(charitem.getName());
+                XmlParser xml = new XmlParser(charitem.getName());
+                String quality = xml.parseXmlQuality().toLowerCase();
+                Label itemname = new Label(charitem.getName());
+                itemname.addStyleName(quality);
+                System.out.println(quality);
+                addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Heroic").setValue(charitem.getHeroic());
         }
 
         private void characterInfoLootTableSetHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", String.class, "");
+                tbl.addContainerProperty("Name", Label.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
                 tbl.addContainerProperty("Heroic", Boolean.class, false);
         }
@@ -97,7 +106,7 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void characterLoots() {
-                Table loots = lootList(user);
+                loots = lootList(user);
                 addComponent(new Label("Loots"));
                 if (loots.size() > 0) {
                         loots.addStyleName("striped");
@@ -147,7 +156,11 @@ public class CharacterInfoWindow extends Window {
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP: "));
                 Label dkp = new Label("" + user.getDKP());
-                dkp.addStyleName("color");
+                if (user.getDKP() >= 0) {
+                        dkp.addStyleName("positive");
+                } else {
+                        dkp.addStyleName("negative");
+                }
                 hzl.addComponent(dkp);
                 addComponent(hzl);
         }
@@ -155,12 +168,18 @@ public class CharacterInfoWindow extends Window {
         private Table lootList(User user) {
                 Table tbl = new Table();
                 characterInfoLootTableSetHeaders(tbl);
+                tbl.setSizeUndefined();
                 tbl.setHeight("150px");
                 for (CharacterItem charitem : user.getCharItems()) {
-                        System.out.println(charitem.toString());
                         Item addItem = tbl.addItem(charitem);
                         characterInfoLootTableAddRow(addItem, charitem);
+                        if (longest < charitem.getName().length() + 1) {
+                                longest = charitem.getName().length() + 1;
+                        }
+                        tbl.setColumnWidth("Name", longest * 6);
+                        tbl.requestRepaint();
                 }
+                tbl.setSizeUndefined();
                 tbl.addListener(new LootListClickListener());
                 return tbl;
         }
@@ -169,8 +188,8 @@ public class CharacterInfoWindow extends Window {
                 Table tbl = new Table();
                 tbl.addContainerProperty("Comment", String.class, "");
                 tbl.addContainerProperty("Date", String.class, "");
+                tbl.setSizeUndefined();
                 tbl.setHeight("150px");
-                tbl.setWidth("220px");
                 for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
                         Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());

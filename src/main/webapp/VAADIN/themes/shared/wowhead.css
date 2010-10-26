@@ -15,8 +15,8 @@
 .q6 a:hover { color: #E5CC63 !important; text-decoration: none; text-shadow: 1px 1px 1px rgba(0, 0, 0, .6); }
 .q7, .q7 a:link, .q7 a:active, .q7 a:visited { color: #E5CC63 !important; text-decoration: none; }
 .q7 a:hover { color: #E5CC63 !important; text-decoration: none; text-shadow: 1px 1px 1px rgba(0, 0, 0, .6); }
-.moneygold, .moneygold a:link, .moneygold a:active, .moneygold a:visited { color: #E5CC63 !important; text-decoration: none; }
-.moneygold a:hover { color: #E5CC63 !important; text-decoration: none; text-shadow: 1px 1px 1px rgba(0, 0, 0, .6); }
+.moneygold, .moneygold a:link, .moneygold a:active, .moneygold a:visited { color: gold !important; text-decoration: none; }
+.moneygold a:hover { color: gold !important; text-decoration: none; text-shadow: 1px 1px 1px rgba(0, 0, 0, .6); }
 .moneysilver, .moneysilver a:link, .moneysilver a:active, .moneysilver a:visited { color: gray !important; text-decoration: none; }
 .moneysilver a:hover { color: gray !important; text-decoration: none; text-shadow: 1px 1px 1px rgba(0, 0, 0, .6); }
 .moneycopper, .moneycopper a:link, .moneycopper a:active, .moneycopper a:visited { color: #DE800D !important; text-decoration: none; }
@@ -213,11 +213,28 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .icontiny { background: none no-repeat scroll left center transparent; padding-left: 18px !important; }
 .wowclass { background: none no-repeat scroll left center transparent; padding-left: 23px !important; padding-top: 3px; padding-bottom: 3px;}
 
+.negative { color: #FF0000;}
+.positive { color: #00FF00;}
+
 .textfieldfont{
         font-size: 12px;
         color: #000000 !important;
 }
 
+/* Epic */
+.epic { color: #9035CF;}
+
+/* Legendary */
+.legendary { color: #DE800D; }
+
+/* Rare */
+.rare { color: #0000FF; }
+
+/* Uncommon */
+.uncommon { color: #00BF00; }
+
+/* Artifact */
+.artifact { color: gold; }
 
 /* Warlock */
 .v-nativebutton-warlock, v-nativebutton-warlock:active, v-nativebutton-warlock:focus {outline: none; border: none; }

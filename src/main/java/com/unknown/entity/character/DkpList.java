@@ -63,7 +63,7 @@ public class DkpList extends Table implements CharacterInfoListener {
                 } catch (IllegalAccessException ex) {
                         Logger.getLogger(DkpList.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                addContainerProperty("DKP", Double.class, 0);
+                addContainerProperty("DKP", Label.class, 0);
         }
 
         public void clear() {
@@ -79,15 +79,6 @@ public class DkpList extends Table implements CharacterInfoListener {
                 ic.removeAllItems();
                 ic.removeAllContainerFilters();
                 printList();
-        }
-
-        private boolean isAdmin() {
-                final SiteUser siteUser = (SiteUser) app.getUser();
-                if (siteUser != null) {
-                        return true;
-                } else {
-                        return false;
-                }
         }
 
         public void printList() {
@@ -113,7 +104,13 @@ public class DkpList extends Table implements CharacterInfoListener {
                 charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
                 addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Armor").setValue(user.getArmor());
-                addItem.getItemProperty("DKP").setValue(user.getDKP());
+                Label dkp = new Label(""+user.getDKP());
+                if (user.getDKP()>=0) {
+                        dkp.addStyleName("positive");
+                } else {
+                        dkp.addStyleName("negative");
+                }
+                addItem.getItemProperty("DKP").setValue(dkp);
         }
 
         public void filter(Object value) {

@@ -9,6 +9,8 @@ import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.XmlParser;
+import com.unknown.entity.dao.CharacterDAO;
+import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.Items;
@@ -219,14 +221,17 @@ public class ItemEditWindow extends Window {
         }
 
         private void itemTableRowAdd(Item addItem, ItemLooter looters) throws ConversionException, ReadOnlyException {
-                addItem.getItemProperty("Name").setValue(looters.getName());
+                Label looter = new Label(looters.getName());
+                CharacterDAO charDao = new CharacterDB();
+                looter.addStyleName(charDao.getRoleForCharacter(looters.getName()).toLowerCase().replace(" ", ""));
+                addItem.getItemProperty("Name").setValue(looter);
                 addItem.getItemProperty("Price").setValue(looters.getPrice());
                 addItem.getItemProperty("Raid").setValue(looters.getRaid());
                 addItem.getItemProperty("Date").setValue(looters.getDate());
         }
 
         private void itemTableHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", String.class, "");
+                tbl.addContainerProperty("Name", Label.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
                 tbl.addContainerProperty("Raid", String.class, "");
                 tbl.addContainerProperty("Date", String.class, "");

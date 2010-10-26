@@ -316,9 +316,6 @@ public class CharacterEditWindow extends Window {
 
         private class updateLootsListener implements ClickListener {
 
-                public updateLootsListener() {
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
                         doUpdateLoots();
@@ -329,32 +326,30 @@ public class CharacterEditWindow extends Window {
 
         private class LootClickListener implements ItemClickListener {
 
-                public LootClickListener() {
-                }
-
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        ItemDAO itemDao = new ItemDB();
-                        CharacterItem citem = (CharacterItem) event.getItemId();
-                        Items temp = itemDao.getSingleItem(citem.getName());
-                        PopUpControl pop = new PopUpControl(app);
-                        pop.setItemList(itemList);
-                        pop.showProperItemWindow(temp);
+                        if (event.isDoubleClick()) {
+                                ItemDAO itemDao = new ItemDB();
+                                CharacterItem citem = (CharacterItem) event.getItemId();
+                                Items temp = itemDao.getSingleItem(citem.getName());
+                                PopUpControl pop = new PopUpControl(app);
+                                pop.setItemList(itemList);
+                                pop.showProperItemWindow(temp);
+                        }
                 }
         }
 
         private class RaidListClickListener implements ItemClickListener {
 
-                public RaidListClickListener() {
-                }
-
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        Raid item = (Raid) event.getItemId();
-                        PopUpControl pop = new PopUpControl(app);
-                        pop.setItemList(itemList);
-                        pop.setRaidList(raidList);
-                        pop.showProperRaidWindow(item);
+                        if (event.isDoubleClick()) {
+                                Raid item = (Raid) event.getItemId();
+                                PopUpControl pop = new PopUpControl(app);
+                                pop.setItemList(itemList);
+                                pop.setRaidList(raidList);
+                                pop.showProperRaidWindow(item);
+                        }
                 }
         }
 }

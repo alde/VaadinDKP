@@ -76,9 +76,9 @@ public class XmlParser {
         }
 
         public String parseXmlWowid() {
-                String url = findElement(root, "link");
-                url = url.replace("http://www.wowhead.com/item=", "");
-                return url;
+                String wowid = findElement(root, "link");
+                wowid = wowid.replace("http://www.wowhead.com/item=", "");
+                return wowid;
         }
 
         public String parseXmlType() {
@@ -161,5 +161,9 @@ public class XmlParser {
 
         public String parseXmlName() {
                 return findElement(root, "name");
+        }
+
+        public String parseXmlQuality() {
+                return findElement(root, "quality");
         }
 }

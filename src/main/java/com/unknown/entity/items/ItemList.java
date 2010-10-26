@@ -5,6 +5,7 @@
 package com.unknown.entity.items;
 
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.XmlParser;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.ItemDAO;
@@ -13,6 +14,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class ItemList extends Table implements ItemInfoListener {
         private CharacterList charLiist;
         private RaidList raidList;
         private DkpList dkpList;
+        private int longest;
 
         public ItemList(ItemDAO itemDAO) {
                 this.itemDAO = itemDAO;
@@ -35,6 +38,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 this.setSizeUndefined();
                 this.setHeight("500px");
                 this.setSelectable(true);
+                this.longest = 1;
 
                 this.addListener(new ItemListClickListener());
         }
@@ -46,15 +50,24 @@ public class ItemList extends Table implements ItemInfoListener {
         }
 
         private void itemListAddRow(Item addItem, final Items item) throws ConversionException, ReadOnlyException {
-                addItem.getItemProperty("Name").setValue(item.getName());
+                XmlParser xml = new XmlParser(item.getName());
+                String quality = xml.parseXmlQuality().toLowerCase();
+                Label itemname = new Label(item.getName(), Label.CONTENT_TEXT);
+                itemname.addStyleName(quality);
+                System.out.println(quality);
+                addItem.getItemProperty("Name").setValue(itemname);
+//                if (item.getName().length()*9 > this.getColumnWidth(addItem.getItemProperty("Name"))) {
+//                        this.setColumnWidth("Name", item.getName().length()*9);
+//                }
                 addItem.getItemProperty("Price Normal").setValue(item.getPrice());
                 addItem.getItemProperty("Price Heroic").setValue(item.getPrice_hc());
                 addItem.getItemProperty("Slot").setValue(item.getSlot());
                 addItem.getItemProperty("Type").setValue(item.getType().toString());
+                this.requestRepaint();
         }
 
         private void itemListColumnHeaders() throws UnsupportedOperationException {
-                ic.addContainerProperty("Name", String.class, "");
+                ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Price Normal", Double.class, 0);
                 ic.addContainerProperty("Price Heroic", Double.class, 0);
                 ic.addContainerProperty("Slot", String.class, "");
@@ -74,6 +87,11 @@ public class ItemList extends Table implements ItemInfoListener {
                 for (final Items item : itemses) {
                         Item addItem = addItem(item);
                         itemListAddRow(addItem, item);
+                          if (longest < item.getName().length() + 1) {
+                                longest = item.getName().length() + 1;
+                        }
+                        this.setColumnWidth("Name", longest * 6);
+                        this.requestRepaint();
                 }
         }
 
