@@ -84,12 +84,9 @@ public class CharacterDB implements CharacterDAO {
                 ResultSet rss = ps.executeQuery();
                 while (rss.next()) {
                         shares = getSharesForCharacterById(rs, rss, shares);
-//                        if (rss.getInt("characters.active")!=0) {
-//                                totalsharesthischaracter += rss.getInt("rewards.number_of_shares");
-//                        }
                 }
 
-                PreparedStatement totalShares = c.prepareStatement("select * from rewards join character_rewards ON character_rewards.reward_id=rewards.id join characters on character_rewards.character_id=characters.id");
+                        PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
                 ResultSet rsTotalShares = totalShares.executeQuery();
                 while (rsTotalShares.next()) {
                         if (rsTotalShares.getBoolean("characters.active")) {

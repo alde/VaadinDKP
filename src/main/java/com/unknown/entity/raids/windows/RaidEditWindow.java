@@ -101,11 +101,10 @@ public class RaidEditWindow extends Window {
 
                 final DateField datum = new DateField("Date");
                 datum.setImmediate(true);
-                Date date = new Date();
                 datum.setDateFormat("yyyy-MM-dd HH:mm");
                 datum.setResolution(DateField.RESOLUTION_MIN);
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                datum.setValue(dateFormat.format(date));
+                datum.setValue(raid.getDate());
 
 //                final TextField datum = new TextField("Date: ", raid.getDate());
 //                datum.setImmediate(true);
