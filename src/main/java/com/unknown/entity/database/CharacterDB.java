@@ -77,7 +77,9 @@ public class CharacterDB implements CharacterDAO {
                 ResultSet rsloot = ploot.executeQuery();
                 while (rsloot.next()) {
                         dkp_spent = getDkpSpentForCharacterById(rsloot, rs, dkp_spent);
-                        loot_value = loot_value + rsloot.getDouble("loots.price");
+                        if (rsloot.getBoolean(("characters.active"))) {
+                                loot_value = loot_value + rsloot.getDouble("loots.price");
+                        }
                 }
                 PreparedStatement ps = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON character_rewards.reward_id=rewards.id AND characters.id=? AND characters.id=character_rewards.character_id");
                 ps.setInt(1, rs.getInt("characters.id"));
@@ -86,7 +88,7 @@ public class CharacterDB implements CharacterDAO {
                         shares = getSharesForCharacterById(rs, rss, shares);
                 }
 
-                        PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
+                PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
                 ResultSet rsTotalShares = totalShares.executeQuery();
                 while (rsTotalShares.next()) {
                         if (rsTotalShares.getBoolean("characters.active")) {

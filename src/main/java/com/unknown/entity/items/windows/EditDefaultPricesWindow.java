@@ -82,6 +82,7 @@ public class EditDefaultPricesWindow extends Window {
                 priceTable.setContainerDataSource(ic);
                 tableData(priceTable);
 
+                addComponent(priceTable);
 
 
         }

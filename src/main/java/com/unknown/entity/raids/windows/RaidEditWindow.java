@@ -97,17 +97,16 @@ public class RaidEditWindow extends Window {
 
                 final TextField comment = new TextField("Comment: ", raid.getComment());
                 comment.setImmediate(true);
-
-
-                final DateField datum = new DateField("Date");
-                datum.setImmediate(true);
-                datum.setDateFormat("yyyy-MM-dd HH:mm");
-                datum.setResolution(DateField.RESOLUTION_MIN);
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                datum.setValue(raid.getDate());
-
-//                final TextField datum = new TextField("Date: ", raid.getDate());
+//
+//                final DateField datum = new DateField("Date");
 //                datum.setImmediate(true);
+//                datum.setDateFormat("yyyy-MM-dd HH:mm");
+//                datum.setResolution(DateField.RESOLUTION_MIN);
+//                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//                datum.setValue(raid.getDate())
+
+                final TextField datum = new TextField("Date: ", raid.getDate());
+                datum.setImmediate(true);
 
                 Button updateButton = new Button("Update");
 
@@ -117,7 +116,7 @@ public class RaidEditWindow extends Window {
 
                 addComponent(hzl);
                 addComponent(updateButton);
-                updateButton.addListener(new UpdateButtonListener(zone, comment, dateFormat.format(datum.getValue())));
+                updateButton.addListener(new UpdateButtonListener(zone, comment, datum));
         }
 
         private int updateRaid(String raidzoneName, String raidcomment, String raiddate) throws SQLException {
@@ -139,9 +138,9 @@ public class RaidEditWindow extends Window {
 
                 private final ComboBox zone;
                 private final TextField comment;
-                private final String datum;
+                private final TextField datum;
                 
-                public UpdateButtonListener(ComboBox zone, TextField comment, String datum) {
+                public UpdateButtonListener(ComboBox zone, TextField comment, TextField datum) {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;
@@ -151,7 +150,7 @@ public class RaidEditWindow extends Window {
                 public void buttonClick(ClickEvent event) {
                         final String raidzoneName = zone.getValue().toString();
                         final String raidcomment = comment.getValue().toString();
-                        final String raiddate = datum;
+                        final String raiddate = datum.getValue().toString();
                         try {
                                 final int success = updateRaid(raidzoneName, raidcomment, raiddate);
                         } catch (SQLException ex) {
