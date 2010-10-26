@@ -141,7 +141,7 @@ public class PopUpControl extends Window {
         }
 
         private void showRaidRewardInfoWindow(RaidReward rreward) {
-                RewardAttendantsWindow info = new RewardAttendantsWindow(rreward.getRewardChars());
+                RaidRewardAttendantsWindow info = new RaidRewardAttendantsWindow(rreward.getRewardChars());
                 info.printInfo();
                 info.addRaidRewardInfoListener(raidRewardList);
                 app.getMainWindow().addWindow(info);

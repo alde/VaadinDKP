@@ -23,12 +23,12 @@ import java.util.List;
  *
  * @author alde
  */
-public class RewardAttendantsWindow extends Window {
+public class RaidRewardAttendantsWindow extends Window {
 
 	private final List<RaidChar> chars;
         private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
 
-	public RewardAttendantsWindow(List<RaidChar> chars) {
+	public RaidRewardAttendantsWindow(List<RaidChar> chars) {
 		this.chars = chars;
                 this.setCaption("Attendants");
 		this.setPositionX(500);
