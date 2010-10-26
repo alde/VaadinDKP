@@ -8,13 +8,16 @@ import com.unknown.entity.Slots;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.ItemPrices;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
@@ -34,6 +37,7 @@ public class EditDefaultPricesWindow extends Window {
         TextField heroic = null;
         ComboBox slot = null;
         List<ItemPrices> prices = new ArrayList<ItemPrices>();
+        IndexedContainer ic;
 
         public EditDefaultPricesWindow() throws SQLException {
                 this.setCaption("Edit default Prices");
@@ -50,6 +54,7 @@ public class EditDefaultPricesWindow extends Window {
                 heroic.setImmediate(true);
                 this.itemDao = new ItemDB();
                 this.prices.addAll(itemDao.getDefaultPrices());
+                this.ic = new IndexedContainer();
         }
 
         public void printInfo() {
@@ -73,6 +78,24 @@ public class EditDefaultPricesWindow extends Window {
                 hzl.setMargin(true);
                 hzl.setSpacing(true);
                 addComponent(hzl);
+                Table priceTable = new Table();
+                priceTable.setContainerDataSource(ic);
+                tableData(priceTable);
+
+
+
+        }
+
+        private void tableData(Table priceTable) {
+                ic.addContainerProperty("Slot", String.class, "");
+                ic.addContainerProperty("Normal", TextField.class, "");
+                ic.addContainerProperty("Heroic", TextField.class, "");
+                for (ItemPrices ip : prices) {
+                        Item addItem = priceTable.addItem(ip);
+                        addItem.getItemProperty("Slot").setValue(ip.getSlotString());
+                        addItem.getItemProperty("Normal").setValue(ip.getPrice());
+                        addItem.getItemProperty("Heroic").setValue(ip.getPriceHeroic());
+                }
         }
 
         private void slotChangesMeansPriceChanges() {
