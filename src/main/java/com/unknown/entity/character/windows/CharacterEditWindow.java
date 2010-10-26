@@ -226,7 +226,11 @@ public class CharacterEditWindow extends Window {
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("DKP: "));
                 Label dkp = new Label("" + user.getDKP());
-                dkp.addStyleName("color");
+                if (user.getDKP() >= 0) {
+                        dkp.addStyleName("positive");
+                } else {
+                        dkp.addStyleName("negative");
+                }
                 hzl.addComponent(dkp);
                 addComponent(hzl);
         }

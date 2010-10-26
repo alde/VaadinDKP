@@ -15,6 +15,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
@@ -31,15 +32,18 @@ public class EditDefaultPricesWindow extends Window {
         ItemDAO itemDao = null;
         List<ItemPrices> prices = new ArrayList<ItemPrices>();
         IndexedContainer ic;
+        private int longest;
 
         public EditDefaultPricesWindow() throws SQLException {
                 this.setCaption("Edit default Prices");
                 this.addStyleName("opaque");
                 this.center();
+                this.setResizable(false);
                 this.getContent().setSizeUndefined();
                 this.itemDao = new ItemDB();
                 this.prices.addAll(itemDao.getDefaultPrices());
                 this.ic = new IndexedContainer();
+                this.longest = 1;
         }
 
         public void printInfo() {
@@ -51,6 +55,7 @@ public class EditDefaultPricesWindow extends Window {
                 priceTable.setEditable(true);
                 priceTable.setContainerDataSource(ic);
                 priceTable.setImmediate(true);
+                priceTable.setPageLength(0);
                 tableData(priceTable);
                 addComponent(priceTable);
                 HorizontalLayout hzl = new HorizontalLayout();
@@ -70,18 +75,24 @@ public class EditDefaultPricesWindow extends Window {
         }
 
         private void tableData(Table priceTable) {
-                priceTable.addContainerProperty("Slot", String.class, "");
+                priceTable.addContainerProperty("Slot", Label.class, "");
                 priceTable.addContainerProperty("Normal", Double.class, 0);
                 priceTable.addContainerProperty("Heroic", Double.class, 0);
                 for (ItemPrices ip : prices) {
                         System.out.println(ip.getSlotString() + " price: " + ip.getPrice() + " heroic: " + ip.getPriceHeroic());
                         Item addItem = ic.addItem(ip);
                         priceTableSetRow(addItem, ip);
+                        if (longest < ip.getSlotString().length()+1) {
+                                longest = ip.getSlotString().length()+1;
+                        }
                 }
+                priceTable.setColumnWidth("Slot", longest * 10);
+                priceTable.requestRepaint();
         }
 
         private void priceTableSetRow(Item addItem, ItemPrices ip) throws ConversionException, ReadOnlyException {
-                addItem.getItemProperty("Slot").setValue(ip.getSlotString());
+                Label slot = new Label(ip.getSlotString());
+                addItem.getItemProperty("Slot").setValue(slot);
                 addItem.getItemProperty("Normal").setValue(ip.getPrice());
                 addItem.getItemProperty("Heroic").setValue(ip.getPriceHeroic());
         }

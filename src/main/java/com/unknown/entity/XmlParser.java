@@ -166,4 +166,8 @@ public class XmlParser {
         public String parseXmlQuality() {
                 return findElement(root, "quality");
         }
+
+        public String parseXmlItemLevel() {
+                return findElement(root, "level");
+        }
 }
