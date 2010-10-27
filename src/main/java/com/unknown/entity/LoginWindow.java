@@ -13,6 +13,8 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.math.BigInteger;
@@ -29,8 +31,10 @@ public class LoginWindow extends Window {
         private List<MyLoginListener> listeners = new ArrayList<MyLoginListener>();
         private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
         private ILoginDao loginDao = new LoginDao();
+        private HorizontalLayout hzl;
 
         public LoginWindow() {
+                this.hzl = new HorizontalLayout();
                 this.center();
                 this.setModal(true);
                 this.setCaption("Login...");
@@ -43,7 +47,7 @@ public class LoginWindow extends Window {
                 submit.setClickShortcut(KeyCode.ENTER);
                 submit.addStyleName("primary");
                 this.getContent().setSizeUndefined();
-
+                addComponent(hzl);
                 submit.addListener(new LoginClickListener());
 
         }
@@ -69,11 +73,16 @@ public class LoginWindow extends Window {
         }
 
         private void verifyUser() {
+                hzl.removeAllComponents();
                 SiteUser user = loginDao.checkLogin(userName.getValue().toString(), hashPassword(password.getValue().toString()));
                 if (user != null) {
                         getApplication().setUser(user);
                         notifyListeners();
                         close();
+                } else {
+                        Label error = new Label("Bad username or password");
+                        error.addStyleName("error");
+                        hzl.addComponent(error);
                 }
         }
 
