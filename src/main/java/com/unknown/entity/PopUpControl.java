@@ -104,6 +104,8 @@ public class PopUpControl extends Window {
                 ItemEditWindow info = new ItemEditWindow(item);
                 info.printInfo();
                 info.addItemInfoListener(itemList);
+                info.addCharacterInfoListener(charList);
+                info.addCharacterInfoListener(dkpList);
                 app.getMainWindow().addWindow(info);
         }
 
@@ -116,16 +118,17 @@ public class PopUpControl extends Window {
         }
 
         private void showRaidInfoWindow(Raid raid) throws IllegalArgumentException, NullPointerException {
-                RaidInfoWindow info = new RaidInfoWindow(raid, dkpList, charList);
+                RaidInfoWindow info = new RaidInfoWindow(raid, dkpList, charList, itemList);
                 info.printInfo();
                 app.getMainWindow().addWindow(info);
         }
 
         private void showRaidEditWindow(Raid raid) throws NullPointerException, IllegalArgumentException {
-                RaidEditWindow info = new RaidEditWindow(raid, dkpList, charList);
+                RaidEditWindow info = new RaidEditWindow(raid, dkpList, charList, itemList);
                 info.printInfo();
                 info.addRaidInfoListener(raidList);
                 app.getMainWindow().addWindow(info);
+                System.out.println(itemList.toString());
         }
 
         public void setRaidRewardList(RaidRewardList raidRewardList) {
@@ -174,6 +177,7 @@ public class PopUpControl extends Window {
                 info.addRaidLootInfoListener(raidLootList);
                 info.addCharacterInfoListener(dkpList);
                 info.addCharacterInfoListener(charList);
+                info.addItemInfoListener(itemList);
                 app.getMainWindow().addWindow(info);
         }
 }

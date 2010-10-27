@@ -5,20 +5,12 @@
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
-import com.unknown.entity.character.DkpList;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
-import com.unknown.entity.database.ItemDB;
-import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.character.User;
+import com.unknown.entity.dao.*;
+import com.unknown.entity.database.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.Raid;
-import com.unknown.entity.raids.RaidChar;
-import com.unknown.entity.raids.RaidInfoListener;
 import com.unknown.entity.raids.RaidLootListener;
-import com.vaadin.data.Property.ConversionException;
-import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
@@ -30,7 +22,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -49,6 +40,7 @@ public class RaidLootAddWindow extends Window {
         CharacterDAO characterDao;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
+        private List<ItemInfoListener> iteminfolisteners = new ArrayList<ItemInfoListener>();
 
         RaidLootAddWindow(Raid raid) {
                 this.raid = raid;
@@ -108,12 +100,11 @@ public class RaidLootAddWindow extends Window {
         private ComboBox nameComboList() throws UnsupportedOperationException {
                 final ComboBox name = new ComboBox("Name");
                 name.setWidth("300px");
-                name.addStyleName("select-button");
-                HashSet<RaidChar> charlist = new HashSet<RaidChar>();
+                HashSet<User> charlist = new HashSet<User>();
                 TreeSet<String> sortedlist = new TreeSet<String>();
-                charlist.addAll(raid.getRaidChars());
-                for (RaidChar eachname : charlist) {
-                        sortedlist.add(eachname.getName());
+                charlist.addAll(characterDao.getUsers());
+                for (User eachname : charlist) {
+                        sortedlist.add(eachname.getUsername());
                 }
                 for (String s : sortedlist) {
                         name.addItem(s);
@@ -139,7 +130,6 @@ public class RaidLootAddWindow extends Window {
         private ComboBox lootListComboBox(HashSet<Items> lootlist) throws UnsupportedOperationException {
                 ComboBox loots = new ComboBox("Item");
                 loots.setWidth("300px");
-                loots.addStyleName("select-button");
                 for (Items eachitem : lootlist) {
                         loots.addItem(eachitem.getName());
                 }
@@ -150,19 +140,6 @@ public class RaidLootAddWindow extends Window {
         private Double getDefaultPrice(String itemname, boolean isheroic) throws SQLException {
                 return (Double) itemDao.getItemPrice(itemname, isheroic);
         }
-
-//        private ComboBox bossListComboBox() throws ConversionException, ReadOnlyException, UnsupportedOperationException, SQLException {
-//                List<String> bosslist = new ArrayList<String>();
-//                bosslist = raidDao.getBossesForRaid(raid);
-//                ComboBox boss = new ComboBox();
-//                for (String eachboss : bosslist) {
-//                        boss.addItem(eachboss);
-//                }
-//                boss.setNullSelectionAllowed(false);
-//                Collection<?> itemIds = boss.getItemIds();
-//                boss.setValue(itemIds.iterator().next());
-//                return boss;
-//        }
 
         private HashSet<Items> getLootList() {
                 HashSet<Items> lootlist = new HashSet<Items>();
@@ -181,12 +158,19 @@ public class RaidLootAddWindow extends Window {
                 for (CharacterInfoListener charListener : charinfolisteners) {
                         charListener.onCharacterInfoChange();
                 }
+                for (ItemInfoListener itemListener : iteminfolisteners) {
+                        itemListener.onItemInfoChange();
+                }
         }
 
         void addCharacterInfoListener(CharacterInfoListener listener) {
                 charinfolisteners.add(listener);
         }
 
+        void addItemInfoListener(ItemInfoListener listener) {
+                iteminfolisteners.add(listener);
+        }
+        
         private class LootChangeListener implements ValueChangeListener {
 
                 private final TextField price;

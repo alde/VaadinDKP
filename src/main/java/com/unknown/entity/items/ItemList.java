@@ -54,11 +54,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 String quality = xml.parseXmlQuality().toLowerCase();
                 Label itemname = new Label(item.getName(), Label.CONTENT_TEXT);
                 itemname.addStyleName(quality);
-                System.out.println(quality);
                 addItem.getItemProperty("Name").setValue(itemname);
-//                if (item.getName().length()*9 > this.getColumnWidth(addItem.getItemProperty("Name"))) {
-//                        this.setColumnWidth("Name", item.getName().length()*9);
-//                }
                 addItem.getItemProperty("Price Normal").setValue(item.getPrice());
                 addItem.getItemProperty("Price Heroic").setValue(item.getPrice_hc());
                 addItem.getItemProperty("Slot").setValue(item.getSlot());

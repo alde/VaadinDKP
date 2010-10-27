@@ -8,21 +8,18 @@ import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.*;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +36,13 @@ public class RaidEditWindow extends Window {
         private final CharacterList clist;
         private RaidRewardList rrList;
         private RaidLootList rlList;
+        private final ItemList itemList;
 
-        public RaidEditWindow(Raid raid, DkpList dkplist, CharacterList clist) {
+        public RaidEditWindow(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.raid = raid;
                 this.dkplist = dkplist;
                 this.clist = clist;
+                this.itemList = itemList;
                 this.setPositionX(600);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
@@ -61,7 +60,7 @@ public class RaidEditWindow extends Window {
                 rrList.addStyleName("striped");
                 hzl.addComponent(rrList);
 
-                this.rlList = new RaidLootList(raid, dkplist, clist);
+                this.rlList = new RaidLootList(raid, dkplist, clist, itemList);
                 rlList.addStyleName("striped");
                 hzl.addComponent(rlList);
 
@@ -97,13 +96,6 @@ public class RaidEditWindow extends Window {
 
                 final TextField comment = new TextField("Comment: ", raid.getComment());
                 comment.setImmediate(true);
-//
-//                final DateField datum = new DateField("Date");
-//                datum.setImmediate(true);
-//                datum.setDateFormat("yyyy-MM-dd HH:mm");
-//                datum.setResolution(DateField.RESOLUTION_MIN);
-//                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-//                datum.setValue(raid.getDate())
 
                 final TextField datum = new TextField("Date: ", raid.getDate());
                 datum.setImmediate(true);
@@ -171,6 +163,7 @@ public class RaidEditWindow extends Window {
                         rlootadd.addCharacterInfoListener(dkplist);
                         rlootadd.addCharacterInfoListener(clist);
                         rlootadd.addRaidInfoListener(rlList);
+                        rlootadd.addItemInfoListener(itemList);
                         try {
                                 rlootadd.printInfo();
                         } catch (SQLException ex) {

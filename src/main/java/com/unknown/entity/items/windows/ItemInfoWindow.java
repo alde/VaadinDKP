@@ -5,17 +5,9 @@
 package com.unknown.entity.items.windows;
 
 import com.unknown.entity.XmlParser;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
-import com.unknown.entity.items.ItemLooter;
+import com.unknown.entity.items.ItemLooterTable;
 import com.unknown.entity.items.Items;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property.ConversionException;
-import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.terminal.ExternalResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
@@ -23,7 +15,6 @@ import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,6 +30,8 @@ public class ItemInfoWindow extends Window {
 
         private final Items item;
 
+        private ItemLooterTable ilt;
+
         public ItemInfoWindow(Items item) {
                 this.item = item;
                 this.setCaption(item.getName());
@@ -46,6 +39,7 @@ public class ItemInfoWindow extends Window {
                 this.setPositionX(400);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
+                this.ilt = new ItemLooterTable(item);
         }
 
         public void printInfo() {
@@ -55,11 +49,11 @@ public class ItemInfoWindow extends Window {
                         Logger.getLogger(ItemInfoWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 itemGrid();
-                itemLootedByTable();
-
+                addComponent(new Label("Looted by: "));
+                addComponent(ilt);
         }
 
-        private GridLayout itemGridLayout(final Button wowIdBtn, final Button wowIdBtnhc) throws OverlapsException, OutOfBoundsException {
+        private void itemGrid() throws OverlapsException, OutOfBoundsException {
                 GridLayout gl = new GridLayout(3, 3);
                 gl.setWidth("300px");
                 gl.addComponent(new Label("Normal "), 1, 0);
@@ -74,33 +68,6 @@ public class ItemInfoWindow extends Window {
                 heroic.setTargetName("_blank");
                 gl.addComponent(normal, 1, 2);
                 gl.addComponent(heroic, 2, 2);
-                return gl;
-        }
-
-        private void itemLootedByTable() {
-                addComponent(new Label("Looted by"));
-                HorizontalLayout hzl = new HorizontalLayout();
-                hzl.setSpacing(true);
-                Table lootedby = lootList(item);
-                if (lootedby.size() > 0) {
-                        lootedby.addStyleName("striped");
-                        hzl.addComponent(lootedby);
-                } else {
-                        hzl.addComponent(new Label("Not looted by anyone"));
-                }
-                addComponent(hzl);
-        }
-
-        private void itemGrid() throws OverlapsException, OutOfBoundsException {
-
-                final Button wowIdBtn = new Button("" + item.getWowId());
-                wowIdBtn.setStyleName(Button.STYLE_LINK);
-                wowIdBtn.addListener(new WowIdButtonClickListener());
-                final Button wowIdBtnhc = new Button("" + item.getWowId_hc());
-                wowIdBtnhc.setStyleName(Button.STYLE_LINK);
-                wowIdBtnhc.addListener(new WowIdHcButtonClickListener());
-
-                GridLayout gl = itemGridLayout(wowIdBtn, wowIdBtnhc);
                 addComponent(gl);
         }
         
@@ -122,58 +89,5 @@ public class ItemInfoWindow extends Window {
                 }
                 addComponent(hzl);
                 addComponent(new Label("<hr>", Label.CONTENT_XHTML));
-        }
-
-        private Table lootList(Items item) {
-                Table tbl = new Table();
-                itemTableHeaders(tbl);
-                tbl.setHeight(150);
-                for (ItemLooter looters : item.getLooterList()) {
-                        Item addItem = tbl.addItem(looters.getId());
-                        itemTableRowAdd(addItem, looters);
-
-                }
-                return tbl;
-        }
-
-        private void itemTableRowAdd(Item addItem, ItemLooter looters) throws ConversionException, ReadOnlyException {
-                Label looter = new Label(looters.getName());
-                CharacterDAO charDao = new CharacterDB();
-                looter.addStyleName(charDao.getRoleForCharacter(looters.getName()).toLowerCase().replace(" ", ""));
-                addItem.getItemProperty("Name").setValue(looter);
-                addItem.getItemProperty("Price").setValue(looters.getPrice());
-                addItem.getItemProperty("Raid").setValue(looters.getRaid());
-                addItem.getItemProperty("Date").setValue(looters.getDate());
-        }
-
-        private void itemTableHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", Label.class, "");
-                tbl.addContainerProperty("Price", Double.class, 0);
-                tbl.addContainerProperty("Raid", String.class, "");
-                tbl.addContainerProperty("Date", String.class, "");
-        }
-
-        private class WowIdButtonClickListener implements ClickListener {
-
-                public WowIdButtonClickListener() {
-                }
-
-                @Override
-                public void buttonClick(ClickEvent event) {
-                        String url = "http://www.wowhead.com/item=" + item.getWowId();
-                        getWindow().open(new ExternalResource(url), "_blank");
-                }
-        }
-
-        private class WowIdHcButtonClickListener implements ClickListener {
-
-                public WowIdHcButtonClickListener() {
-                }
-
-                @Override
-                public void buttonClick(ClickEvent event) {
-                        String url = "http://www.wowhead.com/item=" + item.getWowId_hc();
-                        getWindow().open(new ExternalResource(url), "_blank");
-                }
         }
 }

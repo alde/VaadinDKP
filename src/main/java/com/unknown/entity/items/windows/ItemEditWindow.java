@@ -4,17 +4,11 @@
  */
 package com.unknown.entity.items.windows;
 
-import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.database.ItemDB;
-import com.unknown.entity.Slots;
-import com.unknown.entity.Type;
-import com.unknown.entity.XmlParser;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
-import com.unknown.entity.items.ItemInfoListener;
-import com.unknown.entity.items.ItemLooter;
-import com.unknown.entity.items.Items;
-import com.vaadin.data.Item;
+import com.unknown.entity.database.*;
+import com.unknown.entity.*;
+import com.unknown.entity.character.CharacterInfoListener;
+import com.unknown.entity.dao.*;
+import com.unknown.entity.items.*;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.terminal.ExternalResource;
@@ -28,9 +22,11 @@ import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,8 +42,22 @@ import java.util.logging.Logger;
  */
 public class ItemEditWindow extends Window {
 
-        private final Items item;
+        private Items item;
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
+        private ItemDAO itemDao;
+//        private IndexedContainer ic;
+        final TextField price;
+        final TextField pricehc;
+        Table lootedby;
+        Table tbl;
+        private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
+        private ItemLooterTable ilt;
+        private TextField name;
+        private ComboBox slot;
+        private ComboBox type;
+        private TextField wowIdField;
+        private TextField wowIdFieldhc;
+        private VerticalLayout lout;
 
         public ItemEditWindow(Items item) {
                 this.item = item;
@@ -56,21 +66,28 @@ public class ItemEditWindow extends Window {
                 this.setPositionX(400);
                 this.setPositionY(50);
                 this.getContent().setSizeUndefined();
+                this.itemDao = new ItemDB();
+                this.ilt = new ItemLooterTable(item);
+                this.price = new TextField("Price");
+                this.pricehc = new TextField("Heroic");
+                this.slot = new ComboBox("Slot");
+                this.type = new ComboBox("Type");
+                this.wowIdField = new TextField("wow-id");
+                this.wowIdFieldhc = new TextField("heroic wow-id");
+                this.name = new TextField("Name");
+                ;
+                this.lout = new VerticalLayout();
         }
 
         public void printInfo() {
                 addComponent(new Label("Item information"));
-                final TextField name = editInfoName();
-                final ComboBox slot = editInfoSlot();
-                slot.setWidth("150px");
-                slot.addStyleName("select-button");
-                final ComboBox type = editInfoType();
-                type.setWidth("150px");
-                type.addStyleName("select-button");
-                final TextField wowIdfield = editInfoWowIdField();
-                final TextField price = editInfoPriceField();
-                final TextField pricehc = editInfoPriceHcField();
-                final TextField wowIdfieldhc = editInfoWowIdHcField();
+                editInfoName();
+                editInfoSlot();
+                editInfoType();
+                editInfoPriceField();
+                editInfoPriceHcField();
+                editInfoWowIdField();
+                editInfoWowIdHcField();
 
                 addComponent(name);
                 HorizontalLayout hzl = new HorizontalLayout();
@@ -79,12 +96,15 @@ public class ItemEditWindow extends Window {
                 hzl.setSpacing(true);
                 addComponent(hzl);
 
-                itemEditGrid(wowIdfield, wowIdfieldhc, price, pricehc);
+                itemEditGrid(wowIdField, wowIdFieldhc, price, pricehc);
 
                 Button updateButton = new Button("Update Item");
                 Button deleteButton = new Button("Delete Item");
+                Button applyPrice = new Button("Apply Price");
+                applyPrice.setDescription("Apply price to all loots of this item.");
                 deleteButton.addListener(new DeleteButtonClickListener(item));
-                updateButton.addListener(new UpdateButtonClickListener(name, slot, type, wowIdfield, wowIdfieldhc, price, pricehc));
+                updateButton.addListener(new UpdateButtonClickListener());
+                applyPrice.addListener(new ApplyButtonClickListener());
                 hzl = new HorizontalLayout();
                 Label warning = new Label();
                 warning.setWidth("220px");
@@ -93,10 +113,12 @@ public class ItemEditWindow extends Window {
                 hzl.addComponent(updateButton);
                 hzl.addComponent(deleteButton);
                 hzl.addComponent(warning);
+                hzl.addComponent(applyPrice);
                 hzl.setSpacing(true);
                 hzl.setMargin(true, false, true, false);
                 addComponent(hzl);
-                itemLootedByTable();
+                lout.addComponent(ilt);
+                addComponent(lout);
                 try {
                         itemTooltips(item);
                 } catch (IOException ex) {
@@ -108,142 +130,120 @@ public class ItemEditWindow extends Window {
                 GridLayout gl = new GridLayout(3, 3);
                 gl.setWidth("500px");
 
-                Link normal = new Link("Normal", new ExternalResource("http://www.wowhead.com/item="+item.getWowId()));
+                Link normal = new Link("Normal", new ExternalResource("http://www.wowhead.com/item=" + item.getWowId()));
                 normal.setTargetName("_blank");
-                Link heroic = new Link("Heroic", new ExternalResource("http://www.wowhead.com/item="+item.getWowId_hc()));
+                Link heroic = new Link("Heroic", new ExternalResource("http://www.wowhead.com/item=" + item.getWowId_hc()));
                 heroic.setTargetName("_blank");
-                
+
                 gl.addComponent(normal, 1, 0);
                 gl.addComponent(heroic, 2, 0);
                 gl.addComponent(new Label("WowID: "), 0, 1);
 
                 gl.addComponent(wowIdfield, 1, 1);
                 gl.addComponent(wowIdfieldhc, 2, 1);
-                
+
                 gl.addComponent(new Label("Price: "), 0, 2);
                 gl.addComponent(price, 1, 2);
                 gl.addComponent(pricehc, 2, 2);
                 addComponent(gl);
         }
 
-        private TextField editInfoPriceHcField() throws ReadOnlyException, ConversionException {
-                final TextField pricehc = new TextField();
+        private void editInfoPriceHcField() throws ReadOnlyException, ConversionException {
                 pricehc.setImmediate(true);
                 pricehc.setValue(item.getPrice_hc());
-                return pricehc;
         }
 
-        private TextField editInfoPriceField() throws ReadOnlyException, ConversionException {
-                final TextField price = new TextField();
+        private void editInfoPriceField() throws ReadOnlyException, ConversionException {
                 price.setImmediate(true);
                 price.setValue(item.getPrice());
-                return price;
         }
 
-        private TextField editInfoWowIdHcField() throws ConversionException, ReadOnlyException {
-                final TextField wowIdfieldhc = new TextField();
-                wowIdfieldhc.setImmediate(true);
-                wowIdfieldhc.setValue("" + item.getWowId_hc());
-                return wowIdfieldhc;
+        private void editInfoWowIdHcField() throws ConversionException, ReadOnlyException {
+                wowIdFieldhc.setImmediate(true);
+                wowIdFieldhc.setValue("" + item.getWowId_hc());
         }
 
-        private TextField editInfoWowIdField() throws ReadOnlyException, ConversionException {
-                final TextField wowIdfield = new TextField();
-                wowIdfield.setImmediate(true);
-                wowIdfield.setValue("" + item.getWowId());
-                return wowIdfield;
+        private void editInfoWowIdField() throws ReadOnlyException, ConversionException {
+                wowIdField.setImmediate(true);
+                wowIdField.setValue("" + item.getWowId());
         }
 
-        private ComboBox editInfoType() throws ConversionException, ReadOnlyException, UnsupportedOperationException {
-                final ComboBox type = new ComboBox("Type: ");
+        private void editInfoType() throws ConversionException, ReadOnlyException, UnsupportedOperationException {
                 for (Type types : Type.values()) {
                         type.addItem(types);
                 }
                 type.setNullSelectionAllowed(false);
                 type.setValue(item.getType());
+                type.setWidth("150px");
+                type.addStyleName("select-button");
                 type.setImmediate(true);
-                return type;
         }
 
-        private ComboBox editInfoSlot() throws UnsupportedOperationException, ConversionException, ReadOnlyException {
-                final ComboBox slot = new ComboBox("Slot: ");
+        private void editInfoSlot() throws UnsupportedOperationException, ConversionException, ReadOnlyException {
                 for (Slots slots : Slots.values()) {
                         slot.addItem(slots);
                 }
                 slot.setNullSelectionAllowed(false);
                 slot.setValue(Slots.valueOf(item.getSlot().replace("-", "")));
+                slot.setWidth("150px");
+                slot.addStyleName("select-button");
                 slot.setImmediate(true);
-                return slot;
         }
 
-        private TextField editInfoName() {
-                final TextField name = new TextField("Name: ", item.getName());
+        private void editInfoName() {
+                name.setValue(item.getName());
                 name.setWidth("300px");
                 name.setImmediate(true);
-                return name;
         }
 
-        private void itemLootedByTable() {
-                addComponent(new Label("Looted by"));
-                HorizontalLayout hzl = new HorizontalLayout();
-                hzl.setSpacing(true);
-                Table lootedby = lootList(item);
-                if (lootedby.size() > 0) {
-                        lootedby.addStyleName("striped");
-                        hzl.addComponent(lootedby);
+        private void updateItem() {
+                String temp = type.getValue().toString();
+                Type tempType = typeFromString(temp);
+                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdField.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()));
+                System.out.println("Items updated: " + success);
+                notifyListeners();
+        }
+
+        private Type typeFromString(String temp) {
+                Type tempType;
+                if (temp.toString().equals("Hunter, Shaman, Warrior")) {
+                        tempType = Type.protector;
+                } else if (temp.toString().equals("Death Knight, Druid, Mage, Rogue")) {
+                        tempType = Type.vanquisher;
+                } else if (temp.toString().equals("Paladin, Priest, Warlock")) {
+                        tempType = Type.conqueror;
                 } else {
-                        hzl.addComponent(new Label("Not looted by anyone"));
+                        tempType = Type.valueOf(temp);
                 }
-                addComponent(hzl);
+                return tempType;
         }
 
-        private int updateItem(String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc) {
-
-                ItemDAO itemDao = new ItemDB();
-                return itemDao.updateItem(item, newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc);
+        private void applyPrices() {
+                itemDao.updateLoots(item, price.getValue().toString(), pricehc.getValue().toString());
+                lout.removeComponent(ilt);
+                ilt = new ItemLooterTable(itemDao.getSingleItem(name.getValue().toString()));
+                lout.addComponent(ilt);
+                notifyListeners();
         }
 
         private int deleteItem(Items item) throws SQLException {
-                ItemDAO itemDao = new ItemDB();
                 return itemDao.deleteItem(item.getId());
-        }
-
-        private Table lootList(Items item) {
-                Table tbl = new Table();
-                itemTableHeaders(tbl);
-                tbl.setHeight(150);
-                for (ItemLooter looters : item.getLooterList()) {
-                        Item addItem = tbl.addItem(looters.getId());
-                        itemTableRowAdd(addItem, looters);
-
-                }
-                return tbl;
-        }
-
-        private void itemTableRowAdd(Item addItem, ItemLooter looters) throws ConversionException, ReadOnlyException {
-                Label looter = new Label(looters.getName());
-                CharacterDAO charDao = new CharacterDB();
-                looter.addStyleName(charDao.getRoleForCharacter(looters.getName()).toLowerCase().replace(" ", ""));
-                addItem.getItemProperty("Name").setValue(looter);
-                addItem.getItemProperty("Price").setValue(looters.getPrice());
-                addItem.getItemProperty("Raid").setValue(looters.getRaid());
-                addItem.getItemProperty("Date").setValue(looters.getDate());
-        }
-
-        private void itemTableHeaders(Table tbl) throws UnsupportedOperationException {
-                tbl.addContainerProperty("Name", Label.class, "");
-                tbl.addContainerProperty("Price", Double.class, 0);
-                tbl.addContainerProperty("Raid", String.class, "");
-                tbl.addContainerProperty("Date", String.class, "");
         }
 
         public void addItemInfoListener(ItemInfoListener listener) {
                 listeners.add(listener);
         }
 
+        public void addCharacterInfoListener(CharacterInfoListener charlistener) {
+                charlisteners.add(charlistener);
+        }
+
         private void notifyListeners() {
                 for (ItemInfoListener itemInfoListener : listeners) {
                         itemInfoListener.onItemInfoChange();
+                }
+                for (CharacterInfoListener charInfoListener : charlisteners) {
+                        charInfoListener.onCharacterInfoChange();
                 }
         }
 
@@ -269,37 +269,10 @@ public class ItemEditWindow extends Window {
 
         private class UpdateButtonClickListener implements ClickListener {
 
-                private final TextField name;
-                private final ComboBox slot;
-                private final ComboBox type;
-                private final TextField wowIdfield;
-                private final TextField wowIdfieldhc;
-                private final TextField price;
-                private final TextField pricehc;
-
-                public UpdateButtonClickListener(TextField name, ComboBox slot, ComboBox type, TextField wowIdfield, TextField wowIdfieldhc, TextField price, TextField pricehc) {
-                        this.name = name;
-                        this.slot = slot;
-                        this.type = type;
-                        this.wowIdfield = wowIdfield;
-                        this.wowIdfieldhc = wowIdfieldhc;
-                        this.price = price;
-                        this.pricehc = pricehc;
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        final String newname = name.getValue().toString();
-                        final Slots newslot = (Slots) slot.getValue();
-                        final Type newtype = (Type) type.getValue();
-                        final int newwowid = Integer.parseInt(wowIdfield.getValue().toString());
-                        final int newwowidhc = Integer.parseInt(wowIdfieldhc.getValue().toString());
-                        final double newprice = Double.parseDouble(price.getValue().toString());
-                        final double newpricehc = Double.parseDouble(pricehc.getValue().toString());
-                        final int success = updateItem(newname, newslot, newtype, newwowid, newwowidhc, newprice, newpricehc);
-                        addComponent(new Label("Success: " + success));
-                        notifyListeners();
-                        close();
+
+                        updateItem();
                 }
         }
 
@@ -320,6 +293,14 @@ public class ItemEditWindow extends Window {
                         } catch (SQLException ex) {
                                 Logger.getLogger(ItemEditWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                }
+        }
+
+        private class ApplyButtonClickListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        applyPrices();
                 }
         }
 }

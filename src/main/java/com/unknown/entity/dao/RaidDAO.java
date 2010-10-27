@@ -51,9 +51,11 @@ public interface RaidDAO {
         
         public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException;
 
-        public int doUpdateLoot(int id, String looter, String itemname, double price, boolean heroic);
+        public int doUpdateLoot(int loodid, String looter, String itemname, double price, boolean heroic, int raidid);
 
         public void removeZone(String zone);
 
         public void addZone(String zoneName);
+
+        public boolean getLootedHeroic(String name, int id, double price);
 }

@@ -113,8 +113,9 @@ public class ItemDB implements ItemDAO {
                         p.setString(6, newslot.toString());
                         p.setString(7, newtype.toString());
                         p.setInt(8, item.getId());
-
+                        System.out.println(p.toString());
                         success = p.executeUpdate();
+
 
                 } catch (SQLException e) {
                         e.printStackTrace();
@@ -193,6 +194,34 @@ public class ItemDB implements ItemDAO {
                         c.close();
                 }
                 return itemid;
+        }
+
+        @Override
+        public int getLootId(int itemid, int charid, double price, Boolean heroic, int raidid) {
+                DBConnection c = new DBConnection();
+                int i = 0;
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM loots WHERE item_id=? AND character_id=? AND price=? AND heroic=? AND raid_id=?");
+                        p.setInt(1, itemid);
+                        p.setInt(2, charid);
+                        p.setDouble(3, price);
+                        if (heroic) {
+                                p.setInt(4, 1);
+                        } else {
+                                p.setInt(4, 0);
+                        }
+
+                        p.setInt(5, raidid);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                i = rs.getInt("id");
+                        }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return i;
         }
 
         @Override
@@ -318,6 +347,26 @@ public class ItemDB implements ItemDAO {
                         return true;
                 } else {
                         return false;
+                }
+        }
+
+        @Override
+        public void updateLoots(Items item, String price, String pricehc) {
+                DBConnection c = new DBConnection();
+
+                try {
+                        PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=1");
+                        ps.setDouble(1, Double.parseDouble(pricehc));
+                        ps.setInt(2, item.getId());
+                        ps.executeUpdate();
+                        ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=0");
+                        ps.setDouble(1, Double.parseDouble(price));
+                        ps.setInt(2, item.getId());
+                        ps.executeUpdate();
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
                 }
         }
 }

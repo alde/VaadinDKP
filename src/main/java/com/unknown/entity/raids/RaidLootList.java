@@ -8,6 +8,7 @@ import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.ItemDB;
+import com.unknown.entity.items.ItemList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -30,13 +31,15 @@ public class RaidLootList extends Table implements RaidLootListener {
         private Raid raid;
         private final DkpList dkplist;
         private final CharacterList clist;
+        private final ItemList itemList;
         private int longest;
 
-        public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist) {
+        public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.ic = new IndexedContainer();
                 this.raid = raid;
                 this.dkplist = dkplist;
                 this.clist = clist;
+                this.itemList = itemList;
                 this.setSelectable(true);
                 this.setSizeUndefined();
                 this.setHeight("500px");
@@ -77,11 +80,11 @@ public class RaidLootList extends Table implements RaidLootListener {
                         for (RaidItem item : temp) {
                                 Item addItem = ic.addItem(item);
                                 raidListAddRow(addItem, item);
-                                if (longest < item.getName().length()+1) {
-                                        longest = item.getName().length()+1;
+                                if (longest < item.getName().length() + 1) {
+                                        longest = item.getName().length() + 1;
                                 }
                         }
-                        this.setColumnWidth("Item", longest*6);
+                        this.setColumnWidth("Item", longest * 6);
                 } catch (SQLException ex) {
                         Logger.getLogger(RaidLootList.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -96,9 +99,6 @@ public class RaidLootList extends Table implements RaidLootListener {
                 String quality = xml.parseXmlQuality().toLowerCase();
                 Label itemname = new Label(item.getName());
                 itemname.addStyleName(quality);
-//                if (item.getName().length()*9 > this.getColumnWidth(addItem.getItemProperty("Item"))) {
-//                        this.setColumnWidth("Item", item.getName().length()*9);
-//                }
                 addItem.getItemProperty("Item").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(item.getPrice());
                 addItem.getItemProperty("Heroic").setValue(item.isHeroic());
@@ -115,7 +115,9 @@ public class RaidLootList extends Table implements RaidLootListener {
                                 pop.setRaidLootList(raidLootList);
                                 pop.setCharacterList(clist);
                                 pop.setDkpList(dkplist);
+                                pop.setItemList(itemList);
                                 pop.showProperRaidLootWindow(raid, ritem);
+
                         }
                 }
         }

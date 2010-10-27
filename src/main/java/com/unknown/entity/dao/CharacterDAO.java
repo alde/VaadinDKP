@@ -28,7 +28,7 @@ public interface CharacterDAO {
         
         public int getCharacterClassId(Connection c, String charclass) throws SQLException;
 
-        public int getCharacterId(String charclass);
+        public int getCharacterId(String charname);
 
         public int updateCharacter(User user, String name, String charclass, boolean active);
 

@@ -15,6 +15,7 @@ public class ItemLooter {
         private double price;
         private String raid;
         private String date;
+        private boolean heroic;
 
         public void setName(String name) {
                 this.name = name;
@@ -45,5 +46,11 @@ public class ItemLooter {
         }
         public void setId(int id) {
                 this.id = id;
+        }
+        public void setHeroic(boolean heroic) {
+                this.heroic = heroic;
+        }
+        public boolean isHeroic() {
+                return heroic;
         }
 }

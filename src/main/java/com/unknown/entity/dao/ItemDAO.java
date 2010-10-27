@@ -43,4 +43,8 @@ public interface ItemDAO {
 
         public Items getItemById(int id);
 
+        public int getLootId(int itemid, int charid, double price, Boolean heroic, int raidid);
+
+        public void updateLoots(Items item, String price, String pricehc);
+
 }

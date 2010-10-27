@@ -9,6 +9,8 @@ import com.unknown.entity.database.*;
 import com.unknown.entity.character.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.*;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -36,6 +38,11 @@ public class RaidLootEditWindow extends Window {
         ItemDAO itemDao;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
+        private List<ItemInfoListener> iteminfolisteners = new ArrayList<ItemInfoListener>();
+        private ComboBox charname;
+        private ComboBox itemname;
+        private TextField price;
+        private CheckBox heroic;
 
         public RaidLootEditWindow(Raid raid, RaidItem item) {
                 this.item = item;
@@ -48,17 +55,22 @@ public class RaidLootEditWindow extends Window {
                 this.setCaption("Edit loot: " + item.getName() + " for raid : " + raid.getComment());
                 this.setPositionX(600);
                 this.setPositionY(300);
+                this.heroic = new CheckBox("Heroic");
+                this.itemname = new ComboBox("Item");
+                this.charname = new ComboBox("Name");
+                this.price = new TextField("Price");
+        }
+
+        private void getDefaultPrice() {
+                price.setValue(getItemPrice(itemname.getValue().toString(), heroic.booleanValue()));
         }
 
         public void printInfo() {
-                final ComboBox charname = new ComboBox("Name");
                 charname.setWidth("300px");
                 charname.addStyleName("select-button");
-                final ComboBox itemname = new ComboBox("Item");
                 itemname.setWidth("300px");
                 itemname.addStyleName("select-button");
-                final CheckBox heroic = new CheckBox("Heroic");
-                final TextField price = new TextField("Price");
+                heroic.addListener(new HeroicCheckBoxListener());
                 final Button deleteButton = new Button("Remove");
                 final Button updateButton = new Button("Update");
 
@@ -90,7 +102,7 @@ public class RaidLootEditWindow extends Window {
                 heroic.setImmediate(true);
 
                 deleteButton.addListener(new DeleteItemListener());
-                updateButton.addListener(new UpdateItemListener(charname, itemname, price, item.getId(), heroic));
+                updateButton.addListener(new UpdateItemListener());
 
         }
 
@@ -98,8 +110,12 @@ public class RaidLootEditWindow extends Window {
                 listeners.add(listener);
         }
 
-        public void addCharacterInfoListener(CharacterInfoListener lstnr)  {
+        public void addCharacterInfoListener(CharacterInfoListener lstnr) {
                 charinfolisteners.add(lstnr);
+        }
+
+        public void addItemInfoListener(ItemInfoListener listeners) {
+                iteminfolisteners.add(listeners);
         }
 
         private void notifyListeners() {
@@ -109,6 +125,9 @@ public class RaidLootEditWindow extends Window {
                 for (CharacterInfoListener cinfoListener : charinfolisteners) {
                         cinfoListener.onCharacterInfoChange();
                 }
+                for (ItemInfoListener iteminfolistener : iteminfolisteners) {
+                        iteminfolistener.onItemInfoChange();
+                }
         }
 
         private int deleteItem(RaidItem item) throws SQLException {
@@ -116,12 +135,11 @@ public class RaidLootEditWindow extends Window {
         }
 
         private class DeleteItemListener implements ClickListener {
+
                 @Override
                 public void buttonClick(ClickEvent event) {
                         try {
-                                // System.out.println("Reward Item ID: " + item.getId());
                                 int success = deleteItem(item);
-                                // System.out.println(success + "items deleted.");
                                 notifyListeners();
                         } catch (SQLException ex) {
                                 Logger.getLogger(RaidLootEditWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -130,36 +148,54 @@ public class RaidLootEditWindow extends Window {
                 }
         }
 
-        private class UpdateItemListener implements ClickListener {
-                private final TextField price;
-                private final CheckBox isheroic;
-                private final int id;
-                private final ComboBox looter;
-                private final ComboBox itemname;
-                
-                
-                UpdateItemListener(ComboBox looter, ComboBox itemname, TextField price, int id, CheckBox isheroic)  {
-                        this.price = price;
-                        this.looter = looter;
-                        this.itemname = itemname;
-                        this.id = id;
-                        this.isheroic = isheroic;
+        private Double getItemPrice(String itemname, Boolean isheroic) {
+                Double getprice = 0.0;
+                if (itemname != null) {
+
+                        try {
+                                getprice = getDefaultPrice(itemname, isheroic.booleanValue());
+                        } catch (SQLException ex) {
+                                Logger.getLogger(RaidLootAddWindow.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                 }
+                return getprice;
+        }
+
+        private Double getDefaultPrice(String itemname, boolean isheroic) throws SQLException {
+                return (Double) itemDao.getItemPrice(itemname, isheroic);
+        }
+
+        private void doUpdateLoot() {
+                double newprice = Double.parseDouble(price.getValue().toString());
+                boolean isheroic = Boolean.parseBoolean(heroic.getValue().toString());
+                String newlooter = charname.getValue().toString();
+                String newitem = itemname.getValue().toString();
+                int success = updateItem(newlooter, newitem, newprice, isheroic);// System.out.println(success + " items updated.");
+                notifyListeners();
+                close();
+        }
+
+        private int updateItem(String looter, String itemname, double price, boolean heroic) {
+                int lootid = itemDao.getLootId(item.getId(), characterDao.getCharacterId(item.getLooter()), item.getPrice(), item.isHeroic(), raid.getId());
+                return raidDao.doUpdateLoot(lootid, looter, itemname, price, heroic, raid.getId());
+        }
+
+        private class UpdateItemListener implements ClickListener {
+
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        double newprice = Double.parseDouble(price.getValue().toString());
-                        boolean heroic = Boolean.parseBoolean(isheroic.getValue().toString());
-                        String newlooter = looter.getValue().toString();
-                        String newitem = itemname.getValue().toString();
-                                // System.out.println("Reward Item ID: " + id);
-                                // System.out.println("Reward Item Name: " + newitem + "\nLooter: " + newlooter + "\nPrice: " + newprice + "\nHeroic: " + heroic);
-                                int success = updateItem(id, newlooter, newitem, newprice, heroic);
-                                // System.out.println(success + " items updated.");
-                                notifyListeners();
+                        doUpdateLoot();
+                }
+        }
+
+        private class HeroicCheckBoxListener implements ValueChangeListener {
+
+                public HeroicCheckBoxListener() {
                 }
 
-                private int updateItem(int id, String looter, String itemname, double price, boolean heroic) {
-                        return raidDao.doUpdateLoot(id, looter, itemname, price, heroic);
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                        getDefaultPrice();
                 }
         }
 }

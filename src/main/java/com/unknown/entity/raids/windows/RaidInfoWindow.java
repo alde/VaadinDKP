@@ -6,6 +6,7 @@ package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
+import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.*;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -23,11 +24,13 @@ public class RaidInfoWindow extends Window {
         private final Raid raid;
         private final DkpList dkplist;
         private final CharacterList clist;
+        private final ItemList itemList;
 
-        public RaidInfoWindow(Raid raid, DkpList dkplist, CharacterList clist) {
+        public RaidInfoWindow(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.raid = raid;
                 this.dkplist = dkplist;
                 this.clist = clist;
+                this.itemList = itemList;
                 this.setPositionX(600);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
@@ -46,7 +49,7 @@ public class RaidInfoWindow extends Window {
                 rRewardList.addStyleName("striped");
                 hzl.addComponent(rRewardList);
 
-                RaidLootList rLootList = new RaidLootList(raid, dkplist, clist);
+                RaidLootList rLootList = new RaidLootList(raid, dkplist, clist, itemList);
                 rLootList.addStyleName("striped");
                 hzl.addComponent(rLootList);
 
@@ -54,8 +57,12 @@ public class RaidInfoWindow extends Window {
         }
 
         private void raidInformation() {
-                addComponent(new Label("Raid information"));
-                addComponent(new Label("Zone: " + raid.getName()));
+                HorizontalLayout hzl = new HorizontalLayout();
+                Label zname = new Label(raid.getName());
+                zname.addStyleName(raid.getName().replace(" ", "").toLowerCase());
+                hzl.addComponent(new Label("Zone: "));
+                hzl.addComponent(zname);
+                addComponent(hzl);
                 addComponent(new Label("Comment: " + raid.getComment()));
                 addComponent(new Label("Date: " + raid.getDate()));
         }

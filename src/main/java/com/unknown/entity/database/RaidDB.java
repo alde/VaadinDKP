@@ -9,6 +9,7 @@ import com.unknown.entity.dao.*;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.SQLRuntimeException;
 import com.unknown.entity.character.User;
+import com.unknown.entity.items.Items;
 import com.unknown.entity.raids.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -534,24 +535,51 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public int doUpdateLoot(int id, String looter, String itemname, double price, boolean heroic) {
+                public boolean getLootedHeroic(String charname, int itemid, double price) {
+                DBConnection c = new DBConnection();
+                boolean isheroic = false;
+                CharacterDAO characterDao = new CharacterDB();
+                int charid = characterDao.getCharacterId(charname);
+//                System.out.println(itam.getId()+ " : " + itam.getName());
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT DISTINCT * FROM loots WHERE item_id=? AND character_id=? AND price=?");
+                        p.setInt(1, itemid);
+                        p.setInt(2, charid);
+                        p.setDouble(3, price);
+                        ResultSet rs = p.executeQuery();
+                        System.out.println(p);
+                        while (rs.next()) {
+                                isheroic = rs.getBoolean("heroic");
+                                System.out.println(rs);
+                        }
+
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return isheroic;
+                }
+
+        @Override
+        public int doUpdateLoot(int lootid, String looter, String itemname, double price, boolean heroic, int raidid) {
                 ItemDAO itemDao = new ItemDB();
                 CharacterDAO charDao = new CharacterDB();
                 int itemid = itemDao.getItemId(itemname);
                 int charid = charDao.getCharacterId(looter);
-                // System.out.println("Itemid: " + itemid + " Charid: " + charid);
                 int success = 0;
                 DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
+                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , raid_id=? , character_id=? , price=? , heroic=? WHERE id=?");
                         p.setInt(1, itemid);
-                        p.setInt(2, charid);
-                        p.setDouble(3, price);
-                        p.setBoolean(4, heroic);
-                        p.setInt(5, id);
-                        // System.out.println(p.toString());
+                        p.setInt(2, raidid);
+                        p.setInt(3, charid);
+                        p.setDouble(4, price);
+                        p.setBoolean(5, heroic);
+                        p.setInt(6, lootid);
+                        System.out.println(p.toString());
                         success = p.executeUpdate();
-                        // System.out.println(success + " items updated.");
+                        System.out.println(success + " items updated.");
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {

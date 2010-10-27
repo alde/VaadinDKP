@@ -57,7 +57,7 @@ public class UnknownEntityDKP extends Application {
                 CharacterDAO characterDAO = new CharacterDB();
                 ItemDAO itemDAO = new ItemDB();
 
-                
+
                 dkpList = new DkpList(characterDAO, this);
                 charList = new CharacterList(characterDAO, dkpList, this);
                 charList.attach();
@@ -73,6 +73,7 @@ public class UnknownEntityDKP extends Application {
                 dkpList.setLists(itemList, raidList);
                 itemList.setLists(charList, dkpList, raidList);
                 raidList.setItemList(itemList);
+
 
                 TablePanel tp = new TablePanel(dkpList, itemList, raidList);
                 final HorizontalLayout hzl = tp.HorizontalSegment();
@@ -100,5 +101,4 @@ public class UnknownEntityDKP extends Application {
                 charList.printList();
                 window.addComponent(hzChar);
         }
-
 }

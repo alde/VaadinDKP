@@ -79,7 +79,6 @@ public class EditDefaultPricesWindow extends Window {
                 priceTable.addContainerProperty("Normal", Double.class, 0);
                 priceTable.addContainerProperty("Heroic", Double.class, 0);
                 for (ItemPrices ip : prices) {
-                        System.out.println(ip.getSlotString() + " price: " + ip.getPrice() + " heroic: " + ip.getPriceHeroic());
                         Item addItem = ic.addItem(ip);
                         priceTableSetRow(addItem, ip);
                         if (longest < ip.getSlotString().length()+1) {
