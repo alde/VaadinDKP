@@ -199,7 +199,7 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
-                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdField.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()));
+                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()));
                 System.out.println("Items updated: " + success);
                 notifyListeners();
         }
