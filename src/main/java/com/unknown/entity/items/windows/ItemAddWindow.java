@@ -10,6 +10,8 @@ import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.XmlParser;
 import com.unknown.entity.items.*;
+import com.vaadin.data.Property.ConversionException;
+import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.terminal.ExternalResource;
@@ -137,7 +139,7 @@ public class ItemAddWindow extends Window {
                 Button queryButton = new Button();
                 queryButton.setIcon(new ThemeResource("../shared/query.png"));
                 queryButton.setStyle(Button.STYLE_LINK);
-                queryButton.addListener(new QueryListener(name, vrt));
+                queryButton.addListener(new QueryListener());
                 hzl.addComponent(queryButton);
                 addItem.addComponent(hzl);
                 addItem.addComponent(wowid);
@@ -241,7 +243,7 @@ public class ItemAddWindow extends Window {
                                 success = addItem(iname, iwowid, iwowidheroic, iprice, ipriceheroic, islot, itype);
 
                                 if (success < 0) {
-                                        vert.addComponent(new Label("Item already in database\n"+iname));
+                                        vert.addComponent(new Label("Item already in database\n" + iname));
                                 } else {
                                         notifyListeners();
                                         close();
@@ -250,6 +252,47 @@ public class ItemAddWindow extends Window {
                                 Logger.getLogger(ItemAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
+                }
+        }
+
+        private void queryData() throws ConversionException, ReadOnlyException {
+                String query = "";
+                if (!name.getValue().toString().isEmpty()) {
+                        query = name.getValue().toString();
+                } else if (!wowid.getValue().toString().isEmpty()) {
+                        query = wowid.getValue().toString();
+                } else if (!wowidheroic.getValue().toString().isEmpty()) {
+                        query = wowidheroic.getValue().toString();
+                }
+                if (!query.isEmpty()) {
+                        query = query.replace(" ", "%20");
+                        XmlParser xml = new XmlParser(query);
+                        String typeFromXml = xml.parseXmlType();
+                        vrt.removeAllComponents();
+                        addComponent(vrt);
+                        if (!typeFromXml.equalsIgnoreCase("Item not found!")) {
+                                String tooltip = xml.parseXmlTooltip();
+                                String wowidFromXml = xml.parseXmlWowid();
+                                if (tooltip.contains("Heroic")) {
+                                        wowidheroic.setValue(wowidFromXml);
+                                } else {
+                                        wowid.setValue(wowidFromXml);
+                                }
+                                type.setValue(Type.valueOf(typeFromXml));
+                                String slotsFromXml = xml.parseXmlSlots();
+                                slot.setValue(Slots.valueOf(slotsFromXml));
+                                String itemname = xml.parseXmlName();
+                                name.setValue(itemname);
+                                String url = xml.parseXmlUrl();
+                                Link seealso = new Link(itemname, new ExternalResource(url + "#see-also"));
+                                seealso.setTargetName("_blank");
+                                vrt.addComponent(new Label("See also for non-queryable wow-id:"));
+                                vrt.addComponent(seealso);
+                        } else {
+                                vrt.addComponent(new Label("Item not found!"));
+                        }
+                } else {
+                        vrt.addComponent(new Label("Gotta have an item to query."));
                 }
         }
 
@@ -263,44 +306,9 @@ public class ItemAddWindow extends Window {
 
         private class QueryListener implements ClickListener {
 
-                private TextField name;
-                private VerticalLayout vrt;
-
-                public QueryListener(TextField name, VerticalLayout vrt) {
-                        this.name = name;
-                        this.vrt = vrt;
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        String query = name.getValue().toString();
-                        query = query.replace(" ", "%20");
-                        XmlParser xml = new XmlParser(query);
-                        String typeFromXml = xml.parseXmlType();
-                        vrt.removeAllComponents();
-                        addComponent(vrt);
-                        if (!typeFromXml.equalsIgnoreCase("Item not found!")) {
-                                String tooltip = xml.parseXmlTooltip();
-                                String wowidFromXml = xml.parseXmlWowid();
-                                if (tooltip.contains(("Heroic"))) {
-                                        wowidheroic.setValue(wowidFromXml);
-                                } else {
-                                        wowid.setValue(wowidFromXml);
-                                }
-                                type.setValue(Type.valueOf(typeFromXml));
-                                String slotsFromXml = xml.parseXmlSlots();
-                                slot.setValue(Slots.valueOf(slotsFromXml));
-
-                                String itemname = xml.parseXmlName();
-                                name.setValue(itemname);
-                                String url = xml.parseXmlUrl();
-                                Link seealso = new Link(itemname, new ExternalResource(url + "#see-also"));
-                                seealso.setTargetName("_blank");
-                                vrt.addComponent(new Label("See also for non-queryable wow-id:"));
-                                vrt.addComponent(seealso);
-                        } else {
-                                vrt.addComponent(new Label("Item not found!"));
-                        }
+                        queryData();
                 }
         }
 

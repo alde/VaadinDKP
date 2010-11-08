@@ -9,7 +9,6 @@ import com.unknown.entity.dao.*;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.SQLRuntimeException;
 import com.unknown.entity.character.User;
-import com.unknown.entity.items.Items;
 import com.unknown.entity.raids.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -225,10 +224,10 @@ public class RaidDB implements RaidDAO {
         public int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) throws SQLException {
                 int success = 0;
                 Connection c = null;
+                int zoneid = getZoneIdByName(raidzoneName);
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("UPDATE raids SET zone_id=? , date=? , comment=? WHERE id=?");
-                        int zoneid = getZoneIdByName(c, raidzoneName);
                         p.setInt(1, zoneid);
                         p.setString(2, raiddate);
                         p.setString(3, raidcomment);
@@ -242,13 +241,19 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        private int getZoneIdByName(Connection c, String raidzoneName) throws SQLException {
-                PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
-                pzone.setString(1, raidzoneName);
-                ResultSet rs = pzone.executeQuery();
-                int zoneid = 0;
-                while (rs.next()) {
-                        zoneid = rs.getInt("id");
+        private int getZoneIdByName(String raidzoneName) throws SQLException {
+                DBConnection c = new DBConnection();
+                int zoneid = 1;
+                try {
+                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
+                        pzone.setString(1, raidzoneName);
+                        ResultSet rs = pzone.executeQuery();
+                        while (rs.next()) {
+                                zoneid = rs.getInt("id");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
                 }
                 return zoneid;
         }
@@ -535,7 +540,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-                public boolean getLootedHeroic(String charname, int itemid, double price) {
+        public boolean getLootedHeroic(String charname, int itemid, double price) {
                 DBConnection c = new DBConnection();
                 boolean isheroic = false;
                 CharacterDAO characterDao = new CharacterDB();
@@ -559,7 +564,7 @@ public class RaidDB implements RaidDAO {
                         c.close();
                 }
                 return isheroic;
-                }
+        }
 
         @Override
         public int doUpdateLoot(int lootid, String looter, String itemname, double price, boolean heroic, int raidid) {
@@ -598,6 +603,7 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public void removeZone(String zone) {
+                fixExistingZones(zone);
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("DELETE FROM zones WHERE name=?");
@@ -615,6 +621,21 @@ public class RaidDB implements RaidDAO {
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO zones (name) VALUES(?)");
                         p.setString(1, zone);
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        private void fixExistingZones(String zone) {
+                DBConnection c = new DBConnection();
+                int zoneid = 1;
+                try {
+                        zoneid = getZoneIdByName(zone);
+                        PreparedStatement p = c.prepareStatement("UPDATE raids SET zone_id=? WHERE zone_id=?");
+                        p.setInt(1, 1);
+                        p.setInt(2, zoneid);
                         p.executeUpdate();
                 } catch (SQLException ex) {
                 } finally {

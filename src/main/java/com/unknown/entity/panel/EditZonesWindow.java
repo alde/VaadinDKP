@@ -6,8 +6,6 @@ package com.unknown.entity.panel;
 
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -28,9 +26,10 @@ class EditZonesWindow extends Window {
         String oldZone = "";
         private ComboBox zoneList;
         private RaidDAO raidDao;
+        SuperImmediateTextField zoneName;
 
         public EditZonesWindow() {
-                this.setCaption("Edit default Prices");
+                this.setCaption("Edit Zones");
                 this.addStyleName("opaque");
                 this.center();
                 this.getContent().setSizeUndefined();
@@ -42,11 +41,12 @@ class EditZonesWindow extends Window {
 
                 Label addZoneLabel = new Label("Add Zone");
                 addComponent(addZoneLabel);
-                SuperImmediateTextField zoneName = new SuperImmediateTextField("");
+                zoneName = new SuperImmediateTextField();
                 zoneName.setImmediate(true);
                 zoneName.setWidth("200px");
+                zoneName.addStyleName("textfieldfont");
                 Button addButton = new Button("Add Zone");
-                addButton.addListener(new AddButtonClickListener(zoneName));
+                addButton.addListener(new AddButtonClickListener());
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.addComponent(zoneName);
                 hzl.addComponent(addButton);
@@ -65,18 +65,33 @@ class EditZonesWindow extends Window {
                 CheckBox deleteZone = new CheckBox("Delete");
                 Button updateButton = new Button("Delete Zone");
 
-                updateButton.addListener(new UpdateZoneListener(zoneList));
+                updateButton.addListener(new UpdateZoneListener());
 
                 hzl = new HorizontalLayout();
                 hzl.addComponent(zoneList);
                 hzl.addComponent(deleteZone);
                 hzl.addComponent(updateButton);
+                Label warning = new Label("Don't delete Old (Default) \nor you'll fuck things up.");
+                warning.addStyleName("error");
 
                 addComponent(hzl);
+                addComponent(warning);
 
                 Button closeButton = new Button("Close");
                 closeButton.addListener(new CloseButtonListener());
                 addComponent(closeButton);
+        }
+
+        private void removeZone() {
+                raidDao.removeZone(zoneList.getValue().toString());
+                this.removeAllComponents();
+                this.printInfo();
+        }
+
+        private void addZone() {
+                raidDao.addZone(zoneName.getValue().toString());
+                this.removeAllComponents();
+                this.printInfo();
         }
 
         private class CloseButtonListener implements ClickListener {
@@ -89,31 +104,17 @@ class EditZonesWindow extends Window {
 
         private class UpdateZoneListener implements ClickListener {
 
-                private final ComboBox zoneList;
-
-                public UpdateZoneListener(ComboBox zoneList) {
-                        this.zoneList = zoneList;
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        raidDao.removeZone(zoneList.getValue().toString());
+                        removeZone();
                 }
         }
 
         private class AddButtonClickListener implements ClickListener {
 
-                SuperImmediateTextField zoneName;
-
-                public AddButtonClickListener(SuperImmediateTextField zoneName) {
-                        this.zoneName = zoneName;
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        raidDao.addZone(zoneName.getValue().toString());
+                        addZone();
                 }
         }
-
-     
 }
