@@ -257,81 +257,81 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .artifact { color: gold; }
 
 /* Warlock */
-.v-nativebutton-warlock, v-nativebutton-warlock:active, v-nativebutton-warlock:focus {outline: none; border: none; }
-.v-nativebutton-warlock:hover { font-style: italic; }
-.v-nativebutton-warlock .v-nativebutton-caption { font-size: 12px; color: #9482C9; }
+.v-nativebutton-warlock, v-nativebutton-warlock:active, v-nativebutton-warlock:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-warlock:hover { text-decoration: underline; }
+.v-nativebutton-warlock .v-nativebutton-caption { font-size: 12px; color: #9482C9; text-decoration: none; }
 .warlock { color: #9482C9; }
 .v-label-warlock { color: #9482C9;}
 .v-label-warlock:hover { text-decoration: underline; }
 
 /* Warrior */
-.v-nativebutton-warrior, v-nativebutton-warrior:active, v-nativebutton-warrior:focus {outline: none; border: none; }
-.v-nativebutton-warrior:hover { font-style: italic; }
-.v-nativebutton-warrior .v-nativebutton-caption { font-size: 12px; color: #C79C6E; }
+.v-nativebutton-warrior, v-nativebutton-warrior:active, v-nativebutton-warrior:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-warrior:hover { text-decoration: underline;  }
+.v-nativebutton-warrior .v-nativebutton-caption { font-size: 12px; color: #C79C6E; text-decoration: none; }
 .warrior { color: #C79C6E; }
 .v-label-warrior { color: #C79C6E; }
 .v-label-warrior:hover { text-decoration: underline; }
 
 /* Death Knight */
-.v-nativebutton-deathknight, v-nativebutton-deathknight:active, v-nativebutton-deathknight:focus {outline: none; border: none; }
-.v-nativebutton-deathknight:hover { font-style: italic; }
-.v-nativebutton-deathknight .v-nativebutton-caption {font-size: 12px; color: #C41F3B; }
+.v-nativebutton-deathknight, v-nativebutton-deathknight:active, v-nativebutton-deathknight:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-deathknight:hover { text-decoration: underline; }
+.v-nativebutton-deathknight .v-nativebutton-caption {font-size: 12px; color: #C41F3B; text-decoration: none; }
 .deathknight {color: #C41F3B; }
 .v-label-deathnkight {color: #C41F3B; }
 .v-label-deathknight:hover { text-decoration: underline; }
 
 /* Druid */
-.v-nativebutton-druid, v-nativebutton-druid:active, v-nativebutton-druid:focus {outline: none; border: none; }
-.v-nativebutton-druid:hover { font-style: italic; }
-.v-nativebutton-druid .v-nativebutton-caption {font-size: 12px; color: #FF7D0A; }
+.v-nativebutton-druid, v-nativebutton-druid:active, v-nativebutton-druid:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-druid:hover { text-decoration: underline;  }
+.v-nativebutton-druid .v-nativebutton-caption {font-size: 12px; color: #FF7D0A; text-decoration: none; }
 .druid {color: #FF7D0A; }
 .v-label-druid {color: #FF7D0A; }
 .v-label-druid:hover { text-decoration: underline; }
 
 /* Shaman */
-.v-nativebutton-shaman, v-nativebutton-shaman:active, v-nativebutton-shaman:focus {outline: none; border: none; }
-.v-nativebutton-shaman:hover { font-style: italic; }
-.v-nativebutton-shaman .v-nativebutton-caption {font-size: 12px; color: #0070DE; }
+.v-nativebutton-shaman, v-nativebutton-shaman:active, v-nativebutton-shaman:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-shaman:hover { text-decoration: underline; }
+.v-nativebutton-shaman .v-nativebutton-caption {font-size: 12px; color: #0070DE; text-decoration: none; }
 .shaman {color: #0070DE; }
 .v-label-shaman {color: #0070DE; }
 .v-label-shaman:hover { text-decoration: underline; }
 
 /* Mage */
-.v-nativebutton-mage, v-nativebutton-mage:active, v-nativebutton-mage:focus {outline: none; border: none; }
-.v-nativebutton-mage:hover { font-style: italic; }
-.v-nativebutton-mage .v-nativebutton-caption {font-size: 12px; color: #69CCF0; }
+.v-nativebutton-mage, v-nativebutton-mage:active, v-nativebutton-mage:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-mage:hover { text-decoration: underline; }
+.v-nativebutton-mage .v-nativebutton-caption {font-size: 12px; color: #69CCF0; text-decoration: none; }
 .mage {color: #69CCF0; }
 .v-label-mage {color: #69CCF0; }
 .v-label-mage:hover { text-decoration: underline; }
 
 /* Rogue */
-.v-nativebutton-rogue, v-nativebutton-rogue:active, v-nativebutton-rogue:focus {outline: none; border: none; }
-.v-nativebutton-rogue:hover { font-style: italic; }
-.v-nativebutton-rogue .v-nativebutton-caption {font-size: 12px; color: #FFF569; }
+.v-nativebutton-rogue, v-nativebutton-rogue:active, v-nativebutton-rogue:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-rogue:hover { text-decoration: underline;  }
+.v-nativebutton-rogue .v-nativebutton-caption {font-size: 12px; color: #FFF569; text-decoration: none; }
 .rogue {color: #FFF569; }
 .v-label-rogue {color: #FFF569; }
 .v-label-rogue:hover { text-decoration: underline; }
 
 /* Priest */
-.v-nativebutton-priest, v-nativebutton-priest:active, v-nativebutton-priest:focus {outline: none; border: none; }
-.v-nativebutton-priest:hover { font-style: italic; }
-.v-nativebutton-priest .v-nativebutton-caption {font-size: 12px; color: #FFFFFF; }
+.v-nativebutton-priest, v-nativebutton-priest:active, v-nativebutton-priest:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-priest:hover { text-decoration: underline; }
+.v-nativebutton-priest .v-nativebutton-caption {font-size: 12px; color: #FFFFFF; text-decoration: none; }
 .priest {color: #FFFFFF;}
 .v-label-priest {color: #FFFFFF; }
 .v-label-priest:hover { text-decoration: underline; }
 
 /* Hunter */
-.v-nativebutton-hunter, v-nativebutton-hunter:active, v-nativebutton-hunter:focus {outline: none; border: none; }
-.v-nativebutton-hunter:hover { font-style: italic; }
-.v-nativebutton-hunter .v-nativebutton-caption {font-size: 12px; color: #ABD473; }
+.v-nativebutton-hunter, v-nativebutton-hunter:active, v-nativebutton-hunter:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-hunter:hover { text-decoration: underline; }
+.v-nativebutton-hunter .v-nativebutton-caption {font-size: 12px; color: #ABD473; text-decoration: none; }
 .hunter {color: #ABD473;}
 .v-label-hunter {color: #ABD473; }
 .v-label-hunter:hover { text-decoration: underline; }
 
 /* Paladin */
-.v-nativebutton-paladin, v-nativebutton-paladin:active, v-nativebutton-paladin:focus {outline: none; border: none; }
-.v-nativebutton-paladin:hover { font-style: italic; }
-.v-nativebutton-paladin .v-nativebutton-caption {font-size: 12px; color: #F58CBA; }
+.v-nativebutton-paladin, v-nativebutton-paladin:active, v-nativebutton-paladin:focus {outline: none; border: none; text-decoration: none; }
+.v-nativebutton-paladin:hover { text-decoration: underline; }
+.v-nativebutton-paladin .v-nativebutton-caption {font-size: 12px; color: #F58CBA; text-decoration: none; }
 .paladin {color: #F58CBA;}
 .v-label-paladin {color: #F58CBA; }
 .v-label-paladin:hover { text-decoration: underline; }
