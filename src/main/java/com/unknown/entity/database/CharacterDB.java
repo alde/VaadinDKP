@@ -72,7 +72,7 @@ public class CharacterDB implements CharacterDAO {
 
         private void doSQLMagicForCharacters(Connection c, ResultSet rs, List<User> users) throws SQLException {
                 PreparedStatement ploot = c.prepareStatement("SELECT * FROM loots JOIN characters where loots.character_id=characters.id");
-                int shares = 0, totalsharesthischaracter = 0, totalshares = 0;
+                int shares = 0, totalshares = 0;
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, loot_value = 0.0, share_value = 0.0;
                 ResultSet rsloot = ploot.executeQuery();
                 while (rsloot.next()) {

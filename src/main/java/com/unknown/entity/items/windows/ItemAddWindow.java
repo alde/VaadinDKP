@@ -26,6 +26,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,18 +197,19 @@ public class ItemAddWindow extends Window {
                         String slotvalue = slot.getValue().toString();
                         double defprice = 0.0;
                         double defpricehc = 0.0;
+                        BigDecimal formattedprice = new BigDecimal(0), formattedpricehc = new BigDecimal(0);
                         for (ItemPrices ip : defaultprices) {
                                 if (ip.getSlotString().equals(slotvalue)) {
                                         Multiplier mp = itemDao.getMultiplierForItemlevel(ilvl);
                                         defprice = ip.getPrice() * mp.getMultiplier();
+                                        formattedprice = new BigDecimal(defprice).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                                         mp = itemDao.getMultiplierForItemlevel(ilvl + 13);
-                                        defpricehc = ip.getPriceHeroic();
+                                        defpricehc = ip.getPrice() * mp.getMultiplier();
+                                        formattedpricehc = new BigDecimal(defpricehc).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                                 }
                         }
-                        Multiplier mp = itemDao.getMultiplierForItemlevel(ilvl);
-                        price.setValue("" + defprice * mp.getMultiplier());
-                        mp = itemDao.getMultiplierForItemlevel(ilvl + 13);
-                        priceheroic.setValue("" + defpricehc);
+                        price.setValue("" + formattedprice);
+                        priceheroic.setValue("" + formattedpricehc);
                 }
         }
 

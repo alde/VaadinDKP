@@ -29,6 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,12 +133,14 @@ public class ItemEditWindow extends Window {
         }
 
         private void setPricesToDefault() {
-               int itemlvl = Integer.parseInt(ilvl.getValue().toString());
-               double prices = itemDao.getDefaultPrice(item);
-               Multiplier mp = itemDao.getMultiplierForItemlevel(itemlvl);
-               price.setValue(""+prices*mp.getMultiplier());
-               mp = itemDao.getMultiplierForItemlevel(itemlvl+13);
-               pricehc.setValue(""+prices*mp.getMultiplier());
+                int itemlvl = Integer.parseInt(ilvl.getValue().toString());
+                double prices = itemDao.getDefaultPrice(item);
+                Multiplier mp = itemDao.getMultiplierForItemlevel(itemlvl);
+                BigDecimal formattedprice = new BigDecimal(prices * mp.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                price.setValue("" + formattedprice);
+                mp = itemDao.getMultiplierForItemlevel(itemlvl + 13);
+                BigDecimal formattedpricehc = new BigDecimal(prices * mp.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                pricehc.setValue("" + formattedpricehc);
         }
 
         private void itemEditGrid(final TextField wowIdfield, final TextField wowIdfieldhc, final TextField price, final TextField pricehc) throws OutOfBoundsException, OverlapsException {
