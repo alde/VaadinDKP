@@ -697,4 +697,47 @@ public class RaidDB implements RaidDAO {
                         return true;
                 }
         }
+
+        @Override
+        public void safelyRemoveRaid(Raid raid) {
+                deleteRewardsForRaid(raid);
+                deleteLootsForRaid(raid);
+                deleteRaid(raid);
+        }
+
+        private void deleteRewardsForRaid(Raid raid) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("DELETE FROM rewards WHERE raid_id=?");
+                        p.setInt(1, raid.getId());
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        private void deleteLootsForRaid(Raid raid) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE raid_id=?");
+                        p.setInt(1, raid.getId());
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        private void deleteRaid(Raid raid) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("DELETE FROM raids WHERE id=?");
+                        p.setInt(1, raid.getId());
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
 }

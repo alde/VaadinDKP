@@ -66,4 +66,6 @@ public interface RaidDAO {
         public int getZoneIdByName(String raidzoneName);
 
         public boolean isValidZone(String oldzone);
+
+        public void safelyRemoveRaid(Raid raid);
 }

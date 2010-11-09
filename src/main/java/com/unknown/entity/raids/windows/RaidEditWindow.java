@@ -37,6 +37,7 @@ public class RaidEditWindow extends Window {
         private RaidRewardList rrList;
         private RaidLootList rlList;
         private final ItemList itemList;
+        private RaidDAO raidDao;
 
         public RaidEditWindow(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.raid = raid;
@@ -48,6 +49,7 @@ public class RaidEditWindow extends Window {
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
                 this.setCaption("Edit raid: " + raid.getName());
+                this.raidDao = new RaidDB();
         }
 
         public void printInfo() {
@@ -101,18 +103,30 @@ public class RaidEditWindow extends Window {
                 datum.setImmediate(true);
 
                 Button updateButton = new Button("Update");
+                Button deleteButton = new Button("Delete");
 
                 hzl.addComponent(zone);
                 hzl.addComponent(comment);
                 hzl.addComponent(datum);
 
                 addComponent(hzl);
-                addComponent(updateButton);
+
+                HorizontalLayout hoributtons = new HorizontalLayout();
+                hoributtons.addComponent(updateButton);
+                hoributtons.addComponent(deleteButton);
+                addComponent(hoributtons);
+
                 updateButton.addListener(new UpdateButtonListener(zone, comment, datum));
+                deleteButton.addListener(new DeleteButtonListener());
+        }
+
+        private void deleteRaid() {
+                raidDao.safelyRemoveRaid(raid);
+                notifyListeners();
+                close();
         }
 
         private int updateRaid(String raidzoneName, String raidcomment, String raiddate) throws SQLException {
-                RaidDAO raidDao = new RaidDB();
                 return raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
         }
 
@@ -131,7 +145,7 @@ public class RaidEditWindow extends Window {
                 private final ComboBox zone;
                 private final TextField comment;
                 private final TextField datum;
-                
+
                 public UpdateButtonListener(ComboBox zone, TextField comment, TextField datum) {
                         this.zone = zone;
                         this.comment = comment;
@@ -186,6 +200,17 @@ public class RaidEditWindow extends Window {
                         rewardadd.addRaidInfoListener(rrList);
                         rewardadd.printInfo();
                         getApplication().getMainWindow().addWindow(rewardadd);
+                }
+        }
+
+        private class DeleteButtonListener implements ClickListener {
+
+                public DeleteButtonListener() {
+                }
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        deleteRaid();
                 }
         }
 }
