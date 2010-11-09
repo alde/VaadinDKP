@@ -50,6 +50,7 @@ public class MultiplierList extends Table {
                 addContainerProperty("Itemlevel", Integer.class, "");
                 addContainerProperty("Multiplier", Double.class, 0);
                 addContainerProperty("Delete", CheckBox.class, false);
+                setSortContainerPropertyId("Itemlevel");
                 for (Multiplier mp : multipliers) {
                         Item addItem = ic.addItem(mp);
                         priceTableSetRow(addItem, mp);

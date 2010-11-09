@@ -135,7 +135,7 @@ public class ItemAddWindow extends Window {
                 this.type.setStyleName("textfieldfont");
                 this.type.setWidth("150px");
 
-                this.itemlevel = new TextField("Itemlevel (Normal)");
+                this.itemlevel = new TextField("Base Itemlevel");
                 this.itemlevel.setStyleName("textfieldfond");
                 this.itemlevel.setWidth("150px");
         }

@@ -76,7 +76,7 @@ public class ItemEditWindow extends Window {
                 this.wowIdField = new TextField();
                 this.wowIdFieldhc = new TextField();
                 this.name = new TextField("Name");
-                this.ilvl = new TextField("Itemlevel");
+                this.ilvl = new TextField("Base Itemlevel");
                 this.lout = new VerticalLayout();
         }
 

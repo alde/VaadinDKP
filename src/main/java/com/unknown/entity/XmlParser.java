@@ -129,7 +129,7 @@ public class XmlParser {
                                 if (type.toString().contains("vanquisher") || type.toString().contains("conqueror") || type.toString().contains("protector")) {
                                         foo = "Tier";
                                 } else {
-                                        String temp = findElement(root, "inventorySlot").replace("-", "").replace(" ", "").replace("HeldInOffhand", "OffHand");
+                                        String temp = findElement(root, "inventorySlot").replace("-", "").replace(" ", "").replace("HeldInOffhand", "OffHand").replace("Finger", "Ring");
                                         if (!temp.isEmpty()) {
                                                 foo = temp;
                                         }
