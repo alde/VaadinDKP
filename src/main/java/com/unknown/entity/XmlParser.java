@@ -110,7 +110,8 @@ public class XmlParser {
                                         }
                                 } else if (foo.equals("Quest")) {
                                         foo = "Other";
-                                }
+                                } else if (foo.equals("Consumables"))
+                                        foo = "Other";
                         } else {
                                 foo = "Item not found!";
                         }

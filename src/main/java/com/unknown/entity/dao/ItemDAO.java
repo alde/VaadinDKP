@@ -57,4 +57,6 @@ public interface ItemDAO {
         public void updateItemLevels(int id, int ilvl, double multiplier);
 
         public void deleteItemLevelsMultiplier(int id);
+
+        public double getDefaultPrice(Items item);
 }

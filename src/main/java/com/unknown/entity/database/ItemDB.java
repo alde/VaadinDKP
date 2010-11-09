@@ -8,6 +8,7 @@ import com.unknown.entity.DBConnection;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.dao.ItemDAO;
+import com.unknown.entity.items.DefaultPrices;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
@@ -399,15 +400,15 @@ public class ItemDB implements ItemDAO {
 
         @Override
         public void updateLoots(Items item, String price, String pricehc) {
-                DBConnection c = new DBConnection();
+                updateHeroic(item, pricehc);
+                updateNormal(item, price);
+        }
 
+        private void updateHeroic(Items item, String pricehc) {
+                DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=1");
                         ps.setDouble(1, Double.parseDouble(pricehc));
-                        ps.setInt(2, item.getId());
-                        ps.executeUpdate();
-                        ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=0");
-                        ps.setDouble(1, Double.parseDouble(price));
                         ps.setInt(2, item.getId());
                         ps.executeUpdate();
                 } catch (SQLException ex) {
@@ -440,6 +441,38 @@ public class ItemDB implements ItemDAO {
                         p.setInt(1, id);
                         p.executeUpdate();
                 } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public double getDefaultPrice(Items item) {
+                DBConnection c = new DBConnection();
+                double d = 0.0;
+                try {
+                        PreparedStatement ps = c.prepareStatement("SELECT * FROM default_prices WHERE slot=?");
+                        ps.setString(1, item.getSlot());
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                                d = rs.getDouble("price_normal");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return d;
+        }
+
+        private void updateNormal(Items item, String price) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=0");
+                        ps.setDouble(1, Double.parseDouble(price));
+                        ps.setInt(2, item.getId());
+                        ps.executeUpdate();
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
                 } finally {
                         c.close();
                 }

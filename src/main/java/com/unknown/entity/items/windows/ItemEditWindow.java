@@ -102,10 +102,12 @@ public class ItemEditWindow extends Window {
 
                 Button updateButton = new Button("Update Item");
                 Button deleteButton = new Button("Delete Item");
+                Button requestButton = new Button("Request Default Prices");
                 Button applyPrice = new Button("Apply Price");
                 applyPrice.setDescription("Apply price to all loots of this item.");
                 deleteButton.addListener(new DeleteButtonClickListener(item));
                 updateButton.addListener(new UpdateButtonClickListener());
+                requestButton.addListener(new RequestButtonClickListener());
                 applyPrice.addListener(new ApplyButtonClickListener());
                 hzl = new HorizontalLayout();
                 Label warning = new Label();
@@ -115,6 +117,7 @@ public class ItemEditWindow extends Window {
                 hzl.addComponent(updateButton);
                 hzl.addComponent(deleteButton);
                 hzl.addComponent(warning);
+                hzl.addComponent(requestButton);
                 hzl.addComponent(applyPrice);
                 hzl.setSpacing(true);
                 hzl.setMargin(true, false, true, false);
@@ -126,6 +129,15 @@ public class ItemEditWindow extends Window {
                 } catch (IOException ex) {
                         Logger.getLogger(ItemEditWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
+        }
+
+        private void setPricesToDefault() {
+               int itemlvl = Integer.parseInt(ilvl.getValue().toString());
+               double prices = itemDao.getDefaultPrice(item);
+               Multiplier mp = itemDao.getMultiplierForItemlevel(itemlvl);
+               price.setValue(""+prices*mp.getMultiplier());
+               mp = itemDao.getMultiplierForItemlevel(itemlvl+13);
+               pricehc.setValue(""+prices*mp.getMultiplier());
         }
 
         private void itemEditGrid(final TextField wowIdfield, final TextField wowIdfieldhc, final TextField price, final TextField pricehc) throws OutOfBoundsException, OverlapsException {
@@ -159,9 +171,10 @@ public class ItemEditWindow extends Window {
                 price.setImmediate(true);
                 price.setValue(item.getPrice());
         }
+
         private void editInfoIlvlField() throws ReadOnlyException, ConversionException {
                 ilvl.setImmediate(true);
-                ilvl.setValue(item.getPrice());
+                ilvl.setValue(item.getIlvl());
         }
 
         private void editInfoWowIdHcField() throws ConversionException, ReadOnlyException {
@@ -205,7 +218,7 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
-                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()),Integer.parseInt(ilvl.getValue().toString()));
+                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()));
                 System.out.println("Items updated: " + success);
                 notifyListeners();
         }
@@ -307,6 +320,14 @@ public class ItemEditWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         applyPrices();
+                }
+        }
+
+        private class RequestButtonClickListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        setPricesToDefault();
                 }
         }
 }
