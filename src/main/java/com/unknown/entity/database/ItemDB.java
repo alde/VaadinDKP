@@ -11,6 +11,7 @@ import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
+import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.raids.RaidItem;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,7 +40,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                Items tempitem = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType);
+                                Items tempitem = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"));
                                 tempitem.addLooterList(getLootersFormItems(rs.getInt("id")));
                                 items.add(tempitem);
                         }
@@ -77,10 +78,9 @@ public class ItemDB implements ItemDAO {
 
         @Override
         public List<ItemPrices> getDefaultPrices() throws SQLException {
-                Connection c = null;
+                DBConnection c = new DBConnection();
                 List<ItemPrices> prices = new ArrayList<ItemPrices>();
                 try {
-                        c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("SELECT * FROM default_prices");
 
                         ResultSet rs = p.executeQuery();
@@ -91,20 +91,72 @@ public class ItemDB implements ItemDAO {
                         }
 
                 } catch (SQLException e) {
-                        e.printStackTrace();
                 } finally {
-                        closeConnection(c);
+                        c.close();
                 }
                 return prices;
         }
 
         @Override
-        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc) {
+        public List<Multiplier> getMultipliers() {
+                DBConnection c = new DBConnection();
+                List<Multiplier> multi = new ArrayList<Multiplier>();
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM multiplier");
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                multi.add(new Multiplier(rs.getInt("id"), rs.getInt("ilvl"), rs.getDouble("multiplier")));
+                        }
+
+                } catch (SQLException e) {
+                } finally {
+                        c.close();
+                }
+                return multi;
+        }
+
+        @Override
+        public void addMultiplier(int ilvl, double multiplier) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("INSERT INTO multiplier (ilvl, multiplier) VALUES(?, ?)");
+                        p.setInt(1, ilvl);
+                        p.setDouble(2, multiplier);
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public Multiplier getMultiplierForItemlevel(int ilvl) {
+                DBConnection c = new DBConnection();
+                Multiplier mp = null;
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM multiplier WHERE ilvl=?");
+                        p.setInt(1, ilvl);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                mp = new Multiplier(rs.getInt("id"), rs.getInt("ilvl"), rs.getDouble("multiplier"));
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                if (mp == null) {
+                        mp = new Multiplier(0, ilvl, 1);
+                }
+                return mp;
+        }
+
+        @Override
+        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl) {
                 Connection c = null;
                 int success = 0;
                 try {
                         c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("UPDATE items SET name=? , wowid_normal=? , wowid_heroic=? , price_normal=? , price_heroic=? , slot=? , type=? WHERE id=?");
+                        PreparedStatement p = c.prepareStatement("UPDATE items SET name=? , wowid_normal=? , wowid_heroic=? , price_normal=? , price_heroic=? , slot=? , type=? , ilvl=? WHERE id=?");
                         p.setString(1, newname);
                         p.setInt(2, newwowid);
                         p.setInt(3, newwowidhc);
@@ -112,11 +164,9 @@ public class ItemDB implements ItemDAO {
                         p.setDouble(5, newpricehc);
                         p.setString(6, newslot.toString());
                         p.setString(7, newtype.toString());
-                        p.setInt(8, item.getId());
-                        System.out.println(p.toString());
+                        p.setInt(8, ilvl);
+                        p.setInt(9, item.getId());
                         success = p.executeUpdate();
-
-
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -126,14 +176,13 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type) throws SQLException {
+        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl) throws SQLException {
                 Connection c = null;
                 int result = 0;
-
                 try {
                         c = new DBConnection().getConnection();
                         if (!itemAlreadyInDatabase(name)) {
-                                PreparedStatement ps = c.prepareStatement("INSERT INTO items (name, wowid_normal, wowid_heroic, price_normal, price_heroic, slot, type) VALUES(?,?,?,?,?,?,?)");
+                                PreparedStatement ps = c.prepareStatement("INSERT INTO items (name, wowid_normal, wowid_heroic, price_normal, price_heroic, slot, type, ilvl) VALUES(?,?,?,?,?,?,?,?)");
                                 ps.setString(1, name);
                                 ps.setInt(2, wowid);
                                 ps.setInt(3, wowid_hc);
@@ -141,6 +190,7 @@ public class ItemDB implements ItemDAO {
                                 ps.setDouble(5, price_hc);
                                 ps.setString(6, slot);
                                 ps.setString(7, type);
+                                ps.setInt(8, ilvl);
 
                                 result = ps.executeUpdate();
                         } else {
@@ -210,7 +260,6 @@ public class ItemDB implements ItemDAO {
                         } else {
                                 p.setInt(4, 0);
                         }
-
                         p.setInt(5, raidid);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -236,7 +285,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                item = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType);
+                                item = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"));
                                 item.addLooterList(getLootersFormItems(rs.getInt("id")));
                         }
                 } catch (SQLException e) {
@@ -248,17 +297,16 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public void updateDefaultPrice(String slot, double normalprice, double heroicprice) {
+        public void updateDefaultPrice(String slot, double normalprice) {
                 Connection c = null;
                 int success = 0;
                 try {
                         c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("UPDATE default_prices SET price_normal=? , price_heroic=? WHERE slot=? ");
+                        PreparedStatement p = c.prepareStatement("UPDATE default_prices SET price_normal=? WHERE slot=? ");
                         p.setDouble(1, normalprice);
-                        p.setDouble(2, heroicprice);
-                        p.setString(3, slot);
+//                        p.setDouble(2, heroicprice);
+                        p.setString(2, slot);
                         success = p.executeUpdate();
-                        // System.out.println("Default prices changed for " + success + " slots");
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -292,7 +340,6 @@ public class ItemDB implements ItemDAO {
                 while (rs.next()) {
                         RaidItem tmp = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.item_id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
                         items.add(tmp);
-                        // System.out.println(rs.toString());
                 }
                 c.close();
                 return items;
@@ -317,7 +364,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType);
+                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"));
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
@@ -365,6 +412,34 @@ public class ItemDB implements ItemDAO {
                         ps.executeUpdate();
                 } catch (SQLException ex) {
                         ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public void updateItemLevels(int id, int ilvl, double multiplier) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("UPDATE multiplier SET ilvl=? , multiplier=? WHERE id=? ");
+                        p.setInt(1, ilvl);
+                        p.setDouble(2, multiplier);
+                        p.setInt(3, id);
+                        p.executeUpdate();
+                } catch (SQLException e) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public void deleteItemLevelsMultiplier(int id) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("DELETE FROM multiplier WHERE id=?");
+                        p.setInt(1, id);
+                        p.executeUpdate();
+                } catch (SQLException ex) {
                 } finally {
                         c.close();
                 }

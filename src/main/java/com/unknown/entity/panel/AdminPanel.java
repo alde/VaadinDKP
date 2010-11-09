@@ -13,6 +13,7 @@ import com.unknown.entity.character.DkpList;
 import com.unknown.entity.character.windows.CharacterAddWindow;
 import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.items.ItemList;
+import com.unknown.entity.items.windows.EditMultiplierWindow;
 import com.unknown.entity.items.windows.ItemAddWindow;
 import com.unknown.entity.raids.RaidList;
 import com.unknown.entity.raids.windows.RaidAddWindow;
@@ -40,6 +41,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button addRaidBtn = new Button("Add Raid");
         private final Button addItmBtn = new Button("Add Item");
         private final Button editDefaultBtn = new Button("Edit Default prices");
+        private final Button editMultipliersBtn = new Button("Edit Multipliers");
         private final Button addUserBtn = new Button("Add User");
         private final Button editZoneBtn = new Button("Edit Zones");
         private final Button logOutButton = new Button("");
@@ -78,6 +80,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 addRaidBtn.addListener(new AddRaidListener());
                 addItmBtn.addListener(new AddItemListener());
                 editDefaultBtn.addListener(new EditDefaultsListener());
+                editMultipliersBtn.addListener(new EditMultipliersListener());
                 addUserBtn.addListener(new AddUserListener());
                 editZoneBtn.addListener(new EditZonesListener());
                 logOutButton.addListener(new LogOutListener());
@@ -97,6 +100,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         this.addComponent(addItmBtn);
                         this.addComponent(addRaidBtn);
                         this.addComponent(editDefaultBtn);
+                        this.addComponent(editMultipliersBtn);
                         this.addComponent(editZoneBtn);
                         this.addComponent(addUserBtn);
                 } else {
@@ -232,6 +236,16 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         editZones.printInfo();
                         editZones.addRaidInfoListener(raidList);
                         getMainWindow().addWindow(editZones);
+                }
+        }
+
+        private class EditMultipliersListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        EditMultiplierWindow editMP = new EditMultiplierWindow();
+                        editMP.printInfo();
+                        getMainWindow().addWindow(editMP);
                 }
         }
 }

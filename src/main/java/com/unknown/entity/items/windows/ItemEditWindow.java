@@ -22,7 +22,6 @@ import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -58,6 +57,7 @@ public class ItemEditWindow extends Window {
         private TextField wowIdField;
         private TextField wowIdFieldhc;
         private VerticalLayout lout;
+        private TextField ilvl;
 
         public ItemEditWindow(Items item) {
                 this.item = item;
@@ -68,14 +68,14 @@ public class ItemEditWindow extends Window {
                 this.getContent().setSizeUndefined();
                 this.itemDao = new ItemDB();
                 this.ilt = new ItemLooterTable(item);
-                this.price = new TextField("Price");
-                this.pricehc = new TextField("Heroic");
+                this.price = new TextField();
+                this.pricehc = new TextField();
                 this.slot = new ComboBox("Slot");
                 this.type = new ComboBox("Type");
-                this.wowIdField = new TextField("wow-id");
-                this.wowIdFieldhc = new TextField("heroic wow-id");
+                this.wowIdField = new TextField();
+                this.wowIdFieldhc = new TextField();
                 this.name = new TextField("Name");
-                ;
+                this.ilvl = new TextField("Itemlevel");
                 this.lout = new VerticalLayout();
         }
 
@@ -88,11 +88,13 @@ public class ItemEditWindow extends Window {
                 editInfoPriceHcField();
                 editInfoWowIdField();
                 editInfoWowIdHcField();
+                editInfoIlvlField();
 
                 addComponent(name);
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.addComponent(slot);
                 hzl.addComponent(type);
+                hzl.addComponent(ilvl);
                 hzl.setSpacing(true);
                 addComponent(hzl);
 
@@ -157,6 +159,10 @@ public class ItemEditWindow extends Window {
                 price.setImmediate(true);
                 price.setValue(item.getPrice());
         }
+        private void editInfoIlvlField() throws ReadOnlyException, ConversionException {
+                ilvl.setImmediate(true);
+                ilvl.setValue(item.getPrice());
+        }
 
         private void editInfoWowIdHcField() throws ConversionException, ReadOnlyException {
                 wowIdFieldhc.setImmediate(true);
@@ -199,7 +205,7 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
-                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()));
+                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()),Integer.parseInt(ilvl.getValue().toString()));
                 System.out.println("Items updated: " + success);
                 notifyListeners();
         }

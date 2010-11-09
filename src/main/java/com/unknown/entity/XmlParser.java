@@ -77,7 +77,7 @@ public class XmlParser {
 
         public String parseXmlWowid() {
                 String wowid = findElement(root, "link");
-                wowid = wowid.replace("http://www.wowhead.com/item=", "");
+                wowid = wowid.replace("http://cata.wowhead.com/item=", "");
                 return wowid;
         }
 

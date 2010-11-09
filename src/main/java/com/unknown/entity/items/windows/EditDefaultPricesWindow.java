@@ -58,6 +58,7 @@ public class EditDefaultPricesWindow extends Window {
                 priceTable.setPageLength(0);
                 tableData(priceTable);
                 addComponent(priceTable);
+
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.addComponent(updateButton);
                 hzl.addComponent(closeButton);
@@ -69,20 +70,20 @@ public class EditDefaultPricesWindow extends Window {
         private void doUpdatePrices() {
                 for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
                         ItemPrices iid = (ItemPrices) i.next();
-                        Item item = ic.getItem(iid);
-                        itemDao.updateDefaultPrice(item.getItemProperty("Slot").toString(), Double.parseDouble((item.getItemProperty("Normal")).toString()), Double.parseDouble((item.getItemProperty("Heroic")).toString()));
+                        Item item = ic.getItem(iid); //, Double.parseDouble((item.getItemProperty("Heroic")).toString()
+                        itemDao.updateDefaultPrice(item.getItemProperty("Slot").toString(), Double.parseDouble((item.getItemProperty("Normal")).toString()));
                 }
         }
 
         private void tableData(Table priceTable) {
                 priceTable.addContainerProperty("Slot", Label.class, "");
                 priceTable.addContainerProperty("Normal", Double.class, 0);
-                priceTable.addContainerProperty("Heroic", Double.class, 0);
+//                priceTable.addContainerProperty("Heroic", Double.class, 0);
                 for (ItemPrices ip : prices) {
                         Item addItem = ic.addItem(ip);
                         priceTableSetRow(addItem, ip);
-                        if (longest < ip.getSlotString().length()+1) {
-                                longest = ip.getSlotString().length()+1;
+                        if (longest < ip.getSlotString().length() + 1) {
+                                longest = ip.getSlotString().length() + 1;
                         }
                 }
                 priceTable.setColumnWidth("Slot", longest * 10);
@@ -93,7 +94,7 @@ public class EditDefaultPricesWindow extends Window {
                 Label slot = new Label(ip.getSlotString());
                 addItem.getItemProperty("Slot").setValue(slot);
                 addItem.getItemProperty("Normal").setValue(ip.getPrice());
-                addItem.getItemProperty("Heroic").setValue(ip.getPriceHeroic());
+//                addItem.getItemProperty("Heroic").setValue(ip.getPriceHeroic());
         }
 
         private class CloseButtonListener implements ClickListener {
