@@ -21,7 +21,7 @@ public interface RaidDAO {
 
         public List<Raid> getRaids();
 
-        public Collection<RaidChar> getCharsForReward(int id) throws SQLException;
+        public Collection<RaidChar> getCharsForReward(int id);
         
         public List<String> getRaidZoneList();
 
@@ -43,7 +43,7 @@ public interface RaidDAO {
 
         public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId);
 
-        public Iterable<Raid> getRaidsForCharacter(int charid) throws SQLException;
+        public Iterable<Raid> getRaidsForCharacter(int charid);
 
         public int getTotalRaidsLastThirtyDays();
 
@@ -58,4 +58,12 @@ public interface RaidDAO {
         public void addZone(String zoneName);
 
         public boolean getLootedHeroic(String name, int id, double price);
+
+        public String getZoneNameById(int raidzoneid);
+
+        public void updateZoneName(String oldZone, String newZone);
+
+        public int getZoneIdByName(String raidzoneName);
+
+        public boolean isValidZone(String oldzone);
 }

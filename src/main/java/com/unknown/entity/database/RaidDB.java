@@ -165,8 +165,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public Collection<RaidReward> getRewardsForRaid(int raidId) throws SQLException {
-                // System.out.println("getting rewards for raid: " + raidId);
+        public Collection<RaidReward> getRewardsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
                 try {
@@ -193,7 +192,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public Collection<RaidChar> getCharsForReward(int id) throws SQLException {
+        public Collection<RaidChar> getCharsForReward(int id) {
                 Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
@@ -241,14 +240,15 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        private int getZoneIdByName(String raidzoneName) throws SQLException {
+        @Override
+        public int getZoneIdByName(String raidzoneName) {
                 DBConnection c = new DBConnection();
                 int zoneid = 1;
                 try {
                         PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
-                        pzone.setString(1, raidzoneName);
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
+                                System.out.println(rs.toString());
                                 zoneid = rs.getInt("id");
                         }
                 } catch (SQLException ex) {
@@ -256,6 +256,24 @@ public class RaidDB implements RaidDAO {
                         c.close();
                 }
                 return zoneid;
+        }
+
+        @Override
+        public String getZoneNameById(int raidzoneid) {
+                DBConnection c = new DBConnection();
+                String zonename = "";
+                try {
+                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE id=?");
+                        pzone.setInt(1, raidzoneid);
+                        ResultSet rs = pzone.executeQuery();
+                        while (rs.next()) {
+                                zonename = rs.getString("name");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return zonename;
         }
 
         @Override
@@ -327,7 +345,6 @@ public class RaidDB implements RaidDAO {
                         PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, character_id, price, heroic) VALUES(?,?,?,?,?)");
                         ps.setInt(1, itemid);
                         ps.setInt(2, raid.getId());
-//                        ps.setInt(3, mobid);
                         ps.setInt(3, charid);
                         ps.setDouble(4, price);
                         ps.setBoolean(5, heroic);
@@ -436,14 +453,10 @@ public class RaidDB implements RaidDAO {
                 Set<RaidChar> chars = new HashSet<RaidChar>();
                 final CharacterDB characterDB = new CharacterDB();
                 for (String string : attendantlist) {
-
                         int characterId = characterDB.getCharacterId(string);
-                        // System.out.println("Name: " + string + "ID: " + characterId);
                         chars.add(getRaidChar(characterId, raidId));
-
                 }
                 return chars;
-
         }
 
         public RaidChar getRaidChar(int charId, int raidId) {
@@ -471,18 +484,21 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public Iterable<Raid> getRaidsForCharacter(int charid) throws SQLException {
+        public Iterable<Raid> getRaidsForCharacter(int charid) {
                 List<Raid> raids = new ArrayList<Raid>();
                 DBConnection c = new DBConnection();
-                PreparedStatement p = c.prepareStatement("SELECT DISTINCT raids.* FROM raids JOIN rewards JOIN characters JOIN character_rewards WHERE characters.id=? AND rewards.raid_id=raids.id AND character_rewards.character_id=characters.id AND character_rewards.reward_id=rewards.id");
-                p.setInt(1, charid);
-                ResultSet rs = p.executeQuery();
-                while (rs.next()) {
-                        Raid raidtemp = new Raid("", rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
-                        raids.add(raidtemp);
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT DISTINCT raids.* FROM raids JOIN rewards JOIN characters JOIN character_rewards WHERE characters.id=? AND rewards.raid_id=raids.id AND character_rewards.character_id=characters.id AND character_rewards.reward_id=rewards.id");
+                        p.setInt(1, charid);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                Raid raidtemp = new Raid("", rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
+                                raids.add(raidtemp);
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
                 }
-
-                c.close();
                 return raids;
         }
 
@@ -492,8 +508,6 @@ public class RaidDB implements RaidDAO {
                 DateTime dt = new DateTime();
                 String startdate = dt.toYearMonthDay().minusDays(30).toString();
                 String enddate = dt.toYearMonthDay().toString();
-                // System.out.println("Today: " + enddate);
-                // System.out.println("30 Days ago: " + startdate);
                 DBConnection c = new DBConnection();
                 try {
 
@@ -501,11 +515,9 @@ public class RaidDB implements RaidDAO {
                         p.setString(1, startdate);
                         p.setString(2, enddate);
                         ResultSet rs = p.executeQuery();
-                        // System.out.println(p);
                         while (rs.next()) {
                                 i++;
                         }
-
                 } catch (SQLException e) {
                 } finally {
                         c.close();
@@ -526,11 +538,9 @@ public class RaidDB implements RaidDAO {
                         p.setString(2, startdate);
                         p.setString(3, enddate);
                         ResultSet rs = p.executeQuery();
-                        // System.out.println(p);
                         while (rs.next()) {
                                 i++;
                         }
-
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -545,7 +555,6 @@ public class RaidDB implements RaidDAO {
                 boolean isheroic = false;
                 CharacterDAO characterDao = new CharacterDB();
                 int charid = characterDao.getCharacterId(charname);
-//                System.out.println(itam.getId()+ " : " + itam.getName());
                 try {
                         PreparedStatement p = c.prepareStatement("SELECT DISTINCT * FROM loots WHERE item_id=? AND character_id=? AND price=?");
                         p.setInt(1, itemid);
@@ -557,7 +566,6 @@ public class RaidDB implements RaidDAO {
                                 isheroic = rs.getBoolean("heroic");
                                 System.out.println(rs);
                         }
-
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {
@@ -603,7 +611,7 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public void removeZone(String zone) {
-                fixExistingZones(zone);
+                fixExistingZonesToDefaultWhenRemovingThatZone(zone);
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("DELETE FROM zones WHERE name=?");
@@ -628,7 +636,7 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        private void fixExistingZones(String zone) {
+        private void fixExistingZonesToDefaultWhenRemovingThatZone(String zone) {
                 DBConnection c = new DBConnection();
                 int zoneid = 1;
                 try {
@@ -640,6 +648,53 @@ public class RaidDB implements RaidDAO {
                 } catch (SQLException ex) {
                 } finally {
                         c.close();
+                }
+        }
+
+        @Override
+        public void updateZoneName(String oldZone, String newZone) {
+                DBConnection c = new DBConnection();
+                int zoneid = 0;
+                try {
+                        zoneid = getZoneIdByName(oldZone);
+                        PreparedStatement p = c.prepareStatement("UPDATE zones SET name=? WHERE id=?");
+                        p.setString(1, newZone);
+                        p.setInt(2, zoneid);
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        private int getValidZoneByName(String raidzoneName) {
+                DBConnection c = new DBConnection();
+                int zoneid = 0;
+                try {
+                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
+                        pzone.setString(1, raidzoneName);
+                        ResultSet rs = pzone.executeQuery();
+                        while (rs.next()) {
+                                System.out.println(rs.toString());
+                                zoneid = rs.getInt("id");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return zoneid;
+        }
+
+        @Override
+        public boolean isValidZone(String oldzone) {
+                int id = 0;
+                System.out.println(oldzone);
+                id = getValidZoneByName(oldzone);
+                System.out.println("" + id);
+                if (id == 0) {
+                        return false;
+                } else {
+                        return true;
                 }
         }
 }

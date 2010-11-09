@@ -230,6 +230,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
                         EditZonesWindow editZones = new EditZonesWindow();
                         editZones.printInfo();
+                        editZones.addRaidInfoListener(raidList);
                         getMainWindow().addWindow(editZones);
                 }
         }

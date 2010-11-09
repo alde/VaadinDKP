@@ -6,6 +6,8 @@ package com.unknown.entity.panel;
 
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
+import com.unknown.entity.raids.RaidInfoListener;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -14,6 +16,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
+import java.util.ArrayList;
 import java.util.List;
 import org.vaadin.henrik.superimmediatetextfield.SuperImmediateTextField;
 
@@ -23,10 +26,12 @@ import org.vaadin.henrik.superimmediatetextfield.SuperImmediateTextField;
  */
 class EditZonesWindow extends Window {
 
-        String oldZone = "";
+        private String oldZone = "";
         private ComboBox zoneList;
         private RaidDAO raidDao;
-        SuperImmediateTextField zoneName;
+        private CheckBox deleteZone;
+        private SuperImmediateTextField zoneName;
+        private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
 
         public EditZonesWindow() {
                 this.setCaption("Edit Zones");
@@ -36,7 +41,7 @@ class EditZonesWindow extends Window {
                 this.raidDao = new RaidDB();
         }
 
-        void printInfo() {
+        public void printInfo() {
                 List<String> zones = raidDao.getRaidZoneList();
 
                 Label addZoneLabel = new Label("Add Zone");
@@ -61,9 +66,18 @@ class EditZonesWindow extends Window {
                 }
 
                 zoneList.setImmediate(true);
+                zoneList.setNewItemsAllowed(true);
 
-                CheckBox deleteZone = new CheckBox("Delete");
-                Button updateButton = new Button("Delete Zone");
+                zoneList.addListener(new ComboBox.ValueChangeListener() {
+
+                        @Override
+                        public void valueChange(ValueChangeEvent event) {
+                                setOldZone();
+                        }
+                });
+
+                this.deleteZone = new CheckBox("Delete");
+                Button updateButton = new Button("Update Zone");
 
                 updateButton.addListener(new UpdateZoneListener());
 
@@ -71,7 +85,8 @@ class EditZonesWindow extends Window {
                 hzl.addComponent(zoneList);
                 hzl.addComponent(deleteZone);
                 hzl.addComponent(updateButton);
-                Label warning = new Label("Don't delete Old (Default) \nor you'll fuck things up.");
+                String defaultzone = raidDao.getZoneNameById(1);
+                Label warning = new Label("Don't delete " + defaultzone + " or you'll fuck things up.");
                 warning.addStyleName("error");
 
                 addComponent(hzl);
@@ -82,16 +97,53 @@ class EditZonesWindow extends Window {
                 addComponent(closeButton);
         }
 
+        private void setOldZone() {
+                String oldzone = zoneList.getValue().toString();
+                if (raidDao.isValidZone(oldzone)) {
+                        this.oldZone = oldzone;
+                }
+                System.out.println("old: " + oldZone);
+        }
+
         private void removeZone() {
                 raidDao.removeZone(zoneList.getValue().toString());
+                update();
+        }
+
+        private void update() {
                 this.removeAllComponents();
                 this.printInfo();
+                notifyListeners();
+        }
+
+        private void updateZone() {
+                if (deleteZone.booleanValue()) {
+                        removeZone();
+                } else {
+                        updateZoneName();
+                }
         }
 
         private void addZone() {
                 raidDao.addZone(zoneName.getValue().toString());
-                this.removeAllComponents();
-                this.printInfo();
+                update();
+        }
+
+        private void updateZoneName() {
+                String newZone = zoneList.getValue().toString();
+                System.out.println(oldZone + " -- " + newZone);
+                raidDao.updateZoneName(oldZone, newZone);
+                update();
+        }
+
+        public void addRaidInfoListener(RaidInfoListener listener) {
+                listeners.add(listener);
+        }
+
+        private void notifyListeners() {
+                for (RaidInfoListener raidListener : listeners) {
+                        raidListener.onRaidInfoChanged();
+                }
         }
 
         private class CloseButtonListener implements ClickListener {
@@ -106,7 +158,7 @@ class EditZonesWindow extends Window {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        removeZone();
+                        updateZone();
                 }
         }
 

@@ -217,10 +217,6 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .negative { color: #FF0000;}
 .positive { color: #00FF00;}
 
-/* Icecrown Citadel */
-.icecrowncitadel { color: #00FFCC; font-size: 12px; }
-
-
 /* raid zones */
 .tier1 { color: #00F080; }
 .tier2 { color: #00BF00; }
@@ -251,7 +247,6 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .uncommon { color: #00BF00; }
 .v-label-uncommon { color: #00BF00; }
 .v-label-uncommon:hover { text-decoration: underline; }
-
 
 /* Artifact */
 .artifact { color: gold; }
