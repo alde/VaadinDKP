@@ -33,6 +33,7 @@ public class RaidLootList extends Table implements RaidLootListener {
         private final CharacterList clist;
         private final ItemList itemList;
         private int longest;
+        CharacterDAO charDao;
 
         public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.ic = new IndexedContainer();
@@ -45,6 +46,7 @@ public class RaidLootList extends Table implements RaidLootListener {
                 this.setHeight("500px");
                 this.addListener(new RewardListClickListener());
                 this.longest = 1;
+                this.charDao = new CharacterDB();
                 raidRewardListSetHeaders();
                 printList();
         }
@@ -75,34 +77,41 @@ public class RaidLootList extends Table implements RaidLootListener {
         private void printList() {
                 ItemDAO itemDao = new ItemDB();
                 ArrayList<RaidItem> temp;
-                try {
-                        temp = itemDao.getItemsForRaid(raid.getId());
-                        for (RaidItem item : temp) {
-                                Item addItem = ic.addItem(item);
-                                raidListAddRow(addItem, item);
-                                if (longest < item.getName().length() + 1) {
-                                        longest = item.getName().length() + 1;
-                                }
+                temp = itemDao.getItemsForRaid(raid.getId());
+                for (RaidItem item : temp) {
+                        Item addItem = ic.addItem(item);
+                        raidListAddRow(addItem, item);
+                        if (longest < item.getName().length() + 1) {
+                                longest = item.getName().length() + 1;
                         }
-                        this.setColumnWidth("Item", longest * 6);
-                } catch (SQLException ex) {
-                        Logger.getLogger(RaidLootList.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                this.setColumnWidth("Item", longest * 6);
         }
 
         private void raidListAddRow(Item addItem, RaidItem item) {
+                long start = System.currentTimeMillis();
                 Label looter = new Label(item.getLooter());
-                CharacterDAO charDao = new CharacterDB();
                 looter.addStyleName(charDao.getRoleForCharacter(item.getLooter()).toLowerCase().replace(" ", ""));
                 addItem.getItemProperty("Name").setValue(looter);
-                XmlParser xml = new XmlParser(item.getName());
-                String quality = xml.parseXmlQuality().toLowerCase();
+
+//                String quality = parseXmlQuality(item.getName());
                 Label itemname = new Label(item.getName());
-                itemname.addStyleName(quality);
+                itemname.addStyleName(item.getQuality().toLowerCase());
                 addItem.getItemProperty("Item").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(item.getPrice());
                 addItem.getItemProperty("Heroic").setValue(item.isHeroic());
                 super.requestRepaint();
+                long elapsed = System.currentTimeMillis() - start;
+                // System.out.println("Time for raidListAddRow() method : " + elapsed);
+        }
+
+        private String parseXmlQuality(String name) {
+                long start = System.currentTimeMillis();
+                XmlParser xml = new XmlParser(name);
+                String quality = xml.parseXmlQuality().toLowerCase();
+                long elapsed = System.currentTimeMillis() - start;
+                // System.out.println("Time for parseXmlQuality method : " + elapsed);
+                return quality;
         }
 
         private class RewardListClickListener implements ItemClickListener {

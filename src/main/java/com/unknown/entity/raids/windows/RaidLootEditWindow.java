@@ -170,7 +170,8 @@ public class RaidLootEditWindow extends Window {
                 boolean isheroic = Boolean.parseBoolean(heroic.getValue().toString());
                 String newlooter = charname.getValue().toString();
                 String newitem = itemname.getValue().toString();
-                int success = updateItem(newlooter, newitem, newprice, isheroic);// System.out.println(success + " items updated.");
+                int success = updateItem(newlooter, newitem, newprice, isheroic);
+                // System.out.println(success + " items updated.");
                 notifyListeners();
                 close();
         }

@@ -27,8 +27,9 @@ public class Items {
     private double price_hc;
     private int ilvl;
     private List<ItemLooter> looterList = new ArrayList<ItemLooter>();
+    private String quality;
 
-    public Items(int id, String itemname, int wowid, double price, int wowid_hc, double price_hc, String slot, Type type, int ilvl) {
+    public Items(int id, String itemname, int wowid, double price, int wowid_hc, double price_hc, String slot, Type type, int ilvl, String quality) {
             this.id = id;
             this.itemname = itemname;
             this.wowid = wowid;
@@ -38,6 +39,7 @@ public class Items {
             this.slot = slot;
             this.type = type;
             this.ilvl = ilvl;
+            this.quality = quality;
     }
 
     public int getId() {
@@ -72,6 +74,12 @@ public class Items {
             this.ilvl = ilvl;
     }
 
+    public String getQuality() {
+            return quality;
+    }
+    public void setQuality(String quality) {
+            this.quality = quality;
+    }
     public void addLooterList(Collection<ItemLooter> looters) {
                 looterList.addAll(looters);
         }

@@ -14,62 +14,72 @@ import com.unknown.entity.items.Items;
  */
 public class RaidItem {
 
-	private boolean heroic;
-	private int id;
-	private String looter;
-	private String name;
-	private double price;
+        private boolean heroic;
+        private int id;
+        private String looter;
+        private String name;
+        private double price;
+        private String quality;
 
-        public RaidItem (String itemname, String looter, int itemid, double price, boolean isheroic) {
+        public RaidItem(String itemname, String looter, int itemid, double price, boolean isheroic, String quality) {
                 this.name = itemname;
                 this.looter = looter;
                 this.id = itemid;
                 this.price = price;
                 this.heroic = isheroic;
+                this.quality = quality;
         }
-        
-	public void setId(Integer integer) {
-	}
 
-	public boolean isHeroic() {
-		return heroic;
-	}
+        public void setId(Integer integer) {
+        }
 
-	public void setHeroic(boolean heroic) {
-		this.heroic = heroic;
-	}
+        public boolean isHeroic() {
+                return heroic;
+        }
 
-	public int getId() {
-		return id;
-	}
+        public void setHeroic(boolean heroic) {
+                this.heroic = heroic;
+        }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+        public int getId() {
+                return id;
+        }
 
-	public String getLooter() {
-		return looter;
-	}
+        public void setId(int id) {
+                this.id = id;
+        }
 
-	public void setLooter(String looter) {
-		this.looter = looter;
-	}
+        public String getLooter() {
+                return looter;
+        }
 
-	public String getName() {
-		return name;
-	}
+        public void setLooter(String looter) {
+                this.looter = looter;
+        }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+        public String getName() {
+                return name;
+        }
 
-	public double getPrice() {
-		return price;
-	}
+        public void setName(String name) {
+                this.name = name;
+        }
 
-	public void setPrice(double price) {
-		this.price = price;
-	}
+        public double getPrice() {
+                return price;
+        }
+
+        public void setPrice(double price) {
+                this.price = price;
+        }
+
+        public String getQuality() {
+                return quality;
+        }
+
+        public void setQuality(String quality) {
+                this.quality = quality;
+        }
 
         public Items toItem() {
                 ItemDAO itemDao = new ItemDB();

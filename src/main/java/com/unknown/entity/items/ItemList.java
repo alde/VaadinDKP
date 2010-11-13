@@ -50,10 +50,10 @@ public class ItemList extends Table implements ItemInfoListener {
         }
 
         private void itemListAddRow(Item addItem, final Items item) throws ConversionException, ReadOnlyException {
-                XmlParser xml = new XmlParser(item.getName());
-                String quality = xml.parseXmlQuality().toLowerCase();
+//                XmlParser xml = new XmlParser(item.getName());
+//                String quality = xml.parseXmlQuality().toLowerCase();
                 Label itemname = new Label(item.getName(), Label.CONTENT_TEXT);
-                itemname.addStyleName(quality);
+                itemname.addStyleName(item.getQuality().toLowerCase());
                 addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price Normal").setValue(item.getPrice());
                 addItem.getItemProperty("Price Heroic").setValue(item.getPrice_hc());

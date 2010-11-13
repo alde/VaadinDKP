@@ -23,7 +23,6 @@ import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -45,11 +44,10 @@ public class ItemEditWindow extends Window {
         private Items item;
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
         private ItemDAO itemDao;
-//        private IndexedContainer ic;
-        final TextField price;
-        final TextField pricehc;
-        Table lootedby;
-        Table tbl;
+        private TextField price;
+        private TextField pricehc;
+//        private Table lootedby;
+//        private Table tbl;
         private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
         private ItemLooterTable ilt;
         private TextField name;
@@ -59,6 +57,7 @@ public class ItemEditWindow extends Window {
         private TextField wowIdFieldhc;
         private VerticalLayout lout;
         private TextField ilvl;
+        private TextField quality;
 
         public ItemEditWindow(Items item) {
                 this.item = item;
@@ -67,6 +66,10 @@ public class ItemEditWindow extends Window {
                 this.setPositionX(400);
                 this.setPositionY(50);
                 this.getContent().setSizeUndefined();
+                createFields();
+        }
+
+        private void createFields() {
                 this.itemDao = new ItemDB();
                 this.ilt = new ItemLooterTable(item);
                 this.price = new TextField();
@@ -77,11 +80,11 @@ public class ItemEditWindow extends Window {
                 this.wowIdFieldhc = new TextField();
                 this.name = new TextField("Name");
                 this.ilvl = new TextField("Base Itemlevel");
+                this.quality = new TextField("Quality");
                 this.lout = new VerticalLayout();
         }
 
         public void printInfo() {
-                addComponent(new Label("Item information"));
                 editInfoName();
                 editInfoSlot();
                 editInfoType();
@@ -90,12 +93,14 @@ public class ItemEditWindow extends Window {
                 editInfoWowIdField();
                 editInfoWowIdHcField();
                 editInfoIlvlField();
+                editInfoQUalityField();
 
                 addComponent(name);
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.addComponent(slot);
                 hzl.addComponent(type);
                 hzl.addComponent(ilvl);
+                hzl.addComponent(quality);
                 hzl.setSpacing(true);
                 addComponent(hzl);
 
@@ -180,6 +185,11 @@ public class ItemEditWindow extends Window {
                 ilvl.setValue(item.getIlvl());
         }
 
+        private void editInfoQUalityField() throws ReadOnlyException, ConversionException {
+                quality.setImmediate(true);
+                quality.setValue(item.getQuality());
+        }
+
         private void editInfoWowIdHcField() throws ConversionException, ReadOnlyException {
                 wowIdFieldhc.setImmediate(true);
                 wowIdFieldhc.setValue("" + item.getWowId_hc());
@@ -221,9 +231,10 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
-                int success = itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()));
-                System.out.println("Items updated: " + success);
+                itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()), quality.getValue().toString());
+                // System.out.println("Items updated: " + success);
                 notifyListeners();
+                update();
         }
 
         private Type typeFromString(String temp) {
@@ -287,6 +298,27 @@ public class ItemEditWindow extends Window {
                         hzl.addComponent(cshc);
                 }
                 addComponent(hzl);
+        }
+
+        private void update() {
+                clear();
+                printInfo();
+        }
+
+        private void clear() {
+                this.removeAllComponents();
+                this.item = itemDao.getSingleItem(name.getValue().toString());
+                ilt = new ItemLooterTable(item);
+                price.setValue("");
+                pricehc.setValue("");
+                slot.setValue("");
+                type.setValue("");
+                wowIdField.setValue("");
+                wowIdFieldhc.setValue("");
+                name.setValue("");
+                ilvl.setValue("");
+                quality.setValue("");
+                lout.removeAllComponents();
         }
 
         private class UpdateButtonClickListener implements ClickListener {

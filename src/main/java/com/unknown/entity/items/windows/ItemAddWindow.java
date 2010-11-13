@@ -49,6 +49,9 @@ public class ItemAddWindow extends Window {
         private ComboBox type;
         private VerticalLayout vrt;
         private TextField itemlevel;
+        private TextField quality;
+        private List<ItemPrices> prices;
+        private ItemDAO itemDao;
 
         public ItemAddWindow() {
                 this.setCaption("Add Item");
@@ -61,30 +64,19 @@ public class ItemAddWindow extends Window {
         public void printInfo() {
 
                 DefaultPrices def = new DefaultPrices(new ItemDB());
-                List<ItemPrices> prices = new ArrayList<ItemPrices>();
+                this.prices = new ArrayList<ItemPrices>();
                 try {
                         prices = def.getPrices();
                 } catch (SQLException ex) {
                         Logger.getLogger(ItemAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
+                this.itemDao = new ItemDB();
                 VerticalLayout addItem = new VerticalLayout();
                 vrt = new VerticalLayout();
                 addComponent(addItem);
                 itemSetters();
-
-                final List<ItemPrices> defaultprices = prices;
-
-                this.name.setImmediate(true);
-                this.name.focus();
-                this.wowid.setImmediate(true);
-                this.wowidheroic.setImmediate(true);
-                this.price.setImmediate(true);
-                this.priceheroic.setImmediate(true);
-                this.slot.setImmediate(true);
-                this.type.setImmediate(true);
-                this.itemlevel.setImmediate(true);
-
+//                final List<ItemPrices> defaultprices = prices;
                 itemAddWIndowAddComponents(addItem);
 
                 for (Slots slots : Slots.values()) {
@@ -94,14 +86,14 @@ public class ItemAddWindow extends Window {
                         this.type.addItem(types);
                 }
 
-                slot.addListener(new SlotComboBoxValueChangeListener(slot, defaultprices, price, priceheroic, itemlevel));
+                slot.addListener(new SlotComboBoxValueChangeListener());
 
                 final Button btn = new Button("Add");
-                btn.addListener(new AddButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type, vrt, itemlevel));
+                btn.addListener(new AddButtonClickListener());
                 final Button cbtn = new Button("Close");
                 cbtn.addListener(new CloseButtonClickListener());
                 final Button clearButton = new Button("Clear");
-                clearButton.addListener(new ClearButtonClickListener(name, wowid, wowidheroic, price, priceheroic, slot, type, vrt, itemlevel));
+                clearButton.addListener(new ClearButtonClickListener());
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
                 hzl.addComponent(btn);
@@ -136,8 +128,23 @@ public class ItemAddWindow extends Window {
                 this.type.setWidth("150px");
 
                 this.itemlevel = new TextField("Base Itemlevel");
-                this.itemlevel.setStyleName("textfieldfond");
+                this.itemlevel.setStyleName("textfieldfont");
                 this.itemlevel.setWidth("150px");
+
+                this.quality = new TextField("Quality");
+                this.quality.setStyleName("textfieldfont");
+                this.quality.setWidth("150px");
+
+                this.name.setImmediate(true);
+                this.name.focus();
+                this.wowid.setImmediate(true);
+                this.wowidheroic.setImmediate(true);
+                this.price.setImmediate(true);
+                this.priceheroic.setImmediate(true);
+                this.slot.setImmediate(true);
+                this.type.setImmediate(true);
+                this.itemlevel.setImmediate(true);
+                this.quality.setImmediate(true);
         }
 
         private void itemAddWIndowAddComponents(VerticalLayout addItem) {
@@ -156,11 +163,11 @@ public class ItemAddWindow extends Window {
                 addItem.addComponent(price);
                 addItem.addComponent(priceheroic);
                 addItem.addComponent(itemlevel);
+                addItem.addComponent(quality);
         }
 
-        private int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl) throws SQLException {
-                ItemDAO itemDao = new ItemDB();
-                return itemDao.addItem(name, wowid, wowid_hc, price, price_hc, slot, type, ilvl);
+        private int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String qual) {
+                return itemDao.addItem(name, wowid, wowid_hc, price, price_hc, slot, type, ilvl, qual);
         }
 
         public void addItemInfoListener(ItemInfoListener listener) {
@@ -173,106 +180,72 @@ public class ItemAddWindow extends Window {
                 }
         }
 
-        private static class SlotComboBoxValueChangeListener implements ValueChangeListener {
-
-                private final ComboBox slot;
-                private final List<ItemPrices> defaultprices;
-                private final TextField price;
-                private final TextField priceheroic;
-                private final ItemDAO itemDao;
-                private final TextField itemlevel;
-
-                public SlotComboBoxValueChangeListener(ComboBox slot, List<ItemPrices> defaultprices, TextField price, TextField priceheroic, TextField ilvl) {
-                        this.slot = slot;
-                        this.defaultprices = defaultprices;
-                        this.price = price;
-                        this.priceheroic = priceheroic;
-                        this.itemDao = new ItemDB();
-                        this.itemlevel = ilvl;
-                }
+        private class SlotComboBoxValueChangeListener implements ValueChangeListener {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
-                        int ilvl = Integer.parseInt(itemlevel.getValue().toString());
-                        String slotvalue = slot.getValue().toString();
-                        double defprice = 0.0;
-                        double defpricehc = 0.0;
-                        BigDecimal formattedprice = new BigDecimal(0), formattedpricehc = new BigDecimal(0);
-                        for (ItemPrices ip : defaultprices) {
-                                if (ip.getSlotString().equals(slotvalue)) {
-                                        Multiplier mp = itemDao.getMultiplierForItemlevel(ilvl);
-                                        defprice = ip.getPrice() * mp.getMultiplier();
-                                        formattedprice = new BigDecimal(defprice).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                                        mp = itemDao.getMultiplierForItemlevel(ilvl + 13);
-                                        defpricehc = ip.getPrice() * mp.getMultiplier();
-                                        formattedpricehc = new BigDecimal(defpricehc).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                                }
-                        }
-                        price.setValue("" + formattedprice);
-                        priceheroic.setValue("" + formattedpricehc);
+                        slotChanged();
                 }
+        }
+
+        private void slotChanged() {
+                int ilvl = Integer.parseInt(itemlevel.getValue().toString());
+                String slotvalue = slot.getValue().toString();
+                double defprice = 0.0;
+                double defpricehc = 0.0;
+                BigDecimal formattedprice = new BigDecimal(0), formattedpricehc = new BigDecimal(0);
+                for (ItemPrices ip : prices) {
+                        if (ip.getSlotString().equals(slotvalue)) {
+                                Multiplier mp = itemDao.getMultiplierForItemlevel(ilvl);
+                                defprice = ip.getPrice() * mp.getMultiplier();
+                                formattedprice = new BigDecimal(defprice).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                                mp = itemDao.getMultiplierForItemlevel(ilvl + 13);
+                                defpricehc = ip.getPrice() * mp.getMultiplier();
+                                formattedpricehc = new BigDecimal(defpricehc).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        }
+                }
+                price.setValue("" + formattedprice);
+                priceheroic.setValue("" + formattedpricehc);
         }
 
         private class AddButtonClickListener implements ClickListener {
 
-                private final TextField name;
-                private final TextField wowid;
-                private final TextField wowidheroic;
-                private final TextField price;
-                private final TextField priceheroic;
-                private final ComboBox slot;
-                private final ComboBox type;
-                private final VerticalLayout vert;
-                private final TextField ilvl;
-
-                public AddButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type, VerticalLayout vert, TextField ilvl) {
-                        this.name = name;
-                        this.wowid = wowid;
-                        this.wowidheroic = wowidheroic;
-                        this.price = price;
-                        this.priceheroic = priceheroic;
-                        this.slot = slot;
-                        this.type = type;
-                        this.vert = vert;
-                        this.ilvl = ilvl;
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        final String iname = (String) name.getValue();
-                        if (wowid.getValue().toString().isEmpty()) {
-                                wowid.setValue("0");
-                        }
-                        if (wowidheroic.getValue().toString().isEmpty()) {
-                                wowidheroic.setValue("0");
-                        }
-                        if (price.getValue().toString().isEmpty()) {
-                                price.setValue("0");
-                        }
-                        if (priceheroic.getValue().toString().isEmpty()) {
-                                priceheroic.setValue("0");
-                        }
-                        final int iwowid = Integer.parseInt(wowid.getValue().toString());
-                        final int iwowidheroic = Integer.parseInt(wowidheroic.getValue().toString());
-                        final double iprice = Double.parseDouble(price.getValue().toString());
-                        final double ipriceheroic = Double.parseDouble(priceheroic.getValue().toString());
-                        final String islot = slot.getValue().toString();
-                        final String itype = type.getValue().toString();
-                        final int iilvl = Integer.parseInt(ilvl.getValue().toString());
-                        int success = 0;
-                        try {
-                                success = addItem(iname, iwowid, iwowidheroic, iprice, ipriceheroic, islot, itype, iilvl);
+                        addItem();
+                }
+        }
 
-                                if (success < 0) {
-                                        vert.addComponent(new Label("Item already in database\n" + iname));
-                                } else {
-                                        notifyListeners();
-                                        close();
-                                }
-                        } catch (SQLException ex) {
-                                Logger.getLogger(ItemAddWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+        private void addItem() {
+                final String iname = (String) name.getValue();
+                if (wowid.getValue().toString().isEmpty()) {
+                        wowid.setValue("0");
+                }
+                if (wowidheroic.getValue().toString().isEmpty()) {
+                        wowidheroic.setValue("0");
+                }
+                if (price.getValue().toString().isEmpty()) {
+                        price.setValue("0");
+                }
+                if (priceheroic.getValue().toString().isEmpty()) {
+                        priceheroic.setValue("0");
+                }
+                final int iwowid = Integer.parseInt(wowid.getValue().toString());
+                final int iwowidheroic = Integer.parseInt(wowidheroic.getValue().toString());
+                final double iprice = Double.parseDouble(price.getValue().toString());
+                final double ipriceheroic = Double.parseDouble(priceheroic.getValue().toString());
+                final String islot = slot.getValue().toString();
+                final String itype = type.getValue().toString();
+                final int iilvl = Integer.parseInt(itemlevel.getValue().toString());
+                final String iquality = quality.getValue().toString();
+                int success = 0;
 
+                success = addItem(iname, iwowid, iwowidheroic, iprice, ipriceheroic, islot, itype, iilvl, iquality);
+                if (success < 0) {
+                        vrt.addComponent(new Label("Item already in database\n" + iname));
+                } else {
+                        notifyListeners();
+                        close();
                 }
         }
 
@@ -296,10 +269,10 @@ public class ItemAddWindow extends Window {
                                 String wowidFromXml = xml.parseXmlWowid();
                                 String ilevel = xml.parseXmlItemLevel();
                                 if (tooltip.contains("Heroic")) {
-                                        int ilvl = Integer.parseInt(ilevel)-13;
+                                        int ilvl = Integer.parseInt(ilevel) - 13;
                                         wowidheroic.setValue(wowidFromXml);
                                         wowid.setValue("");
-                                        itemlevel.setValue(""+ilvl);
+                                        itemlevel.setValue("" + ilvl);
                                 } else {
                                         wowid.setValue(wowidFromXml);
                                         wowidheroic.setValue("");
@@ -310,6 +283,8 @@ public class ItemAddWindow extends Window {
                                 slot.setValue(Slots.valueOf(slotsFromXml));
                                 String itemname = xml.parseXmlName();
                                 name.setValue(itemname);
+                                String itemquality = xml.parseXmlQuality();
+                                quality.setValue(itemquality);
                                 String url = xml.parseXmlUrl();
                                 Link seealso = new Link(itemname, new ExternalResource(url + "#see-also"));
                                 seealso.setTargetName("_blank");
@@ -341,39 +316,22 @@ public class ItemAddWindow extends Window {
 
         private class ClearButtonClickListener implements ClickListener {
 
-                private final TextField name;
-                private final TextField wowid;
-                private final TextField wowidheroic;
-                private final TextField price;
-                private final TextField priceheroic;
-                private final ComboBox slot;
-                private final ComboBox type;
-                private final VerticalLayout vert;
-                private final TextField itemlevel;
-
-                public ClearButtonClickListener(TextField name, TextField wowid, TextField wowidheroic, TextField price, TextField priceheroic, ComboBox slot, ComboBox type, VerticalLayout vert, TextField itemlevel) {
-                        this.name = name;
-                        this.wowid = wowid;
-                        this.wowidheroic = wowidheroic;
-                        this.price = price;
-                        this.priceheroic = priceheroic;
-                        this.slot = slot;
-                        this.type = type;
-                        this.vert = vert;
-                        this.itemlevel = itemlevel;
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        name.setValue("");
-                        wowid.setValue("");
-                        wowidheroic.setValue("");
-                        price.setValue("");
-                        priceheroic.setValue("");
-                        slot.setValue("Other");
-                        type.setValue("Other");
-                        itemlevel.setValue("");
-                        vert.removeAllComponents();
+                        clearAll();
                 }
+        }
+
+        private void clearAll() {
+                name.setValue("");
+                wowid.setValue("");
+                wowidheroic.setValue("");
+                price.setValue("");
+                priceheroic.setValue("");
+                slot.setValue("Other");
+                type.setValue("Other");
+                itemlevel.setValue("");
+                quality.setValue("");
+                vrt.removeAllComponents();
         }
 }

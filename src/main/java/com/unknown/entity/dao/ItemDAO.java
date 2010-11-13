@@ -26,11 +26,11 @@ public interface ItemDAO {
 
         public List<ItemPrices> getDefaultPrices() throws SQLException;
 
-        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl);
+        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality);
 
-        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl) throws SQLException;
+        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String quality);
 
-        public Object getItemPrice(String itemname, boolean heroic) throws SQLException;
+        public Object getItemPrice(String itemname, boolean heroic);
 
         public Items getSingleItem(String name);
 
@@ -38,7 +38,7 @@ public interface ItemDAO {
 
         public int deleteItem(int id) throws SQLException;
 
-        public ArrayList<RaidItem> getItemsForRaid(int id) throws SQLException;
+        public ArrayList<RaidItem> getItemsForRaid(int id);
 
         public int getItemId(String name);
 

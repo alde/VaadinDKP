@@ -41,9 +41,9 @@ public class RaidDB implements RaidDAO {
                         while (rs.next()) {
                                 final Raid raid = new Raid(rs.getString("zones.name"), rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
                                 // System.out.println("getting stuff for raid: " + raid.getId());
-                                raid.addRaidItems(getItemsForRaid(raid.getId()));
-                                raid.addRaidChars(getCharsForRaid(raid.getId()));
-                                raid.addRaidRewards(getRewardsForRaid(raid.getId()));
+//                                raid.addRaidItems(getItemsForRaid(raid.getId()));
+//                                raid.addRaidChars(getCharsForRaid(raid.getId()));
+//                                raid.addRaidRewards(getRewardsForRaid(raid.getId()));
                                 raids.add(raid);
                         }
                 } catch (SQLException e) {
@@ -54,29 +54,31 @@ public class RaidDB implements RaidDAO {
                 return raids;
         }
 
-        public List<RaidItem> getItemsForRaid(int raidId) throws SQLException {
-
-                Connection c = null;
-                List<RaidItem> raidItems = new ArrayList<RaidItem>();
-                try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM loots JOIN raids JOIN characters JOIN items WHERE loots.raid_id=raids.id AND character_id=characters.id AND loots.item_id=items.id AND raids.id=?");
-                        p.setInt(1, raidId);
-                        ResultSet rs = p.executeQuery();
-                        while (rs.next()) {
-                                RaidItem item = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
-                                raidItems.add(item);
-                        }
-                } catch (SQLException e) {
-                        e.printStackTrace();
-                } finally {
-                        closeConnection(c);
-                }
-
-                return raidItems;
-        }
+//        public List<RaidItem> getItemsForRaid(int raidId) throws SQLException {
+//                long start = System.currentTimeMillis();
+//                Connection c = null;
+//                List<RaidItem> raidItems = new ArrayList<RaidItem>();
+//                try {
+//                        c = new DBConnection().getConnection();
+//                        PreparedStatement p = c.prepareStatement("SELECT * FROM loots JOIN raids JOIN characters JOIN items WHERE loots.raid_id=raids.id AND character_id=characters.id AND loots.item_id=items.id AND raids.id=?");
+//                        p.setInt(1, raidId);
+//                        ResultSet rs = p.executeQuery();
+//                        while (rs.next()) {
+//                                RaidItem item = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
+//                                raidItems.add(item);
+//                        }
+//                } catch (SQLException e) {
+//                        e.printStackTrace();
+//                } finally {
+//                        closeConnection(c);
+//                }
+//                long elapsed = System.currentTimeMillis() - start;
+//                // System.out.println(elapsed + " ms to retrieve items for raid id: " + raidId);
+//                return raidItems;
+//        }
 
         public List<RaidChar> getCharsForRaid(int raidId) {
+                long start = System.currentTimeMillis();
                 Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
@@ -97,7 +99,8 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
-
+                long elapsed = System.currentTimeMillis() - start;
+                // System.out.println(elapsed + " ms to retrieve chars for raid id: " + raidId);
                 return raidChars;
         }
 
@@ -166,6 +169,7 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public Collection<RaidReward> getRewardsForRaid(int raidId) {
+                long start = System.currentTimeMillis();
                 Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
                 try {
@@ -187,6 +191,9 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+
+                long elapsed = System.currentTimeMillis() - start;
+                // System.out.println(elapsed + " ms to retrieve rewards for raid id: " + raidId);
                 return raidRewards;
 
         }
@@ -248,7 +255,7 @@ public class RaidDB implements RaidDAO {
                         PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
-                                System.out.println(rs.toString());
+                                // System.out.println(rs.toString());
                                 zoneid = rs.getInt("id");
                         }
                 } catch (SQLException ex) {
@@ -561,10 +568,10 @@ public class RaidDB implements RaidDAO {
                         p.setInt(2, charid);
                         p.setDouble(3, price);
                         ResultSet rs = p.executeQuery();
-                        System.out.println(p);
+                        // System.out.println(p);
                         while (rs.next()) {
                                 isheroic = rs.getBoolean("heroic");
-                                System.out.println(rs);
+//                                // System.out.println(rs);
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
@@ -590,9 +597,9 @@ public class RaidDB implements RaidDAO {
                         p.setDouble(4, price);
                         p.setBoolean(5, heroic);
                         p.setInt(6, lootid);
-                        System.out.println(p.toString());
+//                        // System.out.println(p.toString());
                         success = p.executeUpdate();
-                        System.out.println(success + " items updated.");
+//                        // System.out.println(success + " items updated.");
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {
@@ -675,7 +682,6 @@ public class RaidDB implements RaidDAO {
                         pzone.setString(1, raidzoneName);
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
-                                System.out.println(rs.toString());
                                 zoneid = rs.getInt("id");
                         }
                 } catch (SQLException ex) {
@@ -688,9 +694,9 @@ public class RaidDB implements RaidDAO {
         @Override
         public boolean isValidZone(String oldzone) {
                 int id = 0;
-                System.out.println(oldzone);
+                // System.out.println("Old zone: " + oldzone);
                 id = getValidZoneByName(oldzone);
-                System.out.println("" + id);
+                // System.out.println("" + id);
                 if (id == 0) {
                         return false;
                 } else {

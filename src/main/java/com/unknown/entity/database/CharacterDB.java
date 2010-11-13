@@ -118,13 +118,19 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-        public int getCharacterClassId(Connection c, String charclass) throws SQLException {
-                PreparedStatement pclass = c.prepareStatement("SELECT * FROM character_classes WHERE name=?");
-                pclass.setString(1, fixRole(charclass));
-                ResultSet rclass = pclass.executeQuery();
+        public int getCharacterClassId(String charclass) {
+                DBConnection c = new DBConnection();
                 int classid = 0;
-                while (rclass.next()) {
-                        classid = rclass.getInt("id");
+                try {
+                        PreparedStatement pclass = c.prepareStatement("SELECT * FROM character_classes WHERE name=?");
+                        pclass.setString(1, fixRole(charclass));
+                        ResultSet rclass = pclass.executeQuery();
+                        while (rclass.next()) {
+                                classid = rclass.getInt("id");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
                 }
                 return classid;
         }
@@ -161,6 +167,7 @@ public class CharacterDB implements CharacterDAO {
                                 charitem.setName(rs.getString("items.name"));
                                 charitem.setPrice(rs.getDouble("loots.price"));
                                 charitem.setHeroic(rs.getBoolean("loots.heroic"));
+                                charitem.setQuality(rs.getString("items.quality"));
                                 itemlist.add(charitem);
                         }
                 } catch (SQLException e) {
@@ -328,7 +335,7 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-        public int addNewCharacter(String name, String role, Boolean isActive) throws SQLException {
+        public int addNewCharacter(String name, String role, Boolean isActive) {
                 Connection c = null;
                 int class_id = 0, update = 0;
 
@@ -370,7 +377,7 @@ public class CharacterDB implements CharacterDAO {
 
                 try {
                         c = new DBConnection().getConnection();
-                        int classid = getCharacterClassId(c, charclass);
+                        int classid = getCharacterClassId(charclass);
 
                         PreparedStatement p = c.prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
                         p.setString(1, name);

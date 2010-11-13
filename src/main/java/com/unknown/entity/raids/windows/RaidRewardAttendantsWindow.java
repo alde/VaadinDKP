@@ -48,23 +48,23 @@ public class RaidRewardAttendantsWindow extends Window {
 	private Table charList() {
 		Table tbl = new Table();
                 tbl.addStyleName("small");
-		RaidCharWindowCharListSetHeaders(tbl);
+		raidCharWindowCharListSetHeaders(tbl);
 		tbl.setHeight("270px");
                 tbl.setWidth("180px");
 		for (RaidChar rchar : chars) {
 			Item addItem = tbl.addItem(rchar);
-			RaidCharWindowCharListAddRow(addItem, rchar);
+			raidCharWindowCharListAddRow(addItem, rchar);
 		}
                 tbl.addStyleName("striped");
 		return tbl;
 	}
 
-        private void RaidCharWindowCharListSetHeaders(Table tbl) throws UnsupportedOperationException {
+        private void raidCharWindowCharListSetHeaders(Table tbl) throws UnsupportedOperationException {
                 tbl.addContainerProperty("Name", Label.class, "");
                 tbl.addContainerProperty("Shares", Integer.class, "");
         }
 
-        private void RaidCharWindowCharListAddRow(Item addItem, RaidChar rchar) throws ReadOnlyException, ConversionException {
+        private void raidCharWindowCharListAddRow(Item addItem, RaidChar rchar) throws ReadOnlyException, ConversionException {
                 Label charname = new Label(rchar.getName());
                 CharacterDAO charDao = new CharacterDB();
                 String charclass = charDao.getRoleForCharacter(rchar.getName());
@@ -73,9 +73,9 @@ public class RaidRewardAttendantsWindow extends Window {
                 addItem.getItemProperty("Shares").setValue(rchar.getShares());
         }
 
-        private Component getAttendants(Table Attendants) {
-                if (Attendants.size() > 0) {
-			return Attendants;
+        private Component getAttendants(Table attendants) {
+                if (attendants.size() > 0) {
+			return attendants;
 		} else {
 			return new Label("No members in this reward.");
 		}

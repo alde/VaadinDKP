@@ -99,12 +99,15 @@ public class LoginWindow extends Window {
         }
 
         private void notifyListeners() {
+                long start = System.currentTimeMillis();
                 for (MyLoginListener loginListener : listeners) {
                         loginListener.onLogin();
                 }
                 for (CharacterInfoListener characterListener : charlisteners) {
                         characterListener.onCharacterInfoChange();
                 }
+                long elapsed = System.currentTimeMillis() - start;
+                // System.out.println("Time to log in: " + elapsed);
         }
 
         public void addCharacterInfoListener(CharacterInfoListener charlistener) {

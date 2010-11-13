@@ -67,11 +67,10 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
-                XmlParser xml = new XmlParser(charitem.getName());
-                String quality = xml.parseXmlQuality().toLowerCase();
+//                XmlParser xml = new XmlParser(charitem.getName());
+//                String quality = xml.parseXmlQuality().toLowerCase();
                 Label itemname = new Label(charitem.getName());
-                itemname.addStyleName(quality);
-                System.out.println(quality);
+                itemname.addStyleName(charitem.getQuality().toLowerCase());
                 addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Heroic").setValue(charitem.getHeroic());

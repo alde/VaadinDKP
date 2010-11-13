@@ -42,21 +42,33 @@ public class RaidInfoWindow extends Window {
         public void printInfo() {
                 raidInformation();
 
+
+
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
-
+//                long start = System.currentTimeMillis();
                 RaidRewardList rRewardList = new RaidRewardList(raid, dkplist, clist);
                 rRewardList.addStyleName("striped");
                 hzl.addComponent(rRewardList);
+//                long elapsed = System.currentTimeMillis() - start;
+//                // System.out.println("Time for rewardlist class: " + elapsed);
 
+//                start = System.currentTimeMillis();
                 RaidLootList rLootList = new RaidLootList(raid, dkplist, clist, itemList);
                 rLootList.addStyleName("striped");
                 hzl.addComponent(rLootList);
+                
+//                elapsed = System.currentTimeMillis() - start;
+//                // System.out.println("Time for lootlist class: " + elapsed);
+
 
                 addComponent(hzl);
         }
 
         private void raidInformation() {
+
+//                long start = System.currentTimeMillis();
+
                 HorizontalLayout hzl = new HorizontalLayout();
                 Label zname = new Label(raid.getName());
                 zname.addStyleName(raid.getName().replace(" ", "").toLowerCase());
@@ -65,6 +77,9 @@ public class RaidInfoWindow extends Window {
                 addComponent(hzl);
                 addComponent(new Label("Comment: " + raid.getComment()));
                 addComponent(new Label("Date: " + raid.getDate()));
+
+//                long elapsed = System.currentTimeMillis() - start;
+//                // System.out.println("Time for raidInformation() method : " + elapsed);
         }
 
         public void addRaidInfoListener(RaidInfoListener listener) {

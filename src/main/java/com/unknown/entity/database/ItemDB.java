@@ -8,7 +8,6 @@ import com.unknown.entity.DBConnection;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.items.DefaultPrices;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
@@ -41,7 +40,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                Items tempitem = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"));
+                                Items tempitem = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"), rs.getString("quality"));
                                 tempitem.addLooterList(getLootersFormItems(rs.getInt("id")));
                                 items.add(tempitem);
                         }
@@ -152,12 +151,12 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl) {
+        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality) {
                 Connection c = null;
                 int success = 0;
                 try {
                         c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("UPDATE items SET name=? , wowid_normal=? , wowid_heroic=? , price_normal=? , price_heroic=? , slot=? , type=? , ilvl=? WHERE id=?");
+                        PreparedStatement p = c.prepareStatement("UPDATE items SET name=? , wowid_normal=? , wowid_heroic=? , price_normal=? , price_heroic=? , slot=? , type=? , ilvl=? , quality=? WHERE id=?");
                         p.setString(1, newname);
                         p.setInt(2, newwowid);
                         p.setInt(3, newwowidhc);
@@ -166,7 +165,8 @@ public class ItemDB implements ItemDAO {
                         p.setString(6, newslot.toString());
                         p.setString(7, newtype.toString());
                         p.setInt(8, ilvl);
-                        p.setInt(9, item.getId());
+                        p.setString(9, quality);
+                        p.setInt(10, item.getId());
                         success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
@@ -177,13 +177,13 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl) throws SQLException {
+        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String quality) {
                 Connection c = null;
                 int result = 0;
                 try {
                         c = new DBConnection().getConnection();
                         if (!itemAlreadyInDatabase(name)) {
-                                PreparedStatement ps = c.prepareStatement("INSERT INTO items (name, wowid_normal, wowid_heroic, price_normal, price_heroic, slot, type, ilvl) VALUES(?,?,?,?,?,?,?,?)");
+                                PreparedStatement ps = c.prepareStatement("INSERT INTO items (name, wowid_normal, wowid_heroic, price_normal, price_heroic, slot, type, ilvl, quality) VALUES(?,?,?,?,?,?,?,?,?)");
                                 ps.setString(1, name);
                                 ps.setInt(2, wowid);
                                 ps.setInt(3, wowid_hc);
@@ -192,6 +192,7 @@ public class ItemDB implements ItemDAO {
                                 ps.setString(6, slot);
                                 ps.setString(7, type);
                                 ps.setInt(8, ilvl);
+                                ps.setString(9, quality);
 
                                 result = ps.executeUpdate();
                         } else {
@@ -206,7 +207,7 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public Object getItemPrice(String itemname, boolean heroic) throws SQLException {
+        public Object getItemPrice(String itemname, boolean heroic) {
                 Double price = 0.0;
                 Connection c = null;
                 try {
@@ -286,7 +287,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                item = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"));
+                                item = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"), rs.getString("quality"));
                                 item.addLooterList(getLootersFormItems(rs.getInt("id")));
                         }
                 } catch (SQLException e) {
@@ -332,17 +333,24 @@ public class ItemDB implements ItemDAO {
         }
 
         @Override
-        public ArrayList<RaidItem> getItemsForRaid(int id) throws SQLException {
+        public ArrayList<RaidItem> getItemsForRaid(int id) {
+                long start = System.currentTimeMillis();
                 DBConnection c = new DBConnection();
                 ArrayList<RaidItem> items = new ArrayList<RaidItem>();
-                PreparedStatement p = c.prepareStatement("SELECT * FROM loots JOIN items ON loots.item_id = items.id JOIN characters ON loots.character_id = characters.id WHERE loots.raid_id = ?");
-                p.setInt(1, id);
-                ResultSet rs = p.executeQuery();
-                while (rs.next()) {
-                        RaidItem tmp = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.item_id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"));
-                        items.add(tmp);
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM loots JOIN items ON loots.item_id = items.id JOIN characters ON loots.character_id = characters.id WHERE loots.raid_id = ?");
+                        p.setInt(1, id);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                RaidItem tmp = new RaidItem(rs.getString("items.name"), rs.getString("characters.name"), rs.getInt("loots.item_id"), rs.getDouble("loots.price"), rs.getBoolean("loots.heroic"), rs.getString("items.quality"));
+                                items.add(tmp);
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
                 }
-                c.close();
+                long elapsed = System.currentTimeMillis() - start;
+                // System.out.println(elapsed + " ms to retrieve items for raid id: " + id);
                 return items;
         }
 
@@ -365,7 +373,7 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 String temp = rs.getString("type");
                                 Type tempType = typeFromString(temp);
-                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"));
+                                tmp = new Items(rs.getInt("id"), rs.getString("name"), rs.getInt("wowid_normal"), rs.getDouble("price_normal"), rs.getInt("wowid_heroic"), rs.getDouble("price_heroic"), rs.getString("slot"), tempType, rs.getInt("ilvl"), rs.getString("quality"));
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();

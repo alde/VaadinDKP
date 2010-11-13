@@ -21,12 +21,12 @@ public interface CharacterDAO {
         public List<User> getUsers();
 
         public ImmutableList<String> getUserNames();
-		
-		public Collection<User> getUsersWithRole(Role role);
 
-        public int addNewCharacter(String name, String role, Boolean isActive) throws SQLException;
-        
-        public int getCharacterClassId(Connection c, String charclass) throws SQLException;
+        public Collection<User> getUsersWithRole(Role role);
+
+        public int addNewCharacter(String name, String role, Boolean isActive);
+
+        public int getCharacterClassId(String charclass);
 
         public int getCharacterId(String charname);
 

@@ -144,7 +144,7 @@ public class RaidAddWindow extends Window {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;
-                        System.out.println(this.datum);
+                        // System.out.println(this.datum);
 
 
                 }
@@ -154,7 +154,7 @@ public class RaidAddWindow extends Window {
                         String rzone = zone.getValue().toString();
                         String rcomment = comment.getValue().toString();
                         String rdate = datum;
-                        System.out.println(rdate);
+                        // System.out.println(rdate);
                         int success = addRaid(rzone, rcomment, rdate);
                         notifyListeners();
                         close();
