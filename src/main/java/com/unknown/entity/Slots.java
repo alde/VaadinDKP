@@ -10,7 +10,7 @@ public enum Slots {
         Shoulder,
         Hands,
         Waist,
-        Wrists,
+        Wrist,
         Neck,
         Back,
         Ring,
