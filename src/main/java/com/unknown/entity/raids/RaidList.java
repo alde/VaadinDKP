@@ -14,6 +14,8 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -28,7 +30,7 @@ public class RaidList extends Table implements RaidInfoListener {
         private CharacterList clist;
         private DkpList dkplist;
         private ItemList itemList;
-         private int longest;
+        private int longest;
 
         public RaidList(RaidDAO raidDAO) {
                 this.raidDAO = raidDAO;
@@ -79,12 +81,16 @@ public class RaidList extends Table implements RaidInfoListener {
 
         public void printList() {
                 List<Raid> raids = raidDAO.getRaids();
-                this.setSortContainerPropertyId("Date");
-                this.setSortAscending(false);
+                Collections.sort(raids, new Comparator<Raid>() {
+                        @Override
+                        public int compare(Raid t, Raid t1) {
+                                return t1.getDate().compareTo(t.getDate());
+                        }
+                });
                 for (final Raid raid : raids) {
                         Item addItem = addItem(raid);
                         raidListAddRow(addItem, raid);
-                          if (longest < raid.getName().length() + 1) {
+                        if (longest < raid.getName().length() + 1) {
                                 longest = raid.getName().length() + 1;
                         }
                         this.setColumnWidth("Zone", longest * 6);

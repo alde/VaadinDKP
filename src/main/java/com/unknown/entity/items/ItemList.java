@@ -16,6 +16,8 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -79,11 +81,18 @@ public class ItemList extends Table implements ItemInfoListener {
                 clear();
                 itemListColumnHeaders();
                 List<Items> itemses = itemDAO.getItems();
+                Collections.sort(itemses, new Comparator<Items>() {
+
+                        @Override
+                        public int compare(Items t, Items t1) {
+                                return t.getName().compareToIgnoreCase(t1.getName());
+                        }
+                });
 
                 for (final Items item : itemses) {
                         Item addItem = addItem(item);
                         itemListAddRow(addItem, item);
-                          if (longest < item.getName().length() + 1) {
+                        if (longest < item.getName().length() + 1) {
                                 longest = item.getName().length() + 1;
                         }
                         this.setColumnWidth("Name", longest * 6);
