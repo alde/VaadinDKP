@@ -99,7 +99,7 @@ public class RaidRewardEditWindow extends Window {
                 return characters;
         }
 
-         public void addRaidInfoListener(RaidRewardListener listener) {
+        public void addRaidInfoListener(RaidRewardListener listener) {
                 listeners.add(listener);
         }
 
@@ -113,12 +113,7 @@ public class RaidRewardEditWindow extends Window {
         }
 
         private int removeReward(RaidReward reward) {
-                try {
-                        return raidDao.removeReward(reward);
-                } catch (SQLException ex) {
-                        Logger.getLogger(RaidRewardEditWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                return 0;
+                return raidDao.removeReward(reward);
         }
 
         private void showInvalidUsers(List<String> invalidchars) {
@@ -170,7 +165,8 @@ public class RaidRewardEditWindow extends Window {
         public void addRaidRewardInfoListener(RaidRewardListener listener) {
                 listeners.add(listener);
         }
-        public void addCharacterInfoListener(CharacterInfoListener lstnr)  {
+
+        public void addCharacterInfoListener(CharacterInfoListener lstnr) {
                 charinfolisteners.add(lstnr);
         }
 

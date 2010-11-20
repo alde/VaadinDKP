@@ -76,7 +76,6 @@ public class RaidDB implements RaidDAO {
 //                // System.out.println(elapsed + " ms to retrieve items for raid id: " + raidId);
 //                return raidItems;
 //        }
-
         public List<RaidChar> getCharsForRaid(int raidId) {
                 long start = System.currentTimeMillis();
                 Connection c = null;
@@ -227,7 +226,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) throws SQLException {
+        public int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) {
                 int success = 0;
                 Connection c = null;
                 int zoneid = getZoneIdByName(raidzoneName);
@@ -284,7 +283,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException {
+        public int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -341,7 +340,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) throws SQLException {
+        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) {
                 Connection c = null;
                 try {
                         c = new DBConnection().getConnection();
@@ -364,7 +363,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public int removeReward(RaidReward reward) throws SQLException {
+        public int removeReward(RaidReward reward) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -385,21 +384,14 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public int addReward(RaidReward reward) {
-                DBConnection c = new DBConnection();
-                int success = 0;
-                try {
-                        reward = doAddReward(reward);
-                        doAddCharacterReward(reward);
-                } catch (SQLException ex) {
-                        throw new SQLRuntimeException(ex);
-                } finally {
-                        c.close();
-                }
 
-                return success;
+                reward = doAddReward(reward);
+                doAddCharacterReward(reward);
+
+                return reward.getId();
         }
 
-        private RaidReward doAddReward(RaidReward reward) throws SQLException {
+        private RaidReward doAddReward(RaidReward reward) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -409,15 +401,18 @@ public class RaidDB implements RaidDAO {
                         p.executeUpdate();
                         ResultSet rs = p.getGeneratedKeys();
                         while (rs.next()) {
+                                System.out.println(""+rs.toString());
                                 reward.setId(rs.getInt(1));
                         }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
                 } finally {
                         c.close();
                 }
                 return reward;
         }
 
-        private void doAddCharacterReward(RaidReward reward) throws SQLException {
+        private void doAddCharacterReward(RaidReward reward) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
@@ -426,13 +421,15 @@ public class RaidDB implements RaidDAO {
                                 p.setInt(2, eachid.getId());
                                 p.executeUpdate();
                         }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
                 } finally {
                         c.close();
                 }
         }
 
         @Override
-        public int removeLootFromRaid(RaidItem item) throws SQLException {
+        public int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
                 try {

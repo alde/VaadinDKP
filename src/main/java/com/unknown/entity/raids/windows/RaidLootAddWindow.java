@@ -70,8 +70,8 @@ public class RaidLootAddWindow extends Window {
                 addComponent(name);
                 addComponent(addButton);
 
-                setImmediates(price, heroic, loots,name);
-                setListeners(loots, price, heroic, addButton,name);
+                setImmediates(price, heroic, loots, name);
+                setListeners(loots, price, heroic, addButton, name);
 
         }
 
@@ -90,11 +90,7 @@ public class RaidLootAddWindow extends Window {
         }
 
         private void addRaidLoot(String name, String loot, boolean isheroic, double price) {
-                try {
-                        raidDao.addLootToRaid(raid, name, loot, isheroic, price);
-                } catch (SQLException ex) {
-                        Logger.getLogger(RaidLootAddWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                raidDao.addLootToRaid(raid, name, loot, isheroic, price);
         }
 
         private ComboBox nameComboList() throws UnsupportedOperationException {
@@ -170,7 +166,7 @@ public class RaidLootAddWindow extends Window {
         void addItemInfoListener(ItemInfoListener listener) {
                 iteminfolisteners.add(listener);
         }
-        
+
         private class LootChangeListener implements ValueChangeListener {
 
                 private final TextField price;
@@ -215,7 +211,7 @@ public class RaidLootAddWindow extends Window {
                 private final TextField price;
 
                 public AddRaidListener(ComboBox name, ComboBox loots, CheckBox heroic, TextField price) {
-            
+
                         this.name = name;
                         this.loots = loots;
                         this.heroic = heroic;

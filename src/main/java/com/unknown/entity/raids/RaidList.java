@@ -28,6 +28,7 @@ public class RaidList extends Table implements RaidInfoListener {
         private CharacterList clist;
         private DkpList dkplist;
         private ItemList itemList;
+         private int longest;
 
         public RaidList(RaidDAO raidDAO) {
                 this.raidDAO = raidDAO;
@@ -36,6 +37,7 @@ public class RaidList extends Table implements RaidInfoListener {
                 this.setSizeUndefined();
                 this.setHeight("500px");
                 this.addListener(new RaidListClickListener());
+                this.longest = 0;
                 raidListSetHeaders();
         }
 
@@ -77,10 +79,16 @@ public class RaidList extends Table implements RaidInfoListener {
 
         public void printList() {
                 List<Raid> raids = raidDAO.getRaids();
-
+                this.setSortContainerPropertyId("Date");
+                this.setSortAscending(false);
                 for (final Raid raid : raids) {
                         Item addItem = addItem(raid);
                         raidListAddRow(addItem, raid);
+                          if (longest < raid.getName().length() + 1) {
+                                longest = raid.getName().length() + 1;
+                        }
+                        this.setColumnWidth("Zone", longest * 6);
+                        this.requestRepaint();
                 }
         }
 

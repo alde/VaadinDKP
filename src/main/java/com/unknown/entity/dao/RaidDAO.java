@@ -27,17 +27,17 @@ public interface RaidDAO {
 
         public int addNewRaid(String zone, String comment, String date);
 
-        public int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) throws SQLException;
+        public int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate);
 
-        public int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException;
+        public int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment);
 
-        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) throws SQLException;
+        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price);
 
-        public int removeReward(RaidReward reward) throws SQLException;
+        public int removeReward(RaidReward reward);
 
         public int addReward(RaidReward reward);
 
-        public int removeLootFromRaid(RaidItem item) throws SQLException;
+        public int removeLootFromRaid(RaidItem item);
 
         public List<String> findInvalidCharacters(List<String> attendantlist, CharacterDAO charDao);
 
