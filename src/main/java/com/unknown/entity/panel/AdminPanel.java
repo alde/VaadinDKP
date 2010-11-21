@@ -94,15 +94,19 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
         private void login() {
                 this.removeAllComponents();
-                if (isAdmin()) {
+                if (isAdmin() || isSuperAdmin()) {
                         this.addComponent(logOutButton);
                         this.addComponent(addCharacterBtn);
                         this.addComponent(addItmBtn);
                         this.addComponent(addRaidBtn);
-                        this.addComponent(editDefaultBtn);
-                        this.addComponent(editMultipliersBtn);
+                        if (isSuperAdmin()) {
+                                this.addComponent(editDefaultBtn);
+                                this.addComponent(editMultipliersBtn);
+                        }
                         this.addComponent(editZoneBtn);
-                        this.addComponent(addUserBtn);
+                        if (isSuperAdmin()) {
+                                this.addComponent(addUserBtn);
+                        }
                 } else {
                         addComponent(loginBtn);
 
@@ -112,6 +116,11 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private boolean isAdmin() {
                 final SiteUser siteUser = (SiteUser) getApplication().getUser();
                 return siteUser != null && siteUser.getLevel() == 1;
+        }
+
+        private boolean isSuperAdmin() {
+                final SiteUser siteUser = (SiteUser) getApplication().getUser();
+                return siteUser != null && siteUser.getLevel() == 2;
         }
 
         private Window getMainWindow() {
@@ -244,6 +253,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         EditMultiplierWindow editMP = new EditMultiplierWindow();
+                        editMP.addItemInfoListener(itemList);
                         editMP.printInfo();
                         getMainWindow().addWindow(editMP);
                 }

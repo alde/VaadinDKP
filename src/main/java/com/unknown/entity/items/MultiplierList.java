@@ -74,7 +74,7 @@ public class MultiplierList extends Table {
                                 itemDao.updateItemLevels(iid.getId(), Integer.parseInt(item.getItemProperty("Itemlevel").toString()), Double.parseDouble((item.getItemProperty("Multiplier")).toString()));
                         }
                 }
-                for(int i : idstodelete) {
+                for (int i : idstodelete) {
                         itemDao.deleteItemLevelsMultiplier(i);
                 }
                 update();

@@ -7,6 +7,8 @@ package com.unknown.entity.items.windows;
 import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
+import com.unknown.entity.items.ItemInfoListener;
+import com.unknown.entity.items.Items;
 import com.unknown.entity.items.MultiplierList;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -16,6 +18,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class EditMultiplierWindow extends Window {
         TextField itemlevel;
         TextField multiplier;
         MultiplierList multiplierTable;
+        private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
 
         public EditMultiplierWindow() {
                 this.setCaption("Edit multipliers");
@@ -78,6 +82,16 @@ public class EditMultiplierWindow extends Window {
                 multiplier.setValue("");
         }
 
+        public void addItemInfoListener(ItemInfoListener listener) {
+                listeners.add(listener);
+        }
+
+        private void notifyListeners() {
+                for (ItemInfoListener itemInfoListener : listeners) {
+                        itemInfoListener.onItemInfoChange();
+                }
+        }
+
         private class AddButtonListener implements ClickListener {
 
                 @Override
@@ -91,6 +105,8 @@ public class EditMultiplierWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         multiplierTable.updateIlvls();
+                        updateDefaultPricesOnAllItems();
+                        notifyListeners();
                 }
         }
 
@@ -99,6 +115,18 @@ public class EditMultiplierWindow extends Window {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         close();
+                }
+        }
+
+        private void updateDefaultPricesOnAllItems() {
+                List<Items> itemses = new ArrayList<Items>();
+                itemses.addAll(itemDao.getItems());
+                for (Items i : itemses) {
+                        Multiplier mp1 = itemDao.getMultiplierForItemlevel(i.getIlvl());
+                        BigDecimal formattedprice = new BigDecimal(itemDao.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        Multiplier mp2 = itemDao.getMultiplierForItemlevel(i.getIlvl() + 13);
+                        BigDecimal formattedpricehc = new BigDecimal(itemDao.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        itemDao.updateItemPrices(i.getId(), formattedprice, formattedpricehc);
                 }
         }
 }

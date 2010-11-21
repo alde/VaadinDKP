@@ -11,7 +11,7 @@ import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.raids.RaidItem;
-import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface ItemDAO {
 
     public List<Items> getItems();
 
-        public List<ItemPrices> getDefaultPrices() throws SQLException;
+        public List<ItemPrices> getDefaultPrices();
 
         public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality);
 
@@ -36,7 +36,7 @@ public interface ItemDAO {
 
         public void updateDefaultPrice(String slot, double normalprice);
 
-        public int deleteItem(int id) throws SQLException;
+        public int deleteItem(int id);
 
         public ArrayList<RaidItem> getItemsForRaid(int id);
 
@@ -59,4 +59,6 @@ public interface ItemDAO {
         public void deleteItemLevelsMultiplier(int id);
 
         public double getDefaultPrice(Items item);
+
+        public void updateItemPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc);
 }
