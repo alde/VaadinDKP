@@ -42,16 +42,16 @@ class EditUserWindow extends Window {
         final String user;
         private ILoginDao loginDao;
         Application app;
-        VerticalLayout vert = new VerticalLayout();
+        VerticalLayout vert;
         Label error;
 
         EditUserWindow(Application app) {
                 this.characterDao = new CharacterDB();
+                this.vert = new VerticalLayout();
                 this.loginDao = new LoginDao();
                 this.app = app;
                 SiteUser sUser = (SiteUser) app.getUser();
                 this.user = sUser.getName();
-                System.out.println(user);
                 this.allUsernames = new ComboBox("Username: ");
                 if (isSuperAdmin()) {
                         this.oldPassword = new TextField(user + "'s Password: ");
@@ -120,8 +120,10 @@ class EditUserWindow extends Window {
                                 String pass = hashPassword(newPassword.getValue().toString());
                                 if (isAdmin()) {
                                         characterDao.updateSiteUser(user, pass, userlevel);
+                                        error.setValue("Password Changed.");
                                 } else if (isSuperAdmin()) {
                                         characterDao.updateSiteUser(allUsernames.getValue().toString(), pass, userlevel);
+                                        error.setValue("Password Changed.");
                                 }
                         } else {
                                 error.setValue("Passwords don't match!");
