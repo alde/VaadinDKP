@@ -5,7 +5,6 @@
 package com.unknown.entity.items;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.XmlParser;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.ItemDAO;
@@ -19,6 +18,8 @@ import com.vaadin.ui.Table;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -38,7 +39,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 this.itemDAO = itemDAO;
                 this.ic = new IndexedContainer();
                 this.setSizeUndefined();
-                this.setHeight("500px");
+                this.setHeight("700px");
                 this.setSelectable(true);
                 this.longest = 1;
 
@@ -52,8 +53,6 @@ public class ItemList extends Table implements ItemInfoListener {
         }
 
         private void itemListAddRow(Item addItem, final Items item) throws ConversionException, ReadOnlyException {
-//                XmlParser xml = new XmlParser(item.getName());
-//                String quality = xml.parseXmlQuality().toLowerCase();
                 Label itemname = new Label(item.getName(), Label.CONTENT_TEXT);
                 itemname.addStyleName(item.getQuality().toLowerCase());
                 addItem.getItemProperty("Name").setValue(itemname);
@@ -64,7 +63,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 this.requestRepaint();
         }
 
-        private void itemListColumnHeaders() throws UnsupportedOperationException {
+        private void itemListColumnHeaders() {
                 ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Price Normal", Double.class, 0);
                 ic.addContainerProperty("Price Heroic", Double.class, 0);
@@ -80,6 +79,9 @@ public class ItemList extends Table implements ItemInfoListener {
         public void printList() {
                 clear();
                 itemListColumnHeaders();
+                if (this.getWidth() < 550) {
+                        this.setWidth("550px");
+                }
                 List<Items> itemses = itemDAO.getItems();
                 Collections.sort(itemses, new Comparator<Items>() {
 
@@ -97,6 +99,14 @@ public class ItemList extends Table implements ItemInfoListener {
                         }
                         this.setColumnWidth("Name", longest * 6);
                         this.requestRepaint();
+                }
+
+                this.setColumnCollapsingAllowed(true);
+                try {
+                        this.setColumnCollapsed("Slot", true);
+                        this.setColumnCollapsed("Type", true);
+                } catch (IllegalAccessException ex) {
+                        ex.printStackTrace();
                 }
         }
 
@@ -141,15 +151,15 @@ public class ItemList extends Table implements ItemInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
-                                Items item = (Items) event.getItemId();
-                                PopUpControl pop = new PopUpControl(ItemList.this.getApplication());
-                                pop.setItemList(itemList);
-                                pop.setDkpList(dkpList);
-                                pop.setCharacterList(charLiist);
-                                pop.setRaidList(raidList);
-                                pop.showProperItemWindow(item);
-                        }
+//                        if (event.isDoubleClick()) {
+                        Items item = (Items) event.getItemId();
+                        PopUpControl pop = new PopUpControl(ItemList.this.getApplication());
+                        pop.setItemList(itemList);
+                        pop.setDkpList(dkpList);
+                        pop.setCharacterList(charLiist);
+                        pop.setRaidList(raidList);
+                        pop.showProperItemWindow(item);
+//                        }
                 }
         }
 }

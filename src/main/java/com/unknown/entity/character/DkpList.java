@@ -19,8 +19,6 @@ import com.vaadin.ui.Table;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -43,7 +41,8 @@ public class DkpList extends Table implements CharacterInfoListener {
                 dkpListSetColumnHeaders();
                 this.setSelectable(true);
                 this.setWidth("185px");
-                this.setHeight("500px");
+                this.setHeight("700px");
+                this.setPageLength(0);
 
                 this.addListener(new dkpListClickListener());
         }
@@ -53,17 +52,12 @@ public class DkpList extends Table implements CharacterInfoListener {
                 this.raidList = raidList;
         }
 
+        @SuppressWarnings("CallToThreadDumpStack")
         private void dkpListSetColumnHeaders() throws UnsupportedOperationException {
                 ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Armor", Armor.class, "");
+                ic.addContainerProperty("DKP", Label.class, 0);
                 this.setContainerDataSource(ic);
-                this.setColumnCollapsingAllowed(true);
-                try {
-                        this.setColumnCollapsed("Armor", true);
-                } catch (IllegalAccessException ex) {
-                        Logger.getLogger(DkpList.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                addContainerProperty("DKP", Label.class, 0);
         }
 
         public void clear() {
@@ -96,6 +90,12 @@ public class DkpList extends Table implements CharacterInfoListener {
                                 Item addItem = addItem(user);
                                 dkpListAddRow(addItem, user);
                         }
+                }
+                this.setColumnCollapsingAllowed(true);
+                try {
+                        this.setColumnCollapsed("Armor", true);
+                } catch (IllegalAccessException ex) {
+                        ex.printStackTrace();
                 }
         }
 
@@ -137,7 +137,7 @@ public class DkpList extends Table implements CharacterInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
+//                        if (event.isDoubleClick()) {
                                 User user = (User) event.getItemId();
                                 PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
                                 pop.setItemList(itemList);
@@ -145,7 +145,7 @@ public class DkpList extends Table implements CharacterInfoListener {
                                 pop.setDkpList(dkpList);
                                 pop.setCharacterList(charList);
                                 pop.showProperCharWindow(user);
-                        }
+//                        }
                 }
         }
 }

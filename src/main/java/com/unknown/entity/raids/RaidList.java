@@ -37,7 +37,7 @@ public class RaidList extends Table implements RaidInfoListener {
                 this.ic = new IndexedContainer();
                 this.setSelectable(true);
                 this.setSizeUndefined();
-                this.setHeight("500px");
+                this.setHeight("700px");
                 this.addListener(new RaidListClickListener());
                 this.longest = 0;
                 raidListSetHeaders();
@@ -115,7 +115,7 @@ public class RaidList extends Table implements RaidInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
+//                        if (event.isDoubleClick()) {
                                 Raid raid = (Raid) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidList.this.getApplication());
                                 pop.setRaidList(raidList);
@@ -123,7 +123,7 @@ public class RaidList extends Table implements RaidInfoListener {
                                 pop.setDkpList(dkplist);
                                 pop.setItemList(itemList);
                                 pop.showProperRaidWindow(raid);
-                        }
+//                        }
                 }
         }
 }
