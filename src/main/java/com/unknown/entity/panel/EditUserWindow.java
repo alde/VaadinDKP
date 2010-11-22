@@ -42,6 +42,8 @@ class EditUserWindow extends Window {
         final String user;
         private ILoginDao loginDao;
         Application app;
+        VerticalLayout vert = new VerticalLayout();
+        Label error;
 
         EditUserWindow(Application app) {
                 this.characterDao = new CharacterDB();
@@ -75,11 +77,12 @@ class EditUserWindow extends Window {
                 this.center();
                 this.addStyleName("opaque");
                 this.getContent().setSizeUndefined();
+                this.error = new Label();
                 doFillAllUsernames();
         }
 
         void printInfo() {
-                VerticalLayout vert = new VerticalLayout();
+                error.setValue("");
                 if (isAdmin()) {
                         vert.addComponent(new Label(user));
                 } else if (isSuperAdmin()) {
@@ -101,6 +104,7 @@ class EditUserWindow extends Window {
                 hzl.addComponent(closeBtn);
                 vert.addComponent(hzl);
                 vert.setSpacing(true);
+                vert.addComponent(error);
                 this.addComponent(vert);
         }
 
@@ -113,13 +117,26 @@ class EditUserWindow extends Window {
                                 } else if (level.getValue().toString().equals("SuperAdmin")) {
                                         userlevel = 2;
                                 }
-                                String pass = newPassword.getValue().toString();
+                                String pass = hashPassword(newPassword.getValue().toString());
                                 if (isAdmin()) {
                                         characterDao.updateSiteUser(user, pass, userlevel);
                                 } else if (isSuperAdmin()) {
                                         characterDao.updateSiteUser(allUsernames.getValue().toString(), pass, userlevel);
                                 }
+                        } else {
+                                error.setValue("Passwords don't match!");
                         }
+                } else {
+                        if (isAdmin()) {
+                                error.setValue("Old password is wrong.");
+                        } else if (isSuperAdmin()) {
+                                error.setValue(user + "'s password is wrong.");
+                        }
+                }
+                if (!error.getValue().toString().isEmpty()) {
+                        error.setStyleName("error");
+                } else {
+                        error.removeStyleName("error");
                 }
         }
 
