@@ -37,7 +37,7 @@ public class RaidList extends Table implements RaidInfoListener {
                 this.ic = new IndexedContainer();
                 this.setSelectable(true);
                 this.setSizeUndefined();
-                this.setHeight("700px");
+                this.setHeight("650px");
                 this.addListener(new RaidListClickListener());
                 this.longest = 0;
                 raidListSetHeaders();
