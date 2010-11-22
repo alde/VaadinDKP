@@ -24,13 +24,14 @@ public class LoginDao implements ILoginDao {
 		DBConnection dBConnection = new DBConnection();
 		try {
 			conn = dBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT rank from users where name=? and password = ? limit 1");
+			PreparedStatement ps = conn.prepareStatement("SELECT * from users where name=? and password = ? limit 1");
 			ps.setString(1, username);
 			ps.setString(2, password);
 			final ResultSet res = ps.executeQuery();
 			if (res.next()) {
 				final int rank = res.getInt("rank");
-				return new SUser(rank);
+                                final String name = res.getString("name");
+				return new SUser(name, rank);
 
 			}
 			res.close();
@@ -46,14 +47,21 @@ public class LoginDao implements ILoginDao {
         private static class SUser implements SiteUser {
 
                 private final int rank;
+                private final String name;
 
-                public SUser(int rank) {
+                public SUser(String name, int rank) {
+                        this.name = name;
                         this.rank = rank;
                 }
 
                 @Override
                 public int getLevel() {
                         return rank;
+                }
+
+                @Override
+                public String getName() {
+                        return name;
                 }
         }
 }

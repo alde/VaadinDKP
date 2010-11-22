@@ -43,6 +43,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button editDefaultBtn = new Button("Edit Default prices");
         private final Button editMultipliersBtn = new Button("Edit Multipliers");
         private final Button addUserBtn = new Button("Add User");
+        private final Button editUserBtn = new Button("Edit User");
         private final Button editZoneBtn = new Button("Edit Zones");
         private final Button logOutButton = new Button("");
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
@@ -82,12 +83,13 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 editDefaultBtn.addListener(new EditDefaultsListener());
                 editMultipliersBtn.addListener(new EditMultipliersListener());
                 addUserBtn.addListener(new AddUserListener());
+                editUserBtn.addListener(new EditUserListener());
                 editZoneBtn.addListener(new EditZonesListener());
                 logOutButton.addListener(new LogOutListener());
         }
 
         public void init() {
-                if (!isAdmin()) {
+                if (!isAdmin() || !isSuperAdmin()) {
                         addComponent(loginBtn);
                 }
         }
@@ -107,6 +109,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         if (isSuperAdmin()) {
                                 this.addComponent(addUserBtn);
                         }
+                        this.addComponent(editUserBtn);
                 } else {
                         addComponent(loginBtn);
 
@@ -256,6 +259,16 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         editMP.addItemInfoListener(itemList);
                         editMP.printInfo();
                         getMainWindow().addWindow(editMP);
+                }
+        }
+
+        private class EditUserListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        EditUserWindow editUser = new EditUserWindow(getApplication());
+                        editUser.printInfo();
+                        getMainWindow().addWindow(editUser);
                 }
         }
 }

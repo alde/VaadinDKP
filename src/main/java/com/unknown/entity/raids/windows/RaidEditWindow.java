@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.raids.windows;
 
+import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.RaidDAO;
@@ -32,6 +33,7 @@ public class RaidEditWindow extends Window {
 
         private final Raid raid;
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
+        private List<CharacterInfoListener> charlisten = new ArrayList<CharacterInfoListener>();
         private final DkpList dkplist;
         private final CharacterList clist;
         private RaidRewardList rrList;
@@ -134,9 +136,16 @@ public class RaidEditWindow extends Window {
                 listeners.add(listener);
         }
 
+        public void addCharacterInfoListener(CharacterInfoListener listener) {
+                charlisten.add(listener);
+        }
+
         private void notifyListeners() {
                 for (RaidInfoListener raidListener : listeners) {
                         raidListener.onRaidInfoChanged();
+                }
+                for (CharacterInfoListener charinfoListener : charlisten) {
+                        charinfoListener.onCharacterInfoChange();
                 }
         }
 

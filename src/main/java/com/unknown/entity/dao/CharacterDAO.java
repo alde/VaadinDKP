@@ -43,4 +43,10 @@ public interface CharacterDAO {
         public void deleteCharacter(User user);
 
         public String getRoleForCharacter(String name);
+
+        public List<String> getSiteUsers();
+
+        public void updateSiteUser(String username, String password, int level);
+
+        public int getSiteUserLevel(String name);
 }

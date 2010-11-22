@@ -27,6 +27,7 @@ public class User implements SiteUser {
         private boolean active = true;
         private Armor armor;
         private int level = 0;
+        private String siteusername;
         private final List<CharacterItem> charItems = new ArrayList<CharacterItem>();
 
         public User(int id, String username, Role role, boolean active, int shares, double dkp_earned, double dkp_spent, double dkp) {
@@ -109,5 +110,14 @@ public class User implements SiteUser {
 
         public void setLevel(int level) {
                 this.level = level;
+        }
+
+        public void setSiteUserName(String name) {
+                this.siteusername = name;
+        }
+
+        @Override
+        public String getName() {
+                return this.siteusername;
         }
 }

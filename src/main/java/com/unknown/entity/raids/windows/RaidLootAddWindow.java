@@ -55,7 +55,6 @@ public class RaidLootAddWindow extends Window {
         }
 
         public void printInfo() throws SQLException {
-//                final ComboBox boss = bossListComboBox();
                 HashSet<Items> lootlist = getLootList();
                 final ComboBox loots = lootListComboBox(lootlist);
                 final CheckBox heroic = new CheckBox("Heroic");
@@ -63,7 +62,6 @@ public class RaidLootAddWindow extends Window {
                 final ComboBox name = nameComboList();
                 final Button addButton = new Button("Add");
 
-//                addComponent(boss);
                 addComponent(loots);
                 addComponent(heroic);
                 addComponent(price);
@@ -222,6 +220,7 @@ public class RaidLootAddWindow extends Window {
                 public void buttonClick(ClickEvent event) {
                         addRaidLoot(name.getValue().toString(), loots.getValue().toString(), Boolean.parseBoolean(heroic.getValue().toString()), Double.parseDouble(price.getValue().toString()));
                         notifyListeners();
+                        close();
                 }
         }
 }

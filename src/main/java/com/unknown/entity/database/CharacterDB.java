@@ -320,8 +320,77 @@ public class CharacterDB implements CharacterDAO {
 
         }
 
-        private static class HasRolePredicate implements Predicate<User> {
+        @Override
+        public List<String> getSiteUsers() {
+                DBConnection c = new DBConnection();
+                List<String> users = new ArrayList<String>();
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM users");
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                users.add(rs.getString("name"));
+                        }
 
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return users;
+        }
+
+        public int getSiteUserId(String username) {
+                DBConnection c = new DBConnection();
+                int id = 0;
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM users WHERE name=?");
+                        p.setString(1, username);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                           id = rs.getInt("id");
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return id;
+        }
+
+        @Override
+        public void updateSiteUser(String username, String password, int level) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("UPDATE users SET name=? , password = ? , rank = ? WHERE id = ?");
+                        p.setString(1, username);
+                        p.setString(2, password);
+                        p.setInt(3, level);
+                        p.setInt(4, getSiteUserId(username));
+                        p.executeUpdate();
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public int getSiteUserLevel(String name) {
+                DBConnection c = new DBConnection();
+                int level = 1;
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM users WHERE name=?");
+                        p.setString(1, name);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                level = rs.getInt("rank");
+                        }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return level;
+        }
+
+        private class HasRolePredicate implements Predicate<User> {
                 private final Role role;
 
                 public HasRolePredicate(Role role) {

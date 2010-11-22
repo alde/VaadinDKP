@@ -51,15 +51,11 @@ public class PopUpControl extends Window {
         }
 
         public void showProperCharWindow(User user) throws IllegalArgumentException, NullPointerException {
-//                long start = System.currentTimeMillis();
-
-                if (isAdmin()) {
+                if (isAdmin() || isSuperAdmin()) {
                         showCharEditWindow(user);
                 } else {
                         showCharInfoWindow(user);
                 }
-//                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println("Time to open character window: " + elapsed);
         }
 
         private void showCharEditWindow(User user) throws IllegalArgumentException, NullPointerException {
@@ -89,20 +85,18 @@ public class PopUpControl extends Window {
                 final SiteUser siteUser = (SiteUser) app.getUser();
                 return siteUser != null && siteUser.getLevel() == 1;
         }
+
         private boolean isSuperAdmin() {
                 final SiteUser siteUser = (SiteUser) app.getUser();
                 return siteUser != null && siteUser.getLevel() == 2;
         }
 
         public void showProperItemWindow(Items item) throws NullPointerException, IllegalArgumentException {
-//                long start = System.currentTimeMillis();
-                if (isAdmin()) {
+                if (isAdmin() || isSuperAdmin()) {
                         showItemEditWindow(item);
                 } else {
                         showItemInfoWindow(item);
                 }
-//                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println("Time to open item window: " + elapsed);
         }
 
         private void showItemInfoWindow(Items item) throws NullPointerException, IllegalArgumentException {
@@ -121,14 +115,11 @@ public class PopUpControl extends Window {
         }
 
         public void showProperRaidWindow(Raid raid) {
-//                long start = System.currentTimeMillis();
-                if (isAdmin()) {
+                if (isAdmin() || isSuperAdmin()) {
                         showRaidEditWindow(raid);
                 } else {
                         showRaidInfoWindow(raid);
                 }
-//                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println("Time to open raid window: " + elapsed);
         }
 
         private void showRaidInfoWindow(Raid raid) throws IllegalArgumentException, NullPointerException {
@@ -141,8 +132,9 @@ public class PopUpControl extends Window {
                 RaidEditWindow info = new RaidEditWindow(raid, dkpList, charList, itemList);
                 info.printInfo();
                 info.addRaidInfoListener(raidList);
+                info.addCharacterInfoListener(charList);
+                info.addCharacterInfoListener(dkpList);
                 app.getMainWindow().addWindow(info);
-                // System.out.println(itemList.toString());
         }
 
         public void setRaidRewardList(RaidRewardList raidRewardList) {
@@ -150,14 +142,11 @@ public class PopUpControl extends Window {
         }
 
         public void showProperRaidRewardWindow(RaidReward rreward) {
-//                long start = System.currentTimeMillis();
-                if (isAdmin()) {
+                if (isAdmin() || isSuperAdmin()) {
                         showRaidRewardEditWindow(rreward);
                 } else {
                         showRaidRewardInfoWindow(rreward);
                 }
-//                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println("Time to open raid reward window: " + elapsed);
         }
 
         private void showRaidRewardInfoWindow(RaidReward rreward) {
@@ -181,14 +170,11 @@ public class PopUpControl extends Window {
         }
 
         public void showProperRaidLootWindow(Raid raid, RaidItem ritem) {
-//                long start = System.currentTimeMillis();
-                if (isAdmin()) {
+                if (isAdmin() || isSuperAdmin()) {
                         showRaidLootEditWindow(raid, ritem);
                 } else {
                         showItemInfoWindow(ritem.toItem());
                 }
-//                long elapsed = System.currentTimeMillis()-start;
-// System.out.println("Time to open raid loot window: " + elapsed);
         }
 
         private void showRaidLootEditWindow(Raid raid, RaidItem ritem) {
