@@ -67,9 +67,7 @@ public class RaidLootEditWindow extends Window {
 
         public void printInfo() {
                 charname.setWidth("300px");
-                charname.addStyleName("select-button");
                 itemname.setWidth("300px");
-                itemname.addStyleName("select-button");
                 heroic.addListener(new HeroicCheckBoxListener());
                 final Button deleteButton = new Button("Remove");
                 final Button updateButton = new Button("Update");
@@ -82,8 +80,8 @@ public class RaidLootEditWindow extends Window {
                 hzl.addComponent(deleteButton);
                 hzl.addComponent(updateButton);
                 addComponent(hzl);
-                for (RaidChar rc : raid.getRaidChars()) {
-                        charname.addItem(rc.getName());
+                for (User user : characterDao.getUsers()) {
+                        charname.addItem(user.getName());
                 }
                 charname.setValue(item.getLooter());
                 charname.setImmediate(true);

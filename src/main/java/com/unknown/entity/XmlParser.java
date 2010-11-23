@@ -18,7 +18,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class XmlParser {
 
-        private String startString = "http://cata.wowhead.com/item=";
+        private String startString = "http://www.wowhead.com/item=";
         private String endString = "&xml";
         private String query;
         private Element root;
@@ -77,7 +77,7 @@ public class XmlParser {
 
         public String parseXmlWowid() {
                 String wowid = findElement(root, "link");
-                wowid = wowid.replace("http://cata.wowhead.com/item=", "");
+                wowid = wowid.replace("http://www.wowhead.com/item=", "");
                 return wowid;
         }
 
