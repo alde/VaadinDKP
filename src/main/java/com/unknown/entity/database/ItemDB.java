@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author bobo
+ * @author alde
  */
 public class ItemDB implements ItemDAO {
 
@@ -83,14 +83,11 @@ public class ItemDB implements ItemDAO {
                 List<ItemPrices> prices = new ArrayList<ItemPrices>();
                 try {
                         PreparedStatement p = c.prepareStatement("SELECT * FROM default_prices");
-
                         ResultSet rs = p.executeQuery();
-
                         while (rs.next()) {
                                 Slots slot = Slots.valueOf(rs.getString("slot"));
                                 prices.add(new ItemPrices(slot, rs.getDouble("price_normal"), rs.getDouble("price_heroic")));
                         }
-
                 } catch (SQLException e) {
                 } finally {
                         c.close();
@@ -108,7 +105,6 @@ public class ItemDB implements ItemDAO {
                         while (rs.next()) {
                                 multi.add(new Multiplier(rs.getInt("id"), rs.getInt("ilvl"), rs.getDouble("multiplier")));
                         }
-
                 } catch (SQLException e) {
                 } finally {
                         c.close();
@@ -194,7 +190,6 @@ public class ItemDB implements ItemDAO {
                                 ps.setString(7, type);
                                 ps.setInt(8, ilvl);
                                 ps.setString(9, quality);
-
                                 result = ps.executeUpdate();
                         } else {
                                 result = -1;
@@ -307,7 +302,6 @@ public class ItemDB implements ItemDAO {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("UPDATE default_prices SET price_normal=? WHERE slot=? ");
                         p.setDouble(1, normalprice);
-//                        p.setDouble(2, heroicprice);
                         p.setString(2, slot);
                         success = p.executeUpdate();
                 } catch (SQLException e) {
@@ -339,7 +333,6 @@ public class ItemDB implements ItemDAO {
 
         @Override
         public ArrayList<RaidItem> getItemsForRaid(int id) {
-                long start = System.currentTimeMillis();
                 DBConnection c = new DBConnection();
                 ArrayList<RaidItem> items = new ArrayList<RaidItem>();
                 try {
@@ -354,8 +347,6 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         c.close();
                 }
-                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println(elapsed + " ms to retrieve items for raid id: " + id);
                 return items;
         }
 

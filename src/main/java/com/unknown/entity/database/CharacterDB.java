@@ -41,7 +41,6 @@ public class CharacterDB implements CharacterDAO {
                 Connection c = null;
                 List<User> users = new ArrayList<User>();
                 try {
-
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
                         ResultSet rs = p.executeQuery();
@@ -235,7 +234,6 @@ public class CharacterDB implements CharacterDAO {
                 String foo = "";
                 int amountofRaids = raidDao.getTotalRaidsLastThirtyDays();
                 int attendedRaids = raidDao.getAttendedRaidsLastThirtyDays(user);
-                // System.out.println("amount fo raids = " + amountofRaids + " -- attended raids = " + attendedRaids);
                 double temp = 0;
                 if (amountofRaids == 0) {
                         temp = 0;
@@ -258,7 +256,6 @@ public class CharacterDB implements CharacterDAO {
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
                         int success = p.executeUpdate();
-                        // System.out.println(success + " items deleted.");
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -277,16 +274,12 @@ public class CharacterDB implements CharacterDAO {
                         int itemid = itemDao.getItemId(itemname);
 
                         PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
-                        //PreparedStatement p = c.prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
                         p.setInt(1, itemid);
-                        //p.setInt(2, 1);
-                        //p.setInt(3, 1);
                         p.setInt(2, charid);
                         p.setDouble(3, price);
                         p.setBoolean(4, heroic);
                         p.setInt(5, lootid);
                         int success = p.executeUpdate();
-                        // System.out.println(success + " items updated.");
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
@@ -311,7 +304,6 @@ public class CharacterDB implements CharacterDAO {
                         PreparedStatement p = c.prepareStatement("DELETE FROM characters WHERE id=?");
                         p.setInt(1, user.getId());
                         success = p.executeUpdate();
-                        // System.out.println("deleteCharacter("+user.getUsername()+") :" + success);
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {
@@ -330,7 +322,6 @@ public class CharacterDB implements CharacterDAO {
                         while (rs.next()) {
                                 users.add(rs.getString("name"));
                         }
-
                 } catch (SQLException ex) {
                 } finally {
                         c.close();
@@ -443,19 +434,15 @@ public class CharacterDB implements CharacterDAO {
         public int updateCharacter(User user, String name, String charclass, boolean active) {
                 Connection c = null;
                 int success = 0;
-
                 try {
                         c = new DBConnection().getConnection();
                         int classid = getCharacterClassId(charclass);
-
                         PreparedStatement p = c.prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
                         p.setString(1, name);
                         p.setInt(2, classid);
                         p.setBoolean(3, active);
                         p.setInt(4, user.getId());
-
                         success = p.executeUpdate();
-
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {

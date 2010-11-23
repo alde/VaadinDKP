@@ -90,14 +90,14 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
+//                        if (event.isDoubleClick()) {
                                 RaidReward rreward = (RaidReward) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
                                 pop.setRaidRewardList(raidRewardList);
                                 pop.setCharacterList(clist);
                                 pop.setDkpList(dkplist);
                                 pop.showProperRaidRewardWindow(rreward);
-                        }
+//                        }
                 }
         }
 }

@@ -47,11 +47,11 @@ public class UnknownEntityDKP extends Application {
         public void init() {
                 window = new Window("Unknown Entity DKP");
                 setMainWindow(window);
-                Drawings();
+                doDrawings();
                 setTheme("dark");
         }
 
-        private void Drawings() {
+        private void doDrawings() {
                 //  ----------- Declarations of Variables
                 RaidDAO raidDAO = new RaidDB();
                 CharacterDAO characterDAO = new CharacterDB();

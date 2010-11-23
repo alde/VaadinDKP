@@ -19,11 +19,8 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -80,8 +77,8 @@ public class RaidLootEditWindow extends Window {
                 hzl.addComponent(deleteButton);
                 hzl.addComponent(updateButton);
                 addComponent(hzl);
-                for (User user : characterDao.getUsers()) {
-                        charname.addItem(user.getName());
+                for (String user : characterDao.getUserNames()) {
+                        charname.addItem(user);
                 }
                 charname.setValue(item.getLooter());
                 charname.setImmediate(true);
@@ -128,7 +125,7 @@ public class RaidLootEditWindow extends Window {
                 }
         }
 
-        private int deleteItem(RaidItem item) throws SQLException {
+        private int deleteItem(RaidItem item) {
                 return raidDao.removeLootFromRaid(item);
         }
 
@@ -136,30 +133,20 @@ public class RaidLootEditWindow extends Window {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        try {
-                                int success = deleteItem(item);
-                                notifyListeners();
-                        } catch (SQLException ex) {
-                                Logger.getLogger(RaidLootEditWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
+                        int success = deleteItem(item);
+                        notifyListeners();
                 }
         }
 
         private Double getItemPrice(String itemname, Boolean isheroic) {
                 Double getprice = 0.0;
                 if (itemname != null) {
-
-                        try {
-                                getprice = getDefaultPrice(itemname, isheroic.booleanValue());
-                        } catch (SQLException ex) {
-                                Logger.getLogger(RaidLootAddWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        getprice = getDefaultPrice(itemname, isheroic.booleanValue());
                 }
                 return getprice;
         }
 
-        private Double getDefaultPrice(String itemname, boolean isheroic) throws SQLException {
+        private Double getDefaultPrice(String itemname, boolean isheroic) {
                 return (Double) itemDao.getItemPrice(itemname, isheroic);
         }
 
@@ -169,7 +156,6 @@ public class RaidLootEditWindow extends Window {
                 String newlooter = charname.getValue().toString();
                 String newitem = itemname.getValue().toString();
                 int success = updateItem(newlooter, newitem, newprice, isheroic);
-                // System.out.println(success + " items updated.");
                 notifyListeners();
                 close();
         }

@@ -332,14 +332,14 @@ public class CharacterEditWindow extends Window {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
+//                        if (event.isDoubleClick()) {
                                 ItemDAO itemDao = new ItemDB();
                                 CharacterItem citem = (CharacterItem) event.getItemId();
                                 Items temp = itemDao.getSingleItem(citem.getName());
                                 PopUpControl pop = new PopUpControl(app);
                                 pop.setItemList(itemList);
                                 pop.showProperItemWindow(temp);
-                        }
+//                        }
                 }
         }
 
@@ -347,13 +347,13 @@ public class CharacterEditWindow extends Window {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
+//                        if (event.isDoubleClick()) {
                                 Raid item = (Raid) event.getItemId();
                                 PopUpControl pop = new PopUpControl(app);
                                 pop.setItemList(itemList);
                                 pop.setRaidList(raidList);
                                 pop.showProperRaidWindow(item);
-                        }
+//                        }
                 }
         }
 }

@@ -1,7 +1,6 @@
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.XmlParser;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.dao.CharacterDAO;
@@ -15,10 +14,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -89,36 +85,22 @@ public class RaidLootList extends Table implements RaidLootListener {
         }
 
         private void raidListAddRow(Item addItem, RaidItem item) {
-                long start = System.currentTimeMillis();
                 Label looter = new Label(item.getLooter());
                 looter.addStyleName(charDao.getRoleForCharacter(item.getLooter()).toLowerCase().replace(" ", ""));
                 addItem.getItemProperty("Name").setValue(looter);
-
-//                String quality = parseXmlQuality(item.getName());
                 Label itemname = new Label(item.getName());
                 itemname.addStyleName(item.getQuality().toLowerCase());
                 addItem.getItemProperty("Item").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(item.getPrice());
                 addItem.getItemProperty("Heroic").setValue(item.isHeroic());
                 super.requestRepaint();
-                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println("Time for raidListAddRow() method : " + elapsed);
-        }
-
-        private String parseXmlQuality(String name) {
-                long start = System.currentTimeMillis();
-                XmlParser xml = new XmlParser(name);
-                String quality = xml.parseXmlQuality().toLowerCase();
-                long elapsed = System.currentTimeMillis() - start;
-                // System.out.println("Time for parseXmlQuality method : " + elapsed);
-                return quality;
         }
 
         private class RewardListClickListener implements ItemClickListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        if (event.isDoubleClick()) {
+//                        if (event.isDoubleClick()) {
                                 RaidItem ritem = (RaidItem) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidLootList.this.getApplication());
                                 pop.setRaidLootList(raidLootList);
@@ -127,7 +109,7 @@ public class RaidLootList extends Table implements RaidLootListener {
                                 pop.setItemList(itemList);
                                 pop.showProperRaidLootWindow(raid, ritem);
 
-                        }
+//                        }
                 }
         }
 }
