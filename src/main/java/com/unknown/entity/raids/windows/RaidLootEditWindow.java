@@ -135,6 +135,7 @@ public class RaidLootEditWindow extends Window {
                 public void buttonClick(ClickEvent event) {
                         int success = deleteItem(item);
                         notifyListeners();
+                        close();
                 }
         }
 

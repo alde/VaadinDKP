@@ -30,6 +30,7 @@ public class RaidLootList extends Table implements RaidLootListener {
         private final ItemList itemList;
         private int longest;
         CharacterDAO charDao;
+        private int longestname;
 
         public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.ic = new IndexedContainer();
@@ -42,6 +43,7 @@ public class RaidLootList extends Table implements RaidLootListener {
                 this.setHeight("500px");
                 this.addListener(new RewardListClickListener());
                 this.longest = 1;
+                this.longestname = 1;
                 this.charDao = new CharacterDB();
                 raidRewardListSetHeaders();
                 printList();
@@ -80,8 +82,12 @@ public class RaidLootList extends Table implements RaidLootListener {
                         if (longest < item.getName().length() + 1) {
                                 longest = item.getName().length() + 1;
                         }
+                        if (longestname < item.getLooter().length() +1) {
+                                longestname = item.getLooter().length() +1;
+                        }
                 }
                 this.setColumnWidth("Item", longest * 6);
+                this.setColumnWidth("Name", longestname * 6);
         }
 
         private void raidListAddRow(Item addItem, RaidItem item) {

@@ -28,7 +28,6 @@ import org.joda.time.DateTime;
  * @author alde
  */
 public class RaidDB implements RaidDAO {
-        private final CharacterDAO charDao = new CharacterDB();
 
         @Override
         public List<Raid> getRaids() {
@@ -391,7 +390,8 @@ public class RaidDB implements RaidDAO {
         public int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
-                int charid = charDao.getCharacterId(item.getLooter());
+                  CharacterDAO characterDao = new CharacterDB();
+                int charid = characterDao.getCharacterId(item.getLooter());
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
