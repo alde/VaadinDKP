@@ -28,7 +28,8 @@ import org.joda.time.DateTime;
  * @author alde
  */
 public class RaidDB implements RaidDAO {
-        
+        private final CharacterDAO charDao = new CharacterDB();
+
         @Override
         public List<Raid> getRaids() {
                 Connection c = null;
@@ -215,6 +216,7 @@ public class RaidDB implements RaidDAO {
                 int zoneid = 1;
                 try {
                         PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
+                        pzone.setString(1, raidzoneName);
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
                                 zoneid = rs.getInt("id");
@@ -389,10 +391,13 @@ public class RaidDB implements RaidDAO {
         public int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
+                int charid = charDao.getCharacterId(item.getLooter());
                 try {
                         c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE id=?");
+                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
                         p.setInt(1, item.getId());
+                        p.setInt(2, charid);
+                        System.out.println(p.toString());
                         success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();

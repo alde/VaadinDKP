@@ -46,8 +46,6 @@ public class ItemEditWindow extends Window {
         private ItemDAO itemDao;
         private TextField price;
         private TextField pricehc;
-//        private Table lootedby;
-//        private Table tbl;
         private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
         private ItemLooterTable ilt;
         private TextField name;

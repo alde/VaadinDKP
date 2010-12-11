@@ -12,9 +12,11 @@ import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.character.windows.CharacterAddWindow;
 import com.unknown.entity.character.SiteUser;
+import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.windows.EditMultiplierWindow;
 import com.unknown.entity.items.windows.ItemAddWindow;
+import com.unknown.entity.raids.RaidInfoListener;
 import com.unknown.entity.raids.RaidList;
 import com.unknown.entity.raids.windows.RaidAddWindow;
 import com.vaadin.terminal.ThemeResource;
@@ -46,7 +48,10 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button editUserBtn = new Button("Edit User");
         private final Button editZoneBtn = new Button("Edit Zones");
         private final Button logOutButton = new Button("");
+        private final Button refreshBtn = new Button();
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
+        private List<RaidInfoListener> raidlisteners = new ArrayList<RaidInfoListener>();
+        private List<ItemInfoListener> itemlisteners = new ArrayList<ItemInfoListener>();
         RaidList raidList = null;
         CharacterList characterList = null;
         DkpList dkpList = null;
@@ -54,7 +59,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
         public AdminPanel() {
                 setListeners();
-                styleLoginLogout();
+                styleLoginLogoutRefresh();
                 this.setSpacing(true);
         }
 
@@ -62,17 +67,33 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 for (CharacterInfoListener characterListener : listeners) {
                         characterListener.onCharacterInfoChange();
                 }
+                for (RaidInfoListener raidListener : raidlisteners) {
+                        raidListener.onRaidInfoChanged();
+                }
+                for (ItemInfoListener itemInfoListener : itemlisteners) {
+                        itemInfoListener.onItemInfoChange();
+                }
         }
 
         public void addCharacterInfoListener(CharacterInfoListener listener) {
                 listeners.add(listener);
         }
 
-        private void styleLoginLogout() {
+        public void addRaidInfoListener(RaidInfoListener raidlistener) {
+                raidlisteners.add(raidlistener);
+        }
+
+        public void addItemInfoListener(ItemInfoListener itemlistener) {
+                itemlisteners.add(itemlistener);
+        }
+
+        private void styleLoginLogoutRefresh() {
                 loginBtn.setIcon(new ThemeResource("../shared/key.png"));
                 loginBtn.setStyle(Button.STYLE_LINK);
                 logOutButton.setStyle(Button.STYLE_LINK);
                 logOutButton.setIcon(new ThemeResource("../shared/key.png"));
+                refreshBtn.setIcon(new ThemeResource("../shared/refresh.png"));
+                refreshBtn.setStyle(Button.STYLE_LINK);
         }
 
         private void setListeners() {
@@ -86,11 +107,13 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 editUserBtn.addListener(new EditUserListener());
                 editZoneBtn.addListener(new EditZonesListener());
                 logOutButton.addListener(new LogOutListener());
+                refreshBtn.addListener(new refreshListener());
         }
 
         public void init() {
                 if (!isAdmin() || !isSuperAdmin()) {
                         addComponent(loginBtn);
+                        this.addComponent(refreshBtn);
                 }
         }
 
@@ -110,10 +133,12 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                                 this.addComponent(addUserBtn);
                         }
                         this.addComponent(editUserBtn);
+                        this.addComponent(refreshBtn);
                 } else {
-                        addComponent(loginBtn);
-
+                        this.addComponent(loginBtn);
+                        this.addComponent(refreshBtn);
                 }
+
         }
 
         private boolean isAdmin() {
@@ -269,6 +294,17 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         EditUserWindow editUser = new EditUserWindow(getApplication());
                         editUser.printInfo();
                         getMainWindow().addWindow(editUser);
+                }
+        }
+
+        private class refreshListener implements ClickListener {
+
+                public refreshListener() {
+                }
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        notifyListeners();
                 }
         }
 }

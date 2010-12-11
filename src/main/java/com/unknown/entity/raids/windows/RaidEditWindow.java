@@ -177,9 +177,6 @@ public class RaidEditWindow extends Window {
 
         private class AddLootClickListener implements ClickListener {
 
-                public AddLootClickListener() {
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
                         RaidLootAddWindow rlootadd = new RaidLootAddWindow(raid);
@@ -197,9 +194,6 @@ public class RaidEditWindow extends Window {
         }
 
         private class AddRewardClickListener implements ClickListener {
-
-                public AddRewardClickListener() {
-                }
 
                 @Override
                 public void buttonClick(ClickEvent event) {

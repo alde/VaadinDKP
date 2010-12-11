@@ -175,9 +175,6 @@ public class RaidLootEditWindow extends Window {
 
         private class HeroicCheckBoxListener implements ValueChangeListener {
 
-                public HeroicCheckBoxListener() {
-                }
-
                 @Override
                 public void valueChange(ValueChangeEvent event) {
                         getDefaultPrice();
