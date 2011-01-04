@@ -29,8 +29,14 @@ import org.joda.time.DateTime;
  */
 public class RaidDB implements RaidDAO {
 
+    private static ImmutableList<Raid> raidCache = null;
+    private static int raidCount=0;
         @Override
         public List<Raid> getRaids() {
+            System.out.println("raids: "+ ++raidCount);
+            if(raidCache!=null) {
+                return new ArrayList(raidCache);
+            }
                 Connection c = null;
                 List<Raid> raids = new ArrayList<Raid>();
                 try {
@@ -46,6 +52,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                raidCache = ImmutableList.copyOf(raids);
                 return raids;
         }
 

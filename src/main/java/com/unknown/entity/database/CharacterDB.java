@@ -29,15 +29,20 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author alde
+ * @author alde 
  */
 public class CharacterDB implements CharacterDAO {
 
         RaidDAO raidDao = new RaidDB();
         ItemDAO itemDao = new ItemDB();
-
+        private static ImmutableList cachedUsers;
+        private static int count=0;
         @Override
         public List<User> getUsers() {
+            System.out.println("getUsers"+ ++count);
+            if(cachedUsers!=null){
+                return new ArrayList(cachedUsers);
+            }
                 Connection c = null;
                 List<User> users = new ArrayList<User>();
                 try {
@@ -52,6 +57,7 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
+                cachedUsers = ImmutableList.copyOf(users);
                 return users;
         }
 
@@ -68,8 +74,9 @@ public class CharacterDB implements CharacterDAO {
                 }
                 return dkp_spent;
         }
-
+        private static long sqlMagicTime=0;
         private void doSQLMagicForCharacters(Connection c, ResultSet rs, List<User> users) throws SQLException {
+            long start = System.currentTimeMillis();
                 PreparedStatement ploot = c.prepareStatement("SELECT * FROM loots JOIN characters where loots.character_id=characters.id");
                 int shares = 0, totalshares = 0;
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, loot_value = 0.0, share_value = 0.0;
@@ -107,6 +114,8 @@ public class CharacterDB implements CharacterDAO {
                 User user = createCharacter(rs, shares, formatted_dkp_earned.doubleValue(), formatted_dkp_spent.doubleValue(), formatted_dkp.doubleValue());
 
                 users.add(user);
+                sqlMagicTime+=(System.currentTimeMillis()-start);
+                System.out.println("current time spent: "+sqlMagicTime);
         }
 
         private User createCharacter(ResultSet rs, int shares, double dkp_earned, double dkp_spent, double dkp) throws SQLException {
