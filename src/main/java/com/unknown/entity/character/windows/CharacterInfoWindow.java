@@ -97,7 +97,7 @@ public class CharacterInfoWindow extends Window {
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("Class: "));
                 Label charclass = new Label(user.getRole().toString());
-                charclass.addStyleName("color");
+                charclass.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
                 hzl.addComponent(charclass);
                 addComponent(hzl);
                 hzl = new HorizontalLayout();
