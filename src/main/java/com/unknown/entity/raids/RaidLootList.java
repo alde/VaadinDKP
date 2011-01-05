@@ -107,7 +107,6 @@ public class RaidLootList extends Table implements RaidLootListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-//                        if (event.isDoubleClick()) {
                                 RaidItem ritem = (RaidItem) event.getItemId();
                                 PopUpControl pop = new PopUpControl(RaidLootList.this.getApplication());
                                 pop.setRaidLootList(raidLootList);
@@ -115,8 +114,6 @@ public class RaidLootList extends Table implements RaidLootListener {
                                 pop.setDkpList(dkplist);
                                 pop.setItemList(itemList);
                                 pop.showProperRaidLootWindow(raid, ritem);
-
-//                        }
                 }
         }
 }

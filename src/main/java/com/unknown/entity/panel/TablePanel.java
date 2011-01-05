@@ -47,6 +47,7 @@ public class TablePanel {
                 // Vertical DKP List
                 VerticalLayout vertDkp = VerticalDKPListLayout();
                 hzl.addComponent(vertDkp);
+                
                 // Vertical Item List
                 VerticalLayout vertItem = VerticalItemListLayout();
                 hzl.addComponent(vertItem);

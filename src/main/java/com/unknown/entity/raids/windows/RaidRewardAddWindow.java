@@ -21,12 +21,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -49,7 +46,7 @@ public class RaidRewardAddWindow extends Window {
                 this.raid = raid;
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
-                this.setCaption("Add reward for raid " + raid.getComment() + " (id " + raid.getId() + ")");
+                this.setCaption("Add reward for raid " + raid.getComment());
                 this.vertError = new VerticalLayout();
                 attendants.setRows(20);
                 attendants.setImmediate(true);

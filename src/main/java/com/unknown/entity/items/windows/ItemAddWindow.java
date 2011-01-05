@@ -76,7 +76,6 @@ public class ItemAddWindow extends Window {
                 vrt = new VerticalLayout();
                 addComponent(addItem);
                 itemSetters();
-//                final List<ItemPrices> defaultprices = prices;
                 itemAddWIndowAddComponents(addItem);
 
                 for (Slots slots : Slots.values()) {

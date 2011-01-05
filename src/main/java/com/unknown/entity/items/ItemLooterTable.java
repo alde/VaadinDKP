@@ -29,7 +29,6 @@ public class ItemLooterTable extends Table {
                 this.item = item;
                 this.charDao = new CharacterDB();
                 this.raidDao = new RaidDB();
-//                this.ic = new IndexedContainer();
                 printList();
         }
 

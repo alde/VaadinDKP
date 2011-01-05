@@ -138,7 +138,6 @@ public class DkpList extends Table implements CharacterInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-//                        if (event.isDoubleClick()) {
                                 User user = (User) event.getItemId();
                                 PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
                                 pop.setItemList(itemList);
@@ -146,7 +145,6 @@ public class DkpList extends Table implements CharacterInfoListener {
                                 pop.setDkpList(dkpList);
                                 pop.setCharacterList(charList);
                                 pop.showProperCharWindow(user);
-//                        }
                 }
         }
 }

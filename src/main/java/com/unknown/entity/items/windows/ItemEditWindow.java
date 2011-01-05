@@ -230,7 +230,6 @@ public class ItemEditWindow extends Window {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
                 itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()), quality.getValue().toString());
-                // System.out.println("Items updated: " + success);
                 notifyListeners();
                 update();
         }

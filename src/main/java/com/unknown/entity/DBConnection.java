@@ -36,7 +36,6 @@ public final class DBConnection {
         try {
             close();
             conn = DriverManager.getConnection("jdbc:mysql://" + properties.getProperty("db.url") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.db"), properties.getProperty("db.username"), properties.getProperty("db.password"));
-//            conn = DriverManager.getConnection("jdbc:mysql://unknown-entity.com:3306/dkp", "root", "piccolo");
             return conn;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -124,12 +123,12 @@ public final class DBConnection {
     }
 
     private void printError(File f) {
-        // System.out.println("please create " + f.getAbsolutePath());
-        // System.out.println("format: db.url = mydomain.com ");
-        // System.out.println("db.username= nils");
-        // System.out.println("db.db = mydb");
-        // System.out.println("db.port=1234");
-        // System.out.println("db.password = secret");
+         System.out.println("please create " + f.getAbsolutePath());
+         System.out.println("format: db.url = mydomain.com ");
+         System.out.println("db.username= nils");
+         System.out.println("db.db = mydb");
+         System.out.println("db.port=1234");
+         System.out.println("db.password = secret");
     }
 
     private boolean verifyProperties(Properties prop) {

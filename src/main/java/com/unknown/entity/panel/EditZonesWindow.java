@@ -102,7 +102,6 @@ class EditZonesWindow extends Window {
                 if (raidDao.isValidZone(oldzone)) {
                         this.oldZone = oldzone;
                 }
-                // System.out.println("old: " + oldZone);
         }
 
         private void removeZone() {
@@ -131,7 +130,6 @@ class EditZonesWindow extends Window {
 
         private void updateZoneName() {
                 String newZone = zoneList.getValue().toString();
-                // System.out.println(oldZone + " -- " + newZone);
                 raidDao.updateZoneName(oldZone, newZone);
                 update();
         }

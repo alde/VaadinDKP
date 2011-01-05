@@ -18,7 +18,6 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,9 +143,6 @@ public class RaidAddWindow extends Window {
                         this.zone = zone;
                         this.comment = comment;
                         this.datum = datum;
-                        // System.out.println(this.datum);
-
-
                 }
 
                 @Override
@@ -154,7 +150,6 @@ public class RaidAddWindow extends Window {
                         String rzone = zone.getValue().toString();
                         String rcomment = comment.getValue().toString();
                         String rdate = datum;
-                        // System.out.println(rdate);
                         int success = addRaid(rzone, rcomment, rdate);
                         notifyListeners();
                         close();

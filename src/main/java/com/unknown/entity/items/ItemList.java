@@ -152,7 +152,6 @@ public class ItemList extends Table implements ItemInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-//                        if (event.isDoubleClick()) {
                         Items item = (Items) event.getItemId();
                         PopUpControl pop = new PopUpControl(ItemList.this.getApplication());
                         pop.setItemList(itemList);
@@ -160,7 +159,6 @@ public class ItemList extends Table implements ItemInfoListener {
                         pop.setCharacterList(charLiist);
                         pop.setRaidList(raidList);
                         pop.showProperItemWindow(item);
-//                        }
                 }
         }
 }

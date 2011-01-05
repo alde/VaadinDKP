@@ -52,7 +52,6 @@ public class UnknownEntityDKP extends Application {
         }
 
         private void doDrawings() {
-                //  ----------- Declarations of Variables
                 RaidDAO raidDAO = new RaidDB();
                 CharacterDAO characterDAO = new CharacterDB();
                 ItemDAO itemDAO = new ItemDB();
@@ -88,11 +87,8 @@ public class UnknownEntityDKP extends Application {
                 adminPanel.addCharacterInfoListener(dkpList);
                 adminPanel.addItemInfoListener(itemList);
                 adminPanel.addRaidInfoListener(raidList);
-
-                // Character List based on Character Class
+                
                 characterListOnCharacterClass();
-
-                // DKP Table, Item Table, Raid Table
                 window.addComponent(hzl);
 
         }

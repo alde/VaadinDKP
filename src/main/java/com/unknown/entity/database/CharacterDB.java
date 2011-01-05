@@ -140,56 +140,7 @@ public class CharacterDB implements CharacterDAO {
                 user.addCharItems(getItemsForCharacter(userid));
                 return user;
         }
-
-//        private void doSQLMagicForCharacters(Connection c, ResultSet rs, List<User> users, Multimap<Integer, Double> prices) throws SQLException {
-//                long start = System.currentTimeMillis();
-//
-//                int shares = 0, totalshares = 0;
-//                double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, loot_value = 0.0, share_value = 0.0;
-//
-//                while (rsloot.next()) {
-//                        dkp_spent = getDkpSpentForCharacterById(rsloot, rs, dkp_spent);
-//                        if (rsloot.getBoolean(("characters.active"))) {
-//                                loot_value = loot_value + rsloot.getDouble("loots.price");
-//                        }
-//                }
-//                PreparedStatement ps = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON character_rewards.reward_id=rewards.id AND characters.id=? AND characters.id=character_rewards.character_id");
-//                ps.setInt(1, rs.getInt("characters.id"));
-//                ResultSet rss = ps.executeQuery();
-//                while (rss.next()) {
-//                        shares = getSharesForCharacterById(rs, rss, shares);
-//                }
-//
-//                PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
-//                ResultSet rsTotalShares = totalShares.executeQuery();
-//                while (rsTotalShares.next()) {
-//                        if (rsTotalShares.getBoolean("characters.active")) {
-//                                totalshares += rsTotalShares.getInt("rewards.number_of_shares");
-//                        }
-//                }
-//                if (totalshares > 0) {
-//                        share_value = loot_value / totalshares;
-//                } else {
-//                        share_value = 0;
-//                }
-//                dkp_earned = shares * share_value;
-//                dkp = dkp_earned - dkp_spent;
-//                BigDecimal formatted_dkp_spent = new BigDecimal(dkp_spent).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-//                BigDecimal formatted_dkp_earned = new BigDecimal(dkp_earned).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-//                BigDecimal formatted_dkp = new BigDecimal(dkp).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-//                User user = createCharacter(rs, shares, formatted_dkp_earned.doubleValue(), formatted_dkp_spent.doubleValue(), formatted_dkp.doubleValue());
-//
-//                users.add(user);
-//                sqlMagicTime += (System.currentTimeMillis() - start);
-//                System.out.println("current time spent: " + sqlMagicTime);
-//        }
-//
-//        private User createCharacter(ResultSet rs, int shares, double dkp_earned, double dkp_spent, double dkp) throws SQLException {
-//                Role role = Role.valueOf(rs.getString("character_classes.name").replace(" ", ""));
-//                User user = new User(rs.getInt("id"), rs.getString("characters.name"), role, rs.getBoolean("characters.active"), shares, dkp_earned, dkp_spent, dkp);
-//                user.addCharItems(getItemsForCharacter(rs.getInt("id")));
-//                return user;
-//        }
+        
         @Override
         public int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();

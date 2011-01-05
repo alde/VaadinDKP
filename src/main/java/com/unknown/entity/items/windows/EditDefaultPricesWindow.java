@@ -70,7 +70,7 @@ public class EditDefaultPricesWindow extends Window {
         private void doUpdatePrices() {
                 for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
                         ItemPrices iid = (ItemPrices) i.next();
-                        Item item = ic.getItem(iid); //, Double.parseDouble((item.getItemProperty("Heroic")).toString()
+                        Item item = ic.getItem(iid);
                         itemDao.updateDefaultPrice(item.getItemProperty("Slot").toString(), Double.parseDouble((item.getItemProperty("Normal")).toString()));
                 }
         }
@@ -78,7 +78,6 @@ public class EditDefaultPricesWindow extends Window {
         private void tableData(Table priceTable) {
                 priceTable.addContainerProperty("Slot", Label.class, "");
                 priceTable.addContainerProperty("Normal", Double.class, 0);
-//                priceTable.addContainerProperty("Heroic", Double.class, 0);
                 for (ItemPrices ip : prices) {
                         Item addItem = ic.addItem(ip);
                         priceTableSetRow(addItem, ip);
@@ -94,7 +93,6 @@ public class EditDefaultPricesWindow extends Window {
                 Label slot = new Label(ip.getSlotString());
                 addItem.getItemProperty("Slot").setValue(slot);
                 addItem.getItemProperty("Normal").setValue(ip.getPrice());
-//                addItem.getItemProperty("Heroic").setValue(ip.getPriceHeroic());
         }
 
         private class CloseButtonListener implements ClickListener {

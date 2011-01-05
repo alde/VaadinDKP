@@ -67,19 +67,22 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
-//                XmlParser xml = new XmlParser(charitem.getName());
-//                String quality = xml.parseXmlQuality().toLowerCase();
                 Label itemname = new Label(charitem.getName());
                 itemname.addStyleName(charitem.getQuality().toLowerCase());
                 addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
-                addItem.getItemProperty("Heroic").setValue(charitem.getHeroic());
+                if (charitem.getHeroic()) {
+                        addItem.getItemProperty("Heroic").setValue("Yes");
+                } else {
+                        addItem.getItemProperty("Heroic").setValue("No");
+                }
+
         }
 
         private void characterInfoLootTableSetHeaders(Table tbl) throws UnsupportedOperationException {
                 tbl.addContainerProperty("Name", Label.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
-                tbl.addContainerProperty("Heroic", Boolean.class, false);
+                tbl.addContainerProperty("Heroic", String.class, false);
         }
 
         private void characterInformation() {
@@ -201,8 +204,20 @@ public class CharacterInfoWindow extends Window {
         private void raidsAttended() {
                 CharacterDAO charDao = new CharacterDB();
                 String attendance = charDao.getAttendanceRaids(user);
+                Double percent = Double.parseDouble(attendance);
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
+                if (percent>=0 && percent<50){
+                        attended.setStyleName("negative");
+                } else if(percent > 50 && percent < 65) {
+                        attended.setStyleName("uncommon");
+                } else if (percent >= 65 && percent < 75) {
+                        attended.setStyleName("rare");
+                } else if (percent >= 75 && percent < 90) {
+                        attended.setStyleName("epic");
+                } else if (percent >= 90) {
+                        attended.setStyleName("legendary");
+                }
                 addComponent(attended);
         }
 

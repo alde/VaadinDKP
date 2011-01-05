@@ -105,7 +105,6 @@ public class LoginWindow extends Window {
                 for (CharacterInfoListener characterListener : charlisteners) {
                         characterListener.onCharacterInfoChange();
                 }
-                // System.out.println("Time to log in: " + elapsed);
         }
 
         public void addCharacterInfoListener(CharacterInfoListener charlistener) {

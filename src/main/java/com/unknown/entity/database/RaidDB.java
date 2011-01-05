@@ -30,7 +30,6 @@ import org.joda.time.DateTime;
 public class RaidDB implements RaidDAO {
 
         private static List<Raid> raidCache = new ArrayList<Raid>();
-        private static int raidCount = 0;
 
         @Override
         public List<Raid> getRaids() {
