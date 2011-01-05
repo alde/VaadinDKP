@@ -140,7 +140,7 @@ public class CharacterDB implements CharacterDAO {
                 user.addCharItems(getItemsForCharacter(userid));
                 return user;
         }
-        
+
         @Override
         public int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();
@@ -404,6 +404,17 @@ public class CharacterDB implements CharacterDAO {
                         c.close();
                 }
                 return level;
+        }
+
+        @Override
+        public int countActiveUsers() {
+                int i = 0;
+                for (User u : getUsers()) {
+                        if (u.isActive()) {
+                                i++;
+                        }
+                }
+                return i;
         }
 
         private class HasRolePredicate implements Predicate<User> {

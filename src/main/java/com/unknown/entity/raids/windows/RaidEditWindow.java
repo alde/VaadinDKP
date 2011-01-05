@@ -16,7 +16,6 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
@@ -87,12 +86,11 @@ public class RaidEditWindow extends Window {
                 List<String> zoneList = raidDAO.getRaidZoneList();
 
                 HorizontalLayout hzl = new HorizontalLayout();
-                addComponent(new Label("Raid information"));
                 final ComboBox zone = new ComboBox("Zone");
                 for (String zones : zoneList) {
                         zone.addItem(zones);
                 }
-                zone.setWidth("150px");
+                zone.setWidth("250px");
                 zone.addStyleName("select-button");
                 zone.setImmediate(true);
                 zone.setNullSelectionAllowed(false);
@@ -110,13 +108,16 @@ public class RaidEditWindow extends Window {
                 hzl.addComponent(zone);
                 hzl.addComponent(comment);
                 hzl.addComponent(datum);
-
+                hzl.setSpacing(true);
+                
                 addComponent(hzl);
 
                 HorizontalLayout hoributtons = new HorizontalLayout();
                 hoributtons.addComponent(updateButton);
                 hoributtons.addComponent(deleteButton);
+                hoributtons.setSpacing(true);
                 addComponent(hoributtons);
+
 
                 updateButton.addListener(new UpdateButtonListener(zone, comment, datum));
                 deleteButton.addListener(new DeleteButtonListener());

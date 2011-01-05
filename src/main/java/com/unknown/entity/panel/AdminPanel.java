@@ -12,6 +12,8 @@ import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.character.windows.CharacterAddWindow;
 import com.unknown.entity.character.SiteUser;
+import com.unknown.entity.dao.CharacterDAO;
+import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.windows.EditMultiplierWindow;
@@ -49,6 +51,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button editZoneBtn = new Button("Edit Zones");
         private final Button logOutButton = new Button("");
         private final Button refreshBtn = new Button();
+        private final Label activeUsers = new Label("");
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private List<RaidInfoListener> raidlisteners = new ArrayList<RaidInfoListener>();
         private List<ItemInfoListener> itemlisteners = new ArrayList<ItemInfoListener>();
@@ -56,11 +59,13 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         CharacterList characterList = null;
         DkpList dkpList = null;
         ItemList itemList = null;
+        private final CharacterDAO charDao = new CharacterDB();
 
         public AdminPanel() {
                 setListeners();
                 styleLoginLogoutRefresh();
                 this.setSpacing(true);
+                activeUsers.setCaption("Active users: "+charDao.countActiveUsers());
         }
 
         private void notifyListeners() {
@@ -134,6 +139,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         }
                         this.addComponent(editUserBtn);
                         this.addComponent(refreshBtn);
+                        this.addComponent(activeUsers);
                 } else {
                         this.addComponent(loginBtn);
                         this.addComponent(refreshBtn);
