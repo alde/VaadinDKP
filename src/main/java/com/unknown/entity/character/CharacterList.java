@@ -31,7 +31,7 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         private DkpList dkpList;
         private CharacterList charList = this;
-        CharacterDAO characterDAO;
+        private CharacterDAO characterDAO;
         private RaidList raidList;
         private ItemList itemList;
         private Application app;
@@ -98,6 +98,7 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         @Override
         public void onCharacterInfoChange() {
+                characterDAO.clearCache();
                 update();
         }
 

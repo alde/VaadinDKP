@@ -26,10 +26,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,14 +39,14 @@ public class CharacterDB implements CharacterDAO {
 
         RaidDAO raidDao = new RaidDB();
         ItemDAO itemDao = new ItemDB();
-        private static ImmutableList cachedUsers;
-        private static int count = 0;
+        private static List<User> cachedUsers = new ArrayList<User>();
 
         @Override
         public List<User> getUsers() {
-//                System.out.println("getUsers" + ++count);
                 if (cachedUsers != null) {
-                        return new ArrayList(cachedUsers);
+                        if (!cachedUsers.isEmpty()) {
+                                return new ArrayList(cachedUsers);
+                        }
                 }
                 Connection c = null;
                 List<User> users = new ArrayList<User>();
@@ -94,10 +92,8 @@ public class CharacterDB implements CharacterDAO {
 
                         }
                         for (int userid : charids) {
-//                                doSQLMagicForCharacters(c, rs, users);
-//                                doSQLMagicForCharacters(c, rs, users, prices);
                                 Boolean active = charactive.get(userid);
-                                users.add(doDkpCalculations(prices, shareslist, charnames, charroles, userid, active, totalshares, loot_value));
+                                users.add(calculateDKP(prices, shareslist, charnames, charroles, userid, active, totalshares, loot_value));
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
@@ -107,21 +103,13 @@ public class CharacterDB implements CharacterDAO {
                 cachedUsers = ImmutableList.copyOf(users);
                 return users;
         }
-//        private int getSharesForCharacterById(ResultSet rs, ResultSet rss, int shares) throws SQLException {
-//                if (rs.getInt("characters.id") == rss.getInt("character_rewards.character_id")) {
-//                        shares = shares + rss.getInt("rewards.number_of_shares");
-//                }
-//                return shares;
-//        }
-//
-//        private double getDkpSpentForCharacterById(ResultSet rsloot, ResultSet rs, double dkp_spent) throws SQLException {
-//                if (rsloot.getInt("loots.character_id") == rs.getInt("characters.id")) {
-//                        dkp_spent = dkp_spent + rsloot.getDouble("loots.price");
-//                }
-//                return dkp_spent;
-//        }
 
-        private User doDkpCalculations(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
+        @Override
+        public void clearCache() {
+                cachedUsers.clear();
+        }
+
+        private User calculateDKP(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
                 int shares = 0;
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, share_value = 0.0;
 
@@ -148,15 +136,8 @@ public class CharacterDB implements CharacterDAO {
 
                 String username = charnames.get(userid);
                 Role userrole = Role.valueOf(charroles.get(userid));
-                System.out.println("Name: " + username);
-                System.out.println("shares: " + shares);
-                System.out.println("share value: " + share_value);
-                System.out.println("total shares: " + totalshares);
-                System.out.println("Loot value: " + loot_value);
-                System.out.println("new User(" + userid + ", " + username + ", " + userrole.toString() + ", " + active.toString() + ", " + formatted_dkp_earned.toString() + ", " + formatted_dkp_spent.toString() + ", " + formatted_dkp.toString());
                 User user = new User(userid, username, userrole, active, shares, formatted_dkp_earned.doubleValue(), formatted_dkp_spent.doubleValue(), formatted_dkp.doubleValue());
-//                User user = new User(u.getId(), u.getName(), u.getRole(), u.isActive(), shares, formatted_dkp_earned.doubleValue(), formatted_dkp_spent.doubleValue(), formatted_dkp.doubleValue());
-//                users.add(user);
+                user.addCharItems(getItemsForCharacter(userid));
                 return user;
         }
 
@@ -179,13 +160,13 @@ public class CharacterDB implements CharacterDAO {
 //                        shares = getSharesForCharacterById(rs, rss, shares);
 //                }
 //
-////                PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
-////                ResultSet rsTotalShares = totalShares.executeQuery();
-////                while (rsTotalShares.next()) {
-////                        if (rsTotalShares.getBoolean("characters.active")) {
-////                                totalshares += rsTotalShares.getInt("rewards.number_of_shares");
-////                        }
-////                }
+//                PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
+//                ResultSet rsTotalShares = totalShares.executeQuery();
+//                while (rsTotalShares.next()) {
+//                        if (rsTotalShares.getBoolean("characters.active")) {
+//                                totalshares += rsTotalShares.getInt("rewards.number_of_shares");
+//                        }
+//                }
 //                if (totalshares > 0) {
 //                        share_value = loot_value / totalshares;
 //                } else {
@@ -202,13 +183,13 @@ public class CharacterDB implements CharacterDAO {
 //                sqlMagicTime += (System.currentTimeMillis() - start);
 //                System.out.println("current time spent: " + sqlMagicTime);
 //        }
-        private User createCharacter(ResultSet rs, int shares, double dkp_earned, double dkp_spent, double dkp) throws SQLException {
-                Role role = Role.valueOf(rs.getString("character_classes.name").replace(" ", ""));
-                User user = new User(rs.getInt("id"), rs.getString("characters.name"), role, rs.getBoolean("characters.active"), shares, dkp_earned, dkp_spent, dkp);
-                user.addCharItems(getItemsForCharacter(rs.getInt("id")));
-                return user;
-        }
-
+//
+//        private User createCharacter(ResultSet rs, int shares, double dkp_earned, double dkp_spent, double dkp) throws SQLException {
+//                Role role = Role.valueOf(rs.getString("character_classes.name").replace(" ", ""));
+//                User user = new User(rs.getInt("id"), rs.getString("characters.name"), role, rs.getBoolean("characters.active"), shares, dkp_earned, dkp_spent, dkp);
+//                user.addCharItems(getItemsForCharacter(rs.getInt("id")));
+//                return user;
+//        }
         @Override
         public int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();

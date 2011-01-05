@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class DkpList extends Table implements CharacterInfoListener {
 
-        private CharacterDAO characterDAO;
+        private CharacterDAO charDao;
         private IndexedContainer ic;
         private DkpList dkpList = this;
         private CharacterList charList;
@@ -35,7 +35,7 @@ public class DkpList extends Table implements CharacterInfoListener {
         private RaidList raidList;
 
         public DkpList(CharacterDAO characterDAO, Application app) {
-                this.characterDAO = characterDAO;
+                this.charDao = characterDAO;
                 this.ic = new IndexedContainer();
                 this.app = app;
                 dkpListSetColumnHeaders();
@@ -66,6 +66,7 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         @Override
         public void onCharacterInfoChange() {
+                charDao.clearCache();
                 update();
         }
 
@@ -77,7 +78,7 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         public void printList() {
                 clear();
-                List<User> users = characterDAO.getUsers();
+                List<User> users = charDao.getUsers();
                 Collections.sort(users, new Comparator<User>() {
 
                         @Override

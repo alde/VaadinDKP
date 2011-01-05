@@ -21,6 +21,8 @@ public interface RaidDAO {
 
         public List<Raid> getRaids();
 
+        public void clearCache();
+
         public Collection<RaidChar> getCharsForReward(int id);
         
         public List<String> getRaidZoneList();

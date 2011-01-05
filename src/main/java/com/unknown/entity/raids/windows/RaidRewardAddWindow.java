@@ -38,6 +38,7 @@ public class RaidRewardAddWindow extends Window {
         private final TextField attendants = new TextField("Attendants");
         private final TextField shares = new TextField("Shares");
         private final TextField comment = new TextField("Comment");
+        VerticalLayout vertError;
         Button addButton = new Button("Add");
         RaidDAO raidDao = new RaidDB();
         CharacterDAO chardao = new CharacterDB();
@@ -49,6 +50,7 @@ public class RaidRewardAddWindow extends Window {
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
                 this.setCaption("Add reward for raid " + raid.getComment() + " (id " + raid.getId() + ")");
+                this.vertError = new VerticalLayout();
                 attendants.setRows(20);
                 attendants.setImmediate(true);
                 shares.setImmediate(true);
@@ -64,6 +66,7 @@ public class RaidRewardAddWindow extends Window {
                 vert.addComponent(shares);
                 vert.addComponent(attendants);
                 vert.addComponent(addButton);
+                vert.addComponent(vertError);
                 addComponent(vert);
                 addButton.addListener(new AddRewardListener());
         }
@@ -105,9 +108,9 @@ public class RaidRewardAddWindow extends Window {
         }
 
         private void showInvalidUsers(List<String> invalidchars) {
-                addComponent(new Label("Invalid characters"));
+                vertError.addComponent(new Label("Invalid characters"));
                 for (String s : invalidchars) {
-                        addComponent(new Label(s));
+                        vertError.addComponent(new Label(s));
                 }
         }
 
@@ -121,6 +124,7 @@ public class RaidRewardAddWindow extends Window {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
+                        vertError.removeAllComponents();
                         final ImmutableList<String> attendantlist = splitCharsToArray(attendants.getValue().toString());
                         addReward(comment.getValue().toString(), Integer.parseInt(shares.getValue().toString()), attendantlist, raid);
                         notifyListeners();

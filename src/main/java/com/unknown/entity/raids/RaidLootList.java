@@ -57,6 +57,7 @@ public class RaidLootList extends Table implements RaidLootListener {
 
         @Override
         public void onRaidInfoChanged() {
+                charDao.clearCache();
                 update();
         }
 

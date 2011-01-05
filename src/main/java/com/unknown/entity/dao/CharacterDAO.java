@@ -18,6 +18,8 @@ public interface CharacterDAO {
 
         public List<User> getUsers();
 
+        public void clearCache();
+
         public ImmutableList<String> getUserNames();
 
         public Collection<User> getUsersWithRole(Role role);

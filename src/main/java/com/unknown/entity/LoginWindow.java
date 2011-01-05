@@ -77,8 +77,8 @@ public class LoginWindow extends Window {
                 SiteUser user = loginDao.checkLogin(userName.getValue().toString(), hashPassword(password.getValue().toString()));
                 if (user != null) {
                         getApplication().setUser(user);
-                        notifyListeners();
                         close();
+                        notifyListeners();
                 } else {
                         Label error = new Label("Bad username or password");
                         error.addStyleName("error");
@@ -99,14 +99,12 @@ public class LoginWindow extends Window {
         }
 
         private void notifyListeners() {
-                long start = System.currentTimeMillis();
                 for (MyLoginListener loginListener : listeners) {
                         loginListener.onLogin();
                 }
                 for (CharacterInfoListener characterListener : charlisteners) {
                         characterListener.onCharacterInfoChange();
                 }
-                long elapsed = System.currentTimeMillis() - start;
                 // System.out.println("Time to log in: " + elapsed);
         }
 

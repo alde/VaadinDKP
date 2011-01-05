@@ -7,7 +7,9 @@ package com.unknown.entity.raids;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
+import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.RaidDAO;
+import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -30,6 +32,8 @@ public class RaidRewardList extends Table implements RaidRewardListener {
         private Raid raid;
         private final DkpList dkplist;
         private final CharacterList clist;
+        private final RaidDAO raidDao;
+        private final CharacterDAO charDao;
 
         public RaidRewardList(Raid raid, DkpList dkplist, CharacterList clist) {
                 this.ic = new IndexedContainer();
@@ -40,6 +44,8 @@ public class RaidRewardList extends Table implements RaidRewardListener {
                 this.setSizeUndefined();
                 this.setHeight("500px");
                 this.addListener(new RewardListClickListener());
+                this.raidDao = new RaidDB();
+                this.charDao = new CharacterDB();
                 raidRewardListSetHeaders();
                 printList();
         }
@@ -52,6 +58,8 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
         @Override
         public void onRaidInfoChanged() {
+                raidDao.clearCache();
+                charDao.clearCache();
                 update();
         }
 
@@ -66,7 +74,6 @@ public class RaidRewardList extends Table implements RaidRewardListener {
         }
 
         private void printList() {
-                RaidDAO raidDao = new RaidDB();
                 Collection<RaidReward> rewards;
                 try {
                         rewards = raidDao.getRewardsForRaid(this.raid.getId());

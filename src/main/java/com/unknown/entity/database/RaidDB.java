@@ -29,14 +29,16 @@ import org.joda.time.DateTime;
  */
 public class RaidDB implements RaidDAO {
 
-    private static ImmutableList<Raid> raidCache = null;
-    private static int raidCount=0;
+        private static List<Raid> raidCache = new ArrayList<Raid>();
+        private static int raidCount = 0;
+
         @Override
         public List<Raid> getRaids() {
-            System.out.println("raids: "+ ++raidCount);
-            if(raidCache!=null) {
-                return new ArrayList(raidCache);
-            }
+                if (raidCache != null) {
+                        if (!raidCache.isEmpty()) {
+                                return new ArrayList(raidCache);
+                        }
+                }
                 Connection c = null;
                 List<Raid> raids = new ArrayList<Raid>();
                 try {
@@ -54,6 +56,11 @@ public class RaidDB implements RaidDAO {
                 }
                 raidCache = ImmutableList.copyOf(raids);
                 return raids;
+        }
+
+        @Override
+        public void clearCache() {
+                raidCache.clear();
         }
 
         public List<RaidChar> getCharsForRaid(int raidId) {
@@ -397,7 +404,7 @@ public class RaidDB implements RaidDAO {
         public int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
-                  CharacterDAO characterDao = new CharacterDB();
+                CharacterDAO characterDao = new CharacterDB();
                 int charid = characterDao.getCharacterId(item.getLooter());
                 try {
                         c = new DBConnection().getConnection();
@@ -504,7 +511,7 @@ public class RaidDB implements RaidDAO {
                 String enddate = dt.toYearMonthDay().toString();
                 DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
+                        PreparedStatement p = c.prepareStatement("SELECT DISTINCT raid_id FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
                         p.setInt(1, user.getId());
                         p.setString(2, startdate);
                         p.setString(3, enddate);

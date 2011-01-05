@@ -63,6 +63,7 @@ public class RaidList extends Table implements RaidInfoListener {
 
         @Override
         public void onRaidInfoChanged() {
+                raidDAO.clearCache();
                 update();
         }
 
