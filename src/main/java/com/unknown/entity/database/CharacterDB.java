@@ -10,7 +10,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.Role;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author alde 
@@ -40,6 +40,7 @@ public class CharacterDB implements CharacterDAO {
         RaidDAO raidDao = new RaidDB();
         ItemDAO itemDao = new ItemDB();
         private static List<User> cachedUsers = new ArrayList<User>();
+
         @Override
         public List<User> getUsers() {
                 if (cachedUsers != null) {
@@ -53,41 +54,42 @@ public class CharacterDB implements CharacterDAO {
                         c = new DBConnection().getConnection();
                         int totalshares = 0;
                         double loot_value = 0.0;
-                        PreparedStatement p = c.prepareStatement("SELECT characters.id,characters.name,character_classes.name,characters.active FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
                         ResultSet rs = p.executeQuery();
-                        PreparedStatement ploot = c.prepareStatement("SELECT loots.character_id,sum(loots.price) as priceSum,characters.active FROM loots JOIN characters on loots.character_id=characters.id group by character_id");
+                        PreparedStatement ploot = c.prepareStatement("SELECT * FROM loots JOIN characters where loots.character_id=characters.id");
                         ResultSet rsloot = ploot.executeQuery();
-                        PreparedStatement ps = c.prepareStatement("SELECT character_rewards.character_id, sum(rewards.number_of_shares) as shareSum FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id  group by character_id  with rollup");
+                        PreparedStatement ps = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON character_rewards.reward_id=rewards.id AND characters.id=character_rewards.character_id");
                         ResultSet rss = ps.executeQuery();
-                 
-                        Map<Integer, Double> prices = Maps.newHashMap();
+                        PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
+                        ResultSet rsTotalShares = totalShares.executeQuery();
+                        while (rsTotalShares.next()) {
+                                if (rsTotalShares.getBoolean("characters.active")) {
+                                        totalshares += rsTotalShares.getInt("rewards.number_of_shares");
+                                }
+                        }
+
+                        Multimap<Integer, Double> prices = LinkedListMultimap.create();
                         Map<Integer, String> charnames = new HashMap<Integer, String>();
                         Map<Integer, String> charroles = new HashMap<Integer, String>();
-                        Map<Integer, Integer> shareslist = Maps.newHashMap();
+                        Multimap<Integer, Integer> shareslist = LinkedListMultimap.create();
                         Map<Integer, Boolean> charactive = new HashMap<Integer, Boolean>();
-                        
                         List<Integer> charids = new ArrayList<Integer>();
                         while (rsloot.next()) {
-                                double pricetemp = rsloot.getDouble("priceSum");
+                                double pricetemp = rsloot.getDouble("loots.price");
                                 prices.put(rsloot.getInt("loots.character_id"), pricetemp);
                                 if (rsloot.getBoolean("characters.active")) {
                                         loot_value += pricetemp;
                                 }
                         }
-                        
                         while (rss.next()) {
-                            if(rss.getInt("character_rewards.character_id")>0) {
-                                shareslist.put(rss.getInt("character_rewards.character_id"), rss.getInt("shareSum"));
-                            } else {
-                                totalshares=rss.getInt("shareSum");
-                            }
+                                shareslist.put(rss.getInt("characters.id"), rss.getInt("rewards.number_of_shares"));
                         }
-                         
                         while (rs.next()) {
                                 charnames.put(rs.getInt("characters.id"), rs.getString("characters.name"));
                                 charroles.put(rs.getInt("characters.id"), rs.getString("character_classes.name").replace(" ", ""));
                                 charactive.put(rs.getInt("characters.id"), rs.getBoolean("characters.active"));
                                 charids.add(rs.getInt("characters.id"));
+
                         }
                         for (int userid : charids) {
                                 Boolean active = charactive.get(userid);
@@ -107,11 +109,20 @@ public class CharacterDB implements CharacterDAO {
                 cachedUsers.clear();
         }
 
-        private User calculateDKP(Map<Integer, Double> prices, Map<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
+        private User calculateDKP(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
                 int shares = 0;
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, share_value = 0.0;
-                dkp_spent = prices.containsKey(userid) ? prices.get(userid) : 0;
-                shares = shareslist.containsKey(userid) ? shareslist.get(userid) : 0;
+
+                Collection<Double> priceCollection = prices.get(userid);
+                for (Double dkpvalue : priceCollection) {
+                        dkp_spent = dkp_spent + dkpvalue;
+                }
+
+                Collection<Integer> shareCollection = shareslist.get(userid);
+                for (Integer sharetemp : shareCollection) {
+                        shares = shares + sharetemp;
+                }
+
                 if (totalshares > 0) {
                         share_value = loot_value / totalshares;
                 } else {
@@ -129,7 +140,7 @@ public class CharacterDB implements CharacterDAO {
                 user.addCharItems(getItemsForCharacter(userid));
                 return user;
         }
-
+        
         @Override
         public int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();
@@ -303,7 +314,6 @@ public class CharacterDB implements CharacterDAO {
 
         private void closeConnection(Connection c) {
                 try {
-                    if(c!=null)
                         c.close();
                 } catch (SQLException ex) {
                         Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -398,8 +408,8 @@ public class CharacterDB implements CharacterDAO {
 
         @Override
         public int countActiveUsers() {
-                int i = 0;
-                for (User u : getUsers()) {
+                int i=0;
+                for (User u : cachedUsers) {
                         if (u.isActive()) {
                                 i++;
                         }
@@ -408,9 +418,7 @@ public class CharacterDB implements CharacterDAO {
         }
 
         private class HasRolePredicate implements Predicate<User> {
-
                 private final Role role;
-
                 public HasRolePredicate(Role role) {
                         this.role = role;
                 }

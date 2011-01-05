@@ -327,7 +327,19 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-nativebutton-paladin, v-nativebutton-paladin:active, v-nativebutton-paladin:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-paladin:hover { text-decoration: underline; color: #F58CBA; }
 .v-nativebutton-paladin .v-nativebutton-caption {font-size: 12px; color: #F58CBA; text-decoration: none; }
-.paladin {color: #F58CBA;}
+.paladin {color: #F58CBA; }
 .v-label-paladin {color: #F58CBA; }
 .v-label-paladin:hover { text-decoration: underline; }
+
+.i-window-paladin .i-window-header { color: #F58CBA; }
+.i-window-shaman .i-window-header { color: #0070DE; }
+.i-window-warrior .i-window-header { color: #C79C6E; }
+.i-window-warlock .i-window-header { color: #9482C9; }
+.i-window-hunter .i-window-header { color: #ABD473; }
+.i-window-rogue .i-window-header { color: #FFF569; }
+.i-window-priest .i-window-header { color: #FFFFFF; }
+.i-window-deathknight .i-window-header { color: #C41F3B; }
+.i-window-druid .i-window-header { color: #FF7D0A; }
+.i-window-mage .i-window-header { color: #69CCF0; }
+
         

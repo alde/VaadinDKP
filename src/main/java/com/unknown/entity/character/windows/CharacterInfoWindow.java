@@ -5,7 +5,6 @@
 package com.unknown.entity.character.windows;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.XmlParser;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
 import com.unknown.entity.dao.*;
