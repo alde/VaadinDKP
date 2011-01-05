@@ -54,7 +54,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
-                raidCache = ImmutableList.copyOf(raids);
+                raidCache = raids;
                 return raids;
         }
 

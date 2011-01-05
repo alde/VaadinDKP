@@ -24,6 +24,8 @@ public interface ItemDAO {
 
     public List<Items> getItems();
 
+    public void clearCache();
+
         public List<ItemPrices> getDefaultPrices();
 
         public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality);

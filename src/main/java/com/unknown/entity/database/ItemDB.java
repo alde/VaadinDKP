@@ -30,8 +30,15 @@ import java.util.logging.Logger;
  */
 public class ItemDB implements ItemDAO {
 
+        private static List<Items> itemCache = new ArrayList<Items>();
+
         @Override
         public List<Items> getItems() {
+                if (itemCache != null) {
+                        if (!itemCache.isEmpty()) {
+                                return new ArrayList(itemCache);
+                        }
+                }
                 Connection c = null;
                 List<Items> items = new ArrayList<Items>();
                 try {
@@ -49,7 +56,13 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         closeConnection(c);
                 }
+                itemCache = items;
                 return items;
+        }
+
+        @Override
+        public void clearCache() {
+                itemCache.clear();
         }
 
         private Collection<ItemLooter> getLootersFormItems(int itemId) {

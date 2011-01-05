@@ -100,7 +100,7 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
-                cachedUsers = ImmutableList.copyOf(users);
+                cachedUsers = users;
                 return users;
         }
 
