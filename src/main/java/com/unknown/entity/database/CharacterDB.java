@@ -10,6 +10,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.Role;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
  * @author alde 
@@ -40,7 +40,6 @@ public class CharacterDB implements CharacterDAO {
         RaidDAO raidDao = new RaidDB();
         ItemDAO itemDao = new ItemDB();
         private static List<User> cachedUsers = new ArrayList<User>();
-
         @Override
         public List<User> getUsers() {
                 if (cachedUsers != null) {
@@ -56,7 +55,7 @@ public class CharacterDB implements CharacterDAO {
                         double loot_value = 0.0;
                         PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
                         ResultSet rs = p.executeQuery();
-                        PreparedStatement ploot = c.prepareStatement("SELECT * FROM loots JOIN characters where loots.character_id=characters.id");
+                        PreparedStatement ploot = c.prepareStatement("SELECT loots.character_id,sum(loots.price),characters.active FROM loots JOIN characters on loots.character_id=characters.id where characters.active group by character_id");
                         ResultSet rsloot = ploot.executeQuery();
                         PreparedStatement ps = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON character_rewards.reward_id=rewards.id AND characters.id=character_rewards.character_id");
                         ResultSet rss = ps.executeQuery();
@@ -68,11 +67,12 @@ public class CharacterDB implements CharacterDAO {
                                 }
                         }
 
-                        Multimap<Integer, Double> prices = LinkedListMultimap.create();
+                        Map<Integer, Double> prices = Maps.newHashMap();
                         Map<Integer, String> charnames = new HashMap<Integer, String>();
                         Map<Integer, String> charroles = new HashMap<Integer, String>();
                         Multimap<Integer, Integer> shareslist = LinkedListMultimap.create();
                         Map<Integer, Boolean> charactive = new HashMap<Integer, Boolean>();
+                        
                         List<Integer> charids = new ArrayList<Integer>();
                         while (rsloot.next()) {
                                 double pricetemp = rsloot.getDouble("loots.price");
@@ -81,10 +81,13 @@ public class CharacterDB implements CharacterDAO {
                                         loot_value += pricetemp;
                                 }
                         }
+                        
                         while (rss.next()) {
                                 shareslist.put(rss.getInt("characters.id"), rss.getInt("rewards.number_of_shares"));
                         }
+                         
                         while (rs.next()) {
+                            
                                 charnames.put(rs.getInt("characters.id"), rs.getString("characters.name"));
                                 charroles.put(rs.getInt("characters.id"), rs.getString("character_classes.name").replace(" ", ""));
                                 charactive.put(rs.getInt("characters.id"), rs.getBoolean("characters.active"));
@@ -109,15 +112,10 @@ public class CharacterDB implements CharacterDAO {
                 cachedUsers.clear();
         }
 
-        private User calculateDKP(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
+        private User calculateDKP(Map<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
                 int shares = 0;
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, share_value = 0.0;
-
-                Collection<Double> priceCollection = prices.get(userid);
-                for (Double dkpvalue : priceCollection) {
-                        dkp_spent = dkp_spent + dkpvalue;
-                }
-
+                dkp_spent = prices.get(userid);
                 Collection<Integer> shareCollection = shareslist.get(userid);
                 for (Integer sharetemp : shareCollection) {
                         shares = shares + sharetemp;
