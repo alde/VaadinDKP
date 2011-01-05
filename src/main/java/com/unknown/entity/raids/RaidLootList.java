@@ -99,7 +99,7 @@ public class RaidLootList extends Table implements RaidLootListener {
                 itemname.addStyleName(item.getQuality().toLowerCase());
                 addItem.getItemProperty("Item").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(item.getPrice());
-                addItem.getItemProperty("Heroic").setValue(item.isHeroic());
+                addItem.getItemProperty("Heroic").setValue((item.isHeroic() ? "Yes" : "No"));
                 super.requestRepaint();
         }
 

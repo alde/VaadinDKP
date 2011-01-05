@@ -42,7 +42,7 @@
 
     
 
-    
+    <set-property name="user.agent" value="safari"/> 
 
     <inherits name="org.vaadin.henrik.superimmediatetextfield.SuperimmediatetextfieldApplicationWidgetset" />
 </module>
