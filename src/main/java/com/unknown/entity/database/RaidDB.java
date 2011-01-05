@@ -482,25 +482,25 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public int getTotalRaidsLastThirtyDays() {
-                int i = 0;
+                int total_raids = 0;
                 DateTime dt = new DateTime();
                 String startdate = dt.toYearMonthDay().minusDays(30).toString();
                 String enddate = dt.toYearMonthDay().toString();
                 DBConnection c = new DBConnection();
                 try {
 
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM raids WHERE date BETWEEN ? AND ?");
+                        PreparedStatement p = c.prepareStatement("SELECT COUNT(distinct raids.id) as total_raids FROM raids JOIN rewards WHERE raids.id=rewards.raid_id AND date BETWEEN ? AND ?");
                         p.setString(1, startdate);
                         p.setString(2, enddate);
                         ResultSet rs = p.executeQuery();
-                        while (rs.next()) {
-                                i++;
+                        if (rs.next()) {
+                                total_raids = rs.getInt("total_raids");
                         }
                 } catch (SQLException e) {
                 } finally {
                         c.close();
                 }
-                return i;
+                return total_raids;
         }
 
         @Override

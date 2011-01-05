@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class ItemList extends Table implements ItemInfoListener {
 
-        private ItemDAO itemDAO;
+        private ItemDAO itemDao;
         IndexedContainer ic;
         private final ItemList itemList = this;
         private CharacterList charLiist;
@@ -36,7 +36,7 @@ public class ItemList extends Table implements ItemInfoListener {
         private int longest;
 
         public ItemList(ItemDAO itemDAO) {
-                this.itemDAO = itemDAO;
+                this.itemDao = itemDAO;
                 this.ic = new IndexedContainer();
                 this.setSizeUndefined();
                 this.setHeight("650px");
@@ -82,7 +82,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 if (this.getWidth() < 550) {
                         this.setWidth("550px");
                 }
-                List<Items> itemses = itemDAO.getItems();
+                List<Items> itemses = itemDao.getItems();
                 Collections.sort(itemses, new Comparator<Items>() {
 
                         @Override
@@ -138,6 +138,7 @@ public class ItemList extends Table implements ItemInfoListener {
 
         @Override
         public void onItemInfoChange() {
+                itemDao.clearCache();
                 update();
         }
 
