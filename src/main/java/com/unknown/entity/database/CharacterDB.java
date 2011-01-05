@@ -409,7 +409,7 @@ public class CharacterDB implements CharacterDAO {
         @Override
         public int countActiveUsers() {
                 int i=0;
-                for (User u : cachedUsers) {
+                for (User u : getUsers()) {
                         if (u.isActive()) {
                                 i++;
                         }
