@@ -63,4 +63,6 @@ public interface ItemDAO {
         public double getDefaultPrice(Items item);
 
         public void updateItemPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc);
+
+        public void updateLootedPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc);
 }

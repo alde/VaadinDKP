@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.items.windows;
 
+import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
@@ -34,6 +35,7 @@ public class EditMultiplierWindow extends Window {
         TextField multiplier;
         MultiplierList multiplierTable;
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
+        private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
 
         public EditMultiplierWindow() {
                 this.setCaption("Edit multipliers");
@@ -64,12 +66,19 @@ public class EditMultiplierWindow extends Window {
 
                 Button updateButton = new Button("Update");
                 updateButton.addListener(new UpdateButtonListener());
+
+                Button applyButton = new Button("Apply to looted");
+                applyButton.addListener(new ApplyButtonListener());
+
                 Button closeButton = new Button("Close");
                 closeButton.addListener(new CloseButtonListener());
 
+
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.addComponent(updateButton);
+                hzl.addComponent(applyButton);
                 hzl.addComponent(closeButton);
+                hzl.setMargin(true);
                 hzl.setSpacing(true);
                 addComponent(hzl);
         }
@@ -86,9 +95,16 @@ public class EditMultiplierWindow extends Window {
                 listeners.add(listener);
         }
 
+        public void addCharacterInfoListener(CharacterInfoListener clistn) {
+                charlisteners.add(clistn);
+        }
+
         private void notifyListeners() {
                 for (ItemInfoListener itemInfoListener : listeners) {
                         itemInfoListener.onItemInfoChange();
+                }
+                for (CharacterInfoListener charInfoListener : charlisteners) {
+                        charInfoListener.onCharacterInfoChange();
                 }
         }
 
@@ -127,6 +143,28 @@ public class EditMultiplierWindow extends Window {
                         Multiplier mp2 = itemDao.getMultiplierForItemlevel(i.getIlvl() + 13);
                         BigDecimal formattedpricehc = new BigDecimal(itemDao.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                         itemDao.updateItemPrices(i.getId(), formattedprice, formattedpricehc);
+                }
+        }
+
+        private void updateLootedPrices() {
+                List<Items> itemses = new ArrayList<Items>();
+                itemses.addAll(itemDao.getItems());
+                for (Items i : itemses) {
+                        Multiplier mp1 = itemDao.getMultiplierForItemlevel(i.getIlvl());
+                        BigDecimal formattedprice = new BigDecimal(itemDao.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        Multiplier mp2 = itemDao.getMultiplierForItemlevel(i.getIlvl() + 13);
+                        BigDecimal formattedpricehc = new BigDecimal(itemDao.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        itemDao.updateLootedPrices(i.getId(), formattedprice, formattedpricehc);
+                }
+        }
+
+        private class ApplyButtonListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        multiplierTable.updateIlvls();
+                        updateLootedPrices();
+                        notifyListeners();
                 }
         }
 }

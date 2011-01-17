@@ -58,32 +58,35 @@ public class RaidLootAddWindow extends Window {
                 HashSet<Items> lootlist = getLootList();
                 final ComboBox loots = lootListComboBox(lootlist);
                 final CheckBox heroic = new CheckBox("Heroic");
+                final CheckBox upgrade = new CheckBox("Upgrade (normal > heroic)");
                 final TextField price = new TextField("Price");
                 final ComboBox name = nameComboList();
                 final Button addButton = new Button("Add");
 
                 addComponent(loots);
                 addComponent(heroic);
+                addComponent(upgrade);
                 addComponent(price);
                 addComponent(name);
                 addComponent(addButton);
 
-                setImmediates(price, heroic, loots, name);
-                setListeners(loots, price, heroic, addButton, name);
+                setImmediates(price, heroic, upgrade, loots, name);
+                setListeners(loots, price, heroic, upgrade, addButton, name);
 
         }
 
-        private void setListeners(final ComboBox loots, final TextField price, final CheckBox heroic, final Button addButton, final ComboBox name) {
+        private void setListeners(final ComboBox loots, final TextField price, final CheckBox heroic, final CheckBox upgrade, final Button addButton, final ComboBox name) {
                 loots.addListener(new LootChangeListener(price, loots, heroic));
                 heroic.addListener(new HeroicChangeListener(price, loots, heroic));
+                upgrade.addListener(new UpgradeChangeListener(price, loots, heroic, upgrade));
                 addButton.addListener(new AddRaidListener(name, loots, heroic, price));
         }
 
-        private void setImmediates(final TextField price, final CheckBox heroic, final ComboBox loots, final ComboBox name) {
+        private void setImmediates(final TextField price, final CheckBox heroic, final CheckBox upgrade, final ComboBox loots, final ComboBox name) {
                 price.setImmediate(true);
                 heroic.setImmediate(true);
                 loots.setImmediate(true);
-//                boss.setImmediate(true);
+                upgrade.setImmediate(true);
                 name.setImmediate(true);
         }
 
@@ -221,6 +224,36 @@ public class RaidLootAddWindow extends Window {
                         addRaidLoot(name.getValue().toString(), loots.getValue().toString(), Boolean.parseBoolean(heroic.getValue().toString()), Double.parseDouble(price.getValue().toString()));
                         notifyListeners();
                         close();
+                }
+        }
+
+        private class UpgradeChangeListener implements ValueChangeListener {
+
+                private final TextField price;
+                private final ComboBox loots;
+                private final CheckBox heroic;
+                private final CheckBox upgrade;
+
+                public UpgradeChangeListener(TextField price, ComboBox loots, CheckBox heroic, CheckBox upgrade) {
+                        this.upgrade = upgrade;
+                        this.loots = loots;
+                        this.heroic = heroic;
+                        this.price = price;
+                }
+
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                        heroic.setValue(!heroic.booleanValue());
+                        Double upgradePrice = calcUpgradePrice();
+                        price.setValue(upgradePrice);
+                }
+
+                private double calcUpgradePrice() {
+                        if (upgrade.booleanValue()) {
+                                return getItemPrice(loots.getValue().toString(), true) - getItemPrice(loots.getValue().toString(), false);
+                        } else {
+                                return getItemPrice(loots.getValue().toString(), false);
+                        }
                 }
         }
 }

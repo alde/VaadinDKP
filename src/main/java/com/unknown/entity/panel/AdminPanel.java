@@ -288,6 +288,8 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 public void buttonClick(ClickEvent event) {
                         EditMultiplierWindow editMP = new EditMultiplierWindow();
                         editMP.addItemInfoListener(itemList);
+                        editMP.addCharacterInfoListener(dkpList);
+                        editMP.addCharacterInfoListener(characterList);
                         editMP.printInfo();
                         getMainWindow().addWindow(editMP);
                 }

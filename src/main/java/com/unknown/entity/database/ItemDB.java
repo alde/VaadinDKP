@@ -502,8 +502,30 @@ public class ItemDB implements ItemDAO {
                         PreparedStatement ps = c.prepareStatement("UPDATE items SET price_normal=? , price_heroic=? WHERE id=?");
                         ps.setDouble(1, Double.parseDouble(formattedprice.toString()));
                         ps.setDouble(2, Double.parseDouble(formattedpricehc.toString()));
+
                         ps.setInt(3, id);
                         ps.executeUpdate();
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+        }
+
+        @Override
+        public void updateLootedPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE id=? AND HEROIC=0");
+                        ps.setDouble(1, Double.parseDouble(formattedprice.toString()));
+                        ps.setInt(2, id);
+                        ps.executeUpdate();
+
+                        ps = c.prepareStatement("UPDATE loots SET price=? WHERE id=? AND HEROIC=1");
+                        ps.setDouble(1, Double.parseDouble(formattedpricehc.toString()));
+                        ps.setInt(2, id);
+                        ps.executeUpdate();
+
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {
