@@ -94,6 +94,7 @@ public class RaidRewardAddWindow extends Window {
                         raidReward.addRewardChars(chars);
                         raidDao.addReward(raidReward);
                         updateReward(raidReward, attendantlist, shares, comment);
+                        close();
                 } else {
                         showInvalidUsers(invalidchars);
                 }
@@ -124,7 +125,6 @@ public class RaidRewardAddWindow extends Window {
                         final ImmutableList<String> attendantlist = splitCharsToArray(attendants.getValue().toString());
                         addReward(comment.getValue().toString(), Integer.parseInt(shares.getValue().toString()), attendantlist, raid);
                         notifyListeners();
-                        close();
                 }
 
                 private ImmutableList<String> splitCharsToArray(String attendants) {
