@@ -147,7 +147,7 @@ public class CharacterEditWindow extends Window {
                 }
                 items.setValue(charitem.getName());
                 items.setNullSelectionAllowed(false);
-                String slot = itemDao.getItemById(itemDao.getItemId(items.getValue().toString())).getSlot().toString();
+                String slot = itemDao.getSlotForItemByName(charitem.getName());;
                 addItem.getItemProperty("Name").setValue(items);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Slot").setValue(slot);

@@ -7,6 +7,7 @@ package com.unknown.entity.dao;
 
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
+import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.items.Multiplier;
@@ -65,4 +66,8 @@ public interface ItemDAO {
         public void updateItemPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc);
 
         public void updateLootedPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc);
+
+        public List<CharacterItem> getLootForCharacter(String toString);
+
+        public String getSlotForItemByName(String name);
 }

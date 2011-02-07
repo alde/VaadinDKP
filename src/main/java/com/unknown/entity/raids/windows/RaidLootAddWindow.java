@@ -5,6 +5,7 @@
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
+import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
 import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
@@ -18,6 +19,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
@@ -41,6 +43,13 @@ public class RaidLootAddWindow extends Window {
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
         private List<ItemInfoListener> iteminfolisteners = new ArrayList<ItemInfoListener>();
+        private Label notice;
+        private ComboBox loots;
+        private CheckBox heroic;
+        private CheckBox upgrade;
+        private TextField price;
+        private ComboBox name;
+        private Button addButton;
 
         RaidLootAddWindow(Raid raid) {
                 this.raid = raid;
@@ -56,33 +65,37 @@ public class RaidLootAddWindow extends Window {
 
         public void printInfo() throws SQLException {
                 HashSet<Items> lootlist = getLootList();
-                final ComboBox loots = lootListComboBox(lootlist);
-                final CheckBox heroic = new CheckBox("Heroic");
-                final CheckBox upgrade = new CheckBox("Upgrade (normal > heroic)");
-                final TextField price = new TextField("Price");
-                final ComboBox name = nameComboList();
-                final Button addButton = new Button("Add");
+                this.loots = lootListComboBox(lootlist);
+                this.heroic = new CheckBox("Heroic");
+                this.upgrade = new CheckBox("Upgrade (normal > heroic)");
+                this.price = new TextField("Price");
+                this.name = nameComboList();
+                this.notice = new Label();
+                this.notice.setContentMode(Label.CONTENT_PREFORMATTED);
+                this.addButton = new Button("Add");
 
                 addComponent(loots);
                 addComponent(heroic);
                 addComponent(upgrade);
                 addComponent(price);
                 addComponent(name);
+                addComponent(notice);
                 addComponent(addButton);
 
-                setImmediates(price, heroic, upgrade, loots, name);
-                setListeners(loots, price, heroic, upgrade, addButton, name);
+                setImmediates();
+                setListeners();
 
         }
 
-        private void setListeners(final ComboBox loots, final TextField price, final CheckBox heroic, final CheckBox upgrade, final Button addButton, final ComboBox name) {
-                loots.addListener(new LootChangeListener(price, loots, heroic));
-                heroic.addListener(new HeroicChangeListener(price, loots, heroic));
-                upgrade.addListener(new UpgradeChangeListener(price, loots, heroic, upgrade));
-                addButton.addListener(new AddRaidListener(name, loots, heroic, price));
+        private void setListeners() {
+                loots.addListener(new LootChangeListener());
+                heroic.addListener(new HeroicChangeListener());
+                upgrade.addListener(new UpgradeChangeListener());
+                addButton.addListener(new AddRaidListener());
+                name.addListener(new NameChangeListener());
         }
 
-        private void setImmediates(final TextField price, final CheckBox heroic, final CheckBox upgrade, final ComboBox loots, final ComboBox name) {
+        private void setImmediates() {
                 price.setImmediate(true);
                 heroic.setImmediate(true);
                 loots.setImmediate(true);
@@ -95,8 +108,8 @@ public class RaidLootAddWindow extends Window {
         }
 
         private ComboBox nameComboList() throws UnsupportedOperationException {
-                final ComboBox name = new ComboBox("Name");
-                name.setWidth("300px");
+                final ComboBox cname = new ComboBox("Name");
+                cname.setWidth("300px");
                 HashSet<User> charlist = new HashSet<User>();
                 TreeSet<String> sortedlist = new TreeSet<String>();
                 charlist.addAll(characterDao.getUsers());
@@ -104,34 +117,34 @@ public class RaidLootAddWindow extends Window {
                         sortedlist.add(eachname.getUsername());
                 }
                 for (String s : sortedlist) {
-                        name.addItem(s);
+                        cname.addItem(s);
                 }
-                name.setNullSelectionAllowed(false);
+                cname.setNullSelectionAllowed(false);
 
-                return name;
+                return cname;
         }
 
         private Double getItemPrice(String itemname, Boolean isheroic) {
-                Double price = 0.0;
+                Double iPrice = 0.0;
                 if (itemname != null) {
 
                         try {
-                                price = getDefaultPrice(itemname, isheroic.booleanValue());
+                                iPrice = getDefaultPrice(itemname, isheroic.booleanValue());
                         } catch (SQLException ex) {
                                 Logger.getLogger(RaidLootAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
                 }
-                return price;
+                return iPrice;
         }
 
         private ComboBox lootListComboBox(HashSet<Items> lootlist) throws UnsupportedOperationException {
-                ComboBox loots = new ComboBox("Item");
-                loots.setWidth("300px");
+                ComboBox cloot = new ComboBox("Item");
+                cloot.setWidth("300px");
                 for (Items eachitem : lootlist) {
-                        loots.addItem(eachitem.getName());
+                        cloot.addItem(eachitem.getName());
                 }
-                loots.setNullSelectionAllowed(false);
-                return loots;
+                cloot.setNullSelectionAllowed(false);
+                return cloot;
         }
 
         private Double getDefaultPrice(String itemname, boolean isheroic) throws SQLException {
@@ -168,35 +181,47 @@ public class RaidLootAddWindow extends Window {
                 iteminfolisteners.add(listener);
         }
 
-        private class LootChangeListener implements ValueChangeListener {
+        private void UpdateNotice() {
+                notice.setValue("");
+                if (name.getValue() != null && !name.getValue().toString().isEmpty()) {
+                        String slot = itemDao.getItemById(itemDao.getItemId(loots.getValue().toString())).getSlot();
+                        System.out.println(slot);
+                        List<CharacterItem> prev = new ArrayList<CharacterItem>();
+                        List<CharacterItem> items = itemDao.getLootForCharacter(name.getValue().toString());
+                        for (CharacterItem i : items) {
+                                String tempslot = itemDao.getSlotForItemByName(i.getName());
+                                if (tempslot.equalsIgnoreCase(slot)) {
+                                        prev.add(i);
+                                }
+                        }
+                        if (!prev.isEmpty()) {
+                                String temp = name.getValue().toString() + " has already looted: \n";
+                                for (CharacterItem s : prev) {
+                                        temp += s.getName();
+                                        if (s.getHeroic()) {
+                                                temp += " (H) \n";
+                                        } else {
+                                                temp += "\n";
+                                        }
+                                }
+                                temp += "for that slot ("+ slot +"). Is this an upgrade?";
+                                notice.setValue(temp);
+                                notice.addStyleName("artifact");
+                        }
 
-                private final TextField price;
-                private final ComboBox loots;
-                private final CheckBox heroic;
-
-                public LootChangeListener(TextField price, ComboBox loots, CheckBox heroic) {
-                        this.price = price;
-                        this.loots = loots;
-                        this.heroic = heroic;
                 }
+        }
+
+        private class LootChangeListener implements ValueChangeListener {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
                         price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
+                        UpdateNotice();
                 }
         }
 
         private class HeroicChangeListener implements ValueChangeListener {
-
-                private final TextField price;
-                private final ComboBox loots;
-                private final CheckBox heroic;
-
-                public HeroicChangeListener(TextField price, ComboBox loots, CheckBox heroic) {
-                        this.price = price;
-                        this.loots = loots;
-                        this.heroic = heroic;
-                }
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
@@ -205,19 +230,6 @@ public class RaidLootAddWindow extends Window {
         }
 
         private class AddRaidListener implements ClickListener {
-
-                private final ComboBox name;
-                private final ComboBox loots;
-                private final CheckBox heroic;
-                private final TextField price;
-
-                public AddRaidListener(ComboBox name, ComboBox loots, CheckBox heroic, TextField price) {
-
-                        this.name = name;
-                        this.loots = loots;
-                        this.heroic = heroic;
-                        this.price = price;
-                }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
@@ -228,18 +240,6 @@ public class RaidLootAddWindow extends Window {
         }
 
         private class UpgradeChangeListener implements ValueChangeListener {
-
-                private final TextField price;
-                private final ComboBox loots;
-                private final CheckBox heroic;
-                private final CheckBox upgrade;
-
-                public UpgradeChangeListener(TextField price, ComboBox loots, CheckBox heroic, CheckBox upgrade) {
-                        this.upgrade = upgrade;
-                        this.loots = loots;
-                        this.heroic = heroic;
-                        this.price = price;
-                }
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
@@ -254,6 +254,14 @@ public class RaidLootAddWindow extends Window {
                         } else {
                                 return getItemPrice(loots.getValue().toString(), false);
                         }
+                }
+        }
+
+        private class NameChangeListener implements ValueChangeListener {
+
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                        UpdateNotice();
                 }
         }
 }

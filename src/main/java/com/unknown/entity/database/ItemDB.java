@@ -7,6 +7,7 @@ package com.unknown.entity.database;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
+import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
@@ -531,5 +532,35 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         c.close();
                 }
+        }
+
+        @Override
+        public List<CharacterItem> getLootForCharacter(String name) {
+                List<CharacterItem> foo = new ArrayList<CharacterItem>();
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement ps = c.prepareStatement("SELECT loots.heroic,loots.price,items.name,items.id,items.quality FROM loots JOIN items ON items.id=loots.item_id JOIN characters ON loots.character_id=characters.id WHERE characters.name=?");
+                        ps.setString(1, name);
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                                CharacterItem item = new CharacterItem();
+                                item.setHeroic(rs.getBoolean("heroic"));
+                                item.setId(rs.getInt("id"));
+                                item.setName(rs.getString("name"));
+                                item.setPrice(rs.getDouble("price"));
+                                item.setQuality(rs.getString("quality"));
+                                foo.add(item);
+                        }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return foo;
+        }
+
+        @Override
+        public String getSlotForItemByName(String name) {
+                return getItemById(getItemId(name)).getSlot();
         }
 }

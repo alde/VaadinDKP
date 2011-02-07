@@ -69,7 +69,7 @@ public class CharacterInfoWindow extends Window {
                 Label itemname = new Label(charitem.getName());
                 itemname.addStyleName(charitem.getQuality().toLowerCase());
                 ItemDAO itemDao = new ItemDB();
-                String slot = itemDao.getItemById(itemDao.getItemId(itemname.toString())).getSlot().toString();
+                String slot = itemDao.getSlotForItemByName(itemname.getValue().toString());
                 addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Slot").setValue(slot);
