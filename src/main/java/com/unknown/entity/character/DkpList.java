@@ -133,9 +133,6 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         private class dkpListClickListener implements ItemClickListener {
 
-                public dkpListClickListener() {
-                }
-
                 @Override
                 public void itemClick(ItemClickEvent event) {
                                 User user = (User) event.getItemId();

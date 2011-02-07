@@ -135,6 +135,7 @@ public class CharacterEditWindow extends Window {
         private void characterLootTableSetColumnHeaders() throws UnsupportedOperationException {
                 loots.addContainerProperty("Name", ComboBox.class, "");
                 loots.addContainerProperty("Price", Double.class, 0);
+                loots.addContainerProperty("Slot", String.class, "");
                 loots.addContainerProperty("Heroic", Boolean.class, false);
                 loots.addContainerProperty("Delete", CheckBox.class, false);
         }
@@ -146,8 +147,10 @@ public class CharacterEditWindow extends Window {
                 }
                 items.setValue(charitem.getName());
                 items.setNullSelectionAllowed(false);
+                String slot = itemDao.getItemById(itemDao.getItemId(items.getValue().toString())).getSlot().toString();
                 addItem.getItemProperty("Name").setValue(items);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
+                addItem.getItemProperty("Slot").setValue(slot);
                 addItem.getItemProperty("Heroic").setValue(charitem.getHeroic());
                 addItem.getItemProperty("Delete").setValue("");
         }

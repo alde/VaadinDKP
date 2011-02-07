@@ -68,8 +68,11 @@ public class CharacterInfoWindow extends Window {
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
                 Label itemname = new Label(charitem.getName());
                 itemname.addStyleName(charitem.getQuality().toLowerCase());
+                ItemDAO itemDao = new ItemDB();
+                String slot = itemDao.getItemById(itemDao.getItemId(itemname.toString())).getSlot().toString();
                 addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
+                addItem.getItemProperty("Slot").setValue(slot);
                 if (charitem.getHeroic()) {
                         addItem.getItemProperty("Heroic").setValue("Yes");
                 } else {
@@ -81,6 +84,7 @@ public class CharacterInfoWindow extends Window {
         private void characterInfoLootTableSetHeaders(Table tbl) throws UnsupportedOperationException {
                 tbl.addContainerProperty("Name", Label.class, "");
                 tbl.addContainerProperty("Price", Double.class, 0);
+                tbl.addContainerProperty("Slot", String.class, "");
                 tbl.addContainerProperty("Heroic", String.class, false);
         }
 
