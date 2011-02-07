@@ -47,6 +47,7 @@ public class RaidLootAddWindow extends Window {
         private ComboBox loots;
         private CheckBox heroic;
         private CheckBox upgrade;
+        private CheckBox sidegrade;
         private TextField price;
         private ComboBox name;
         private Button addButton;
@@ -61,6 +62,7 @@ public class RaidLootAddWindow extends Window {
                 this.characterDao = new CharacterDB();
                 this.setPositionX(600);
                 this.setPositionY(300);
+                this.setSizeUndefined();
         }
 
         public void printInfo() throws SQLException {
@@ -68,6 +70,7 @@ public class RaidLootAddWindow extends Window {
                 this.loots = lootListComboBox(lootlist);
                 this.heroic = new CheckBox("Heroic");
                 this.upgrade = new CheckBox("Upgrade (normal > heroic)");
+                this.sidegrade = new CheckBox("Sidegrade (Free)");
                 this.price = new TextField("Price");
                 this.name = nameComboList();
                 this.notice = new Label();
@@ -77,6 +80,7 @@ public class RaidLootAddWindow extends Window {
                 addComponent(loots);
                 addComponent(heroic);
                 addComponent(upgrade);
+                addComponent(sidegrade);
                 addComponent(price);
                 addComponent(name);
                 addComponent(notice);
@@ -91,6 +95,7 @@ public class RaidLootAddWindow extends Window {
                 loots.addListener(new LootChangeListener());
                 heroic.addListener(new HeroicChangeListener());
                 upgrade.addListener(new UpgradeChangeListener());
+                sidegrade.addListener(new SidegradeChangeListener());
                 addButton.addListener(new AddRaidListener());
                 name.addListener(new NameChangeListener());
         }
@@ -100,6 +105,7 @@ public class RaidLootAddWindow extends Window {
                 heroic.setImmediate(true);
                 loots.setImmediate(true);
                 upgrade.setImmediate(true);
+                sidegrade.setImmediate(true);
                 name.setImmediate(true);
         }
 
@@ -185,7 +191,6 @@ public class RaidLootAddWindow extends Window {
                 notice.setValue("");
                 if (name.getValue() != null && !name.getValue().toString().isEmpty()) {
                         String slot = itemDao.getItemById(itemDao.getItemId(loots.getValue().toString())).getSlot();
-                        System.out.println(slot);
                         List<CharacterItem> prev = new ArrayList<CharacterItem>();
                         List<CharacterItem> items = itemDao.getLootForCharacter(name.getValue().toString());
                         for (CharacterItem i : items) {
@@ -197,14 +202,14 @@ public class RaidLootAddWindow extends Window {
                         if (!prev.isEmpty()) {
                                 String temp = name.getValue().toString() + " has already looted: \n";
                                 for (CharacterItem s : prev) {
-                                        temp += s.getName();
+                                        temp += "  " +s.getName();
                                         if (s.getHeroic()) {
-                                                temp += " (H) \n";
+                                                temp += " [H] (" + s.getPrice() + " dkp)\n";
                                         } else {
-                                                temp += "\n";
+                                                temp += " (" + s.getPrice() + " dkp)\n";
                                         }
                                 }
-                                temp += "for that slot ("+ slot +"). Is this an upgrade?";
+                                temp += "for that slot (" + slot + ").\nIs this an upgrade?";
                                 notice.setValue(temp);
                                 notice.addStyleName("artifact");
                         }
@@ -262,6 +267,18 @@ public class RaidLootAddWindow extends Window {
                 @Override
                 public void valueChange(ValueChangeEvent event) {
                         UpdateNotice();
+                }
+        }
+
+        private class SidegradeChangeListener implements ValueChangeListener {
+
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                        if (sidegrade.booleanValue()) {
+                                price.setValue("0.0");
+                        } else {
+                                price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
+                        }
                 }
         }
 }
