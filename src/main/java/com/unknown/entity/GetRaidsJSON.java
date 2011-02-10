@@ -39,15 +39,6 @@ public class GetRaidsJSON extends HttpServlet {
                 try {
                         RaidDAO raidDao = new RaidDB();
                         List<Raid> raids = raidDao.getRaids();
-                        for (Raid r : raids) {
-                                try {
-                                        r.setRaidRewards(raidDao.getRewardsForRaid(r.getId()));
-                                        r.setRaidItems(raidDao.getItemsForRaid(r.getId()));
-
-                                } catch (SQLException ex) {
-                                        Logger.getLogger(GetRaidsJSON.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                        }
                         Gson gson = new Gson();
                         String userJson = gson.toJson(raids);
                         System.out.println(userJson);
