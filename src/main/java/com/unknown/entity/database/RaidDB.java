@@ -162,7 +162,7 @@ public class RaidDB implements RaidDAO {
                                 rrewards.setId(rs.getInt("rewards.id"));
                                 rrewards.setComment(rs.getString("rewards.comment"));
                                 rrewards.setShares(rs.getInt("rewards.number_of_shares"));
-                                rrewards.addRewardChars(getCharsForReward(rrewards.getId()));
+                                rrewards.setRewardChars(getCharsForReward(rrewards.getId()));
                                 raidRewards.add(rrewards);
                         }
                 } catch (SQLException e) {

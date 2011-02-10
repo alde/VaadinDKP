@@ -68,7 +68,7 @@ public class RaidList extends Table implements RaidInfoListener {
         }
 
         private void raidListAddRow(Item addItem, final Raid raid) throws ReadOnlyException, ConversionException {
-                addItem.getItemProperty("Zone").setValue(raid.getName());
+                addItem.getItemProperty("Zone").setValue(raid.getRaidname());
                 addItem.getItemProperty("Comment").setValue(raid.getComment());
                 addItem.getItemProperty("Date").setValue(raid.getDate());
         }
@@ -91,8 +91,8 @@ public class RaidList extends Table implements RaidInfoListener {
                 for (final Raid raid : raids) {
                         Item addItem = addItem(raid);
                         raidListAddRow(addItem, raid);
-                        if (longest < raid.getName().length() + 1) {
-                                longest = raid.getName().length() + 1;
+                        if (longest < raid.getRaidname().length() + 1) {
+                                longest = raid.getRaidname().length() + 1;
                         }
                         this.setColumnWidth("Zone", longest * 6);
                         this.requestRepaint();

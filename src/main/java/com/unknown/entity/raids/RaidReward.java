@@ -54,7 +54,7 @@ public class RaidReward {
                 this.shares = shares;
         }
 
-        public void addRewardChars(Collection<RaidChar> chars) {
+        public void setRewardChars(Collection<RaidChar> chars) {
                 raidChars.addAll(chars);
         }
 

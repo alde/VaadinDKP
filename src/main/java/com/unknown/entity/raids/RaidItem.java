@@ -21,6 +21,10 @@ public class RaidItem {
         private double price;
         private String quality;
 
+        public RaidItem() {
+
+        }
+        
         public RaidItem(String itemname, String looter, int itemid, double price, boolean isheroic, String quality) {
                 this.name = itemname;
                 this.looter = looter;

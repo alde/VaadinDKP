@@ -49,7 +49,7 @@ public class RaidEditWindow extends Window {
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
-                this.setCaption("Edit raid: " + raid.getName());
+                this.setCaption("Edit raid: " + raid.getRaidname());
                 this.raidDao = new RaidDB();
         }
 
@@ -94,7 +94,7 @@ public class RaidEditWindow extends Window {
                 zone.addStyleName("select-button");
                 zone.setImmediate(true);
                 zone.setNullSelectionAllowed(false);
-                zone.setValue(raid.getName());
+                zone.setValue(raid.getRaidname());
 
                 final TextField comment = new TextField("Comment: ", raid.getComment());
                 comment.setImmediate(true);
