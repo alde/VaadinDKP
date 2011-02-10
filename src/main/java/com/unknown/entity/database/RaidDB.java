@@ -171,9 +171,34 @@ public class RaidDB implements RaidDAO {
                         closeConnection(c);
                 }
                 return raidRewards;
-
         }
-
+    @Override
+        public Collection<RaidItem> getItemsForRaid(int raidId) {
+                Connection c = null;
+                List<RaidItem> raidItems = new ArrayList<RaidItem>();
+                try {
+                        c = new DBConnection().getConnection();
+                        PreparedStatement p = c.prepareStatement("SELECT characters.name,items.id,items.name,loots.price,items.quality,loots.heroic FROM loots JOIN items JOIN characters WHERE loots.item_id=items.id AND loots.character_id=characters.id AND loots.raid_id=?");
+                        p.setInt(1, raidId);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                   
+                                RaidItem rItem = new RaidItem();
+                                rItem.setId(rs.getInt("items.id"));
+                                rItem.setName(rs.getString("items.name"));
+                                rItem.setLooter(rs.getString("characters.name"));
+                                rItem.setPrice(rs.getDouble("loots.price"));
+                                rItem.setHeroic(rs.getBoolean("loots.heroic"));
+                                rItem.setQuality(rs.getString("items.quality"));
+                                raidItems.add(rItem);
+                        }
+                } catch (SQLException e) {
+                        e.printStackTrace();
+                } finally {
+                        closeConnection(c);
+                }
+                return raidItems;
+        }
         @Override
         public Collection<RaidChar> getCharsForReward(int id) {
                 Connection c = null;

@@ -10,7 +10,10 @@ import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.Raid;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +39,15 @@ public class GetRaidsJSON extends HttpServlet {
                 try {
                         RaidDAO raidDao = new RaidDB();
                         List<Raid> raids = raidDao.getRaids();
+                        for (Raid r : raids) {
+                                try {
+                                        r.setRaidRewards(raidDao.getRewardsForRaid(r.getId()));
+                                        r.setRaidItems(raidDao.getItemsForRaid(r.getId()));
 
+                                } catch (SQLException ex) {
+                                        Logger.getLogger(GetRaidsJSON.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                        }
                         Gson gson = new Gson();
                         String userJson = gson.toJson(raids);
                         System.out.println(userJson);

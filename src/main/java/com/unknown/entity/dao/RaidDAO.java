@@ -70,4 +70,6 @@ public interface RaidDAO {
         public boolean isValidZone(String oldzone);
 
         public void safelyRemoveRaid(Raid raid);
+
+        public Collection<RaidItem> getItemsForRaid(int id);
 }
