@@ -154,7 +154,9 @@ public class EditMultiplierWindow extends Window {
                         BigDecimal formattedprice = new BigDecimal(itemDao.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                         Multiplier mp2 = itemDao.getMultiplierForItemlevel(i.getIlvl() + 13);
                         BigDecimal formattedpricehc = new BigDecimal(itemDao.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                        itemDao.updateLootedPrices(i.getId(), formattedprice, formattedpricehc);
+//                        itemDao.updateLootedPrices(i.getId(), formattedprice, formattedpricehc);
+                        itemDao.updateLoots(i, formattedprice.toString(), formattedpricehc.toString());
+                        System.out.println(""+i.getId());
                 }
         }
 
