@@ -249,6 +249,7 @@ public class ItemEditWindow extends Window {
         }
 
         private void applyPrices() {
+                updateItem();
                 itemDao.updateLoots(item, price.getValue().toString(), pricehc.getValue().toString());
                 lout.removeComponent(ilt);
                 ilt = new ItemLooterTable(itemDao.getSingleItem(name.getValue().toString()));
