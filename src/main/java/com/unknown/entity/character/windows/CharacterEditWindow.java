@@ -34,12 +34,14 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import java.awt.event.KeyListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.plaf.basic.BasicSplitPaneUI.KeyboardDownRightHandler;
 
 /**
  *
@@ -74,8 +76,8 @@ public class CharacterEditWindow extends Window {
                 this.loots.setHeight("450px");
                 this.setCaption("Edit character: " + user.getUsername());
                 this.addStyleName("opaque");
-                this.setPositionX(200);
-                this.setPositionY(100);
+                this.setPositionX(60);
+                this.setPositionY(50);
                 this.getContent().setSizeUndefined();
         }
 
@@ -212,7 +214,6 @@ public class CharacterEditWindow extends Window {
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
                         raids.addStyleName("striped");
-                        raids.setWidth("100%");
                         addComponent(raids);
                         raids.addListener(new RaidListClickListener());
                 } else {
@@ -232,7 +233,11 @@ public class CharacterEditWindow extends Window {
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }
+                if (tbl.getWidth() < 500) {
+                        tbl.setWidth("500px");
+                }
                 return tbl;
+
         }
 
         private void lootList() {
@@ -299,8 +304,20 @@ public class CharacterEditWindow extends Window {
 
         private void raidsAttended() {
                 String attendance = charDao.getAttendanceRaids(user);
+                Double percent = Double.parseDouble(attendance);
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
+                if (percent >= 0 && percent < 50) {
+                        attended.setStyleName("negative");
+                } else if (percent > 50 && percent < 65) {
+                        attended.setStyleName("uncommon");
+                } else if (percent >= 65 && percent < 75) {
+                        attended.setStyleName("rare");
+                } else if (percent >= 75 && percent < 90) {
+                        attended.setStyleName("epic");
+                } else if (percent >= 90) {
+                        attended.setStyleName("legendary");
+                }
                 addComponent(attended);
         }
 

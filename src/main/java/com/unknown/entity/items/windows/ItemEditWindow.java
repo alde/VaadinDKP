@@ -61,8 +61,8 @@ public class ItemEditWindow extends Window {
                 this.item = item;
                 this.addStyleName("opaque");
                 this.setCaption("Edit item: " + item.getName());
-                this.setPositionX(400);
-                this.setPositionY(50);
+                this.setPositionX(50);
+                this.setPositionY(20);
                 this.getContent().setSizeUndefined();
                 createFields();
         }
@@ -70,7 +70,7 @@ public class ItemEditWindow extends Window {
         private void createFields() {
                 this.itemDao = new ItemDB();
                 this.ilt = new ItemLooterTable(item);
-                this.ilt.setWidth("100%");
+                this.ilt.setWidth("500px");
                 this.price = new TextField();
                 this.pricehc = new TextField();
                 this.slot = new ComboBox("Slot");

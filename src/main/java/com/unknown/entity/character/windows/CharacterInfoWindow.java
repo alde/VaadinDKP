@@ -24,6 +24,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  *
@@ -174,7 +177,7 @@ public class CharacterInfoWindow extends Window {
                 Table tbl = new Table();
                 characterInfoLootTableSetHeaders(tbl);
                 tbl.setSizeUndefined();
-                tbl.setHeight("150px");
+                tbl.setHeight("200px");
                 for (CharacterItem charitem : user.getCharItems()) {
                         Item addItem = tbl.addItem(charitem);
                         characterInfoLootTableAddRow(addItem, charitem);
@@ -195,12 +198,18 @@ public class CharacterInfoWindow extends Window {
                 tbl.addContainerProperty("Date", String.class, "");
                 tbl.setSizeUndefined();
                 tbl.setHeight("150px");
-                for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
+                
+                List<Raid> cRaids = raidDao.getRaidsForCharacter(user.getId());
+                Collections.sort(cRaids, new CompareDates());
+                for (Raid charraid : cRaids) {
                         Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }
                 tbl.addListener(new RaidListClickListener());
+                if (tbl.getWidth()<500) {
+                        tbl.setWidth("500px");
+                }
                 return tbl;
         }
 
@@ -226,9 +235,6 @@ public class CharacterInfoWindow extends Window {
 
         private class LootListClickListener implements ItemClickListener {
 
-                public LootListClickListener() {
-                }
-
                 @Override
                 public void itemClick(ItemClickEvent event) {
 
@@ -244,10 +250,6 @@ public class CharacterInfoWindow extends Window {
         }
 
         private class RaidListClickListener implements ItemClickListener {
-
-                public RaidListClickListener() {
-                }
-
                 @Override
                 public void itemClick(ItemClickEvent event) {
                         if (event.isDoubleClick()) {
@@ -256,6 +258,13 @@ public class CharacterInfoWindow extends Window {
                                 pop.setRaidList(raidList);
                                 pop.showProperRaidWindow(item);
                         }
+                }
+        }
+
+            private class CompareDates implements Comparator<Raid> {
+                @Override
+                public int compare(Raid t, Raid t1) {
+                        return t1.getDate().compareTo(t.getDate());
                 }
         }
 }
