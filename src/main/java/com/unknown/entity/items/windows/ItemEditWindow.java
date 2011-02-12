@@ -70,6 +70,9 @@ public class ItemEditWindow extends Window {
         private void createFields() {
                 this.itemDao = new ItemDB();
                 this.ilt = new ItemLooterTable(item);
+                this.ilt.setEditable(true);
+                this.ilt.setImmediate(true);
+                this.ilt.setWidth("100%");
                 this.price = new TextField();
                 this.pricehc = new TextField();
                 this.slot = new ComboBox("Slot");
@@ -126,7 +129,9 @@ public class ItemEditWindow extends Window {
                 hzl.setSpacing(true);
                 hzl.setMargin(true, false, true, false);
                 addComponent(hzl);
-                lout.addComponent(ilt);
+                if (ilt.size() > 0) {
+                        lout.addComponent(ilt);
+                }
                 addComponent(lout);
                 try {
                         itemTooltips(item);

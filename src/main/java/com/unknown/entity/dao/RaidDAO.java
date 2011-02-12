@@ -45,7 +45,7 @@ public interface RaidDAO {
 
         public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId);
 
-        public Iterable<Raid> getRaidsForCharacter(int charid);
+        public List<Raid> getRaidsForCharacter(int charid);
 
         public int getTotalRaidsLastThirtyDays();
 
@@ -72,4 +72,6 @@ public interface RaidDAO {
         public void safelyRemoveRaid(Raid raid);
 
         public Collection<RaidItem> getItemsForRaid(int id);
+
+        public Raid getRaid(String raidname, String raiddate);
 }

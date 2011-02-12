@@ -10,6 +10,7 @@ import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.List;
@@ -35,11 +36,11 @@ public class ItemLooterTable extends Table {
         private void printList() {
                 this.ic = new IndexedContainer();
                 itemLooterSetHeaders();
-                setHeight(150);
+                setHeight("250px");
                 setContainerDataSource(ic);
                 List<ItemLooter> looterlist = item.getLooterList();
                 for (ItemLooter looter : looterlist) {
-                        Item addItem = addItem(looter.getId());
+                        Item addItem = addItem(looter);
                         itemLooterAddRow(addItem, looter);
 
                 }
@@ -61,6 +62,7 @@ public class ItemLooterTable extends Table {
                 addItem.getItemProperty("Heroic").setValue(isheroic);
                 addItem.getItemProperty("Raid").setValue(looter.getRaid());
                 addItem.getItemProperty("Date").setValue(looter.getDate());
+                addItem.getItemProperty("Delete").setValue("");
         }
 
         private void itemLooterSetHeaders() throws UnsupportedOperationException {
@@ -69,5 +71,6 @@ public class ItemLooterTable extends Table {
                 ic.addContainerProperty("Heroic", Boolean.class, false);
                 ic.addContainerProperty("Raid", String.class, "");
                 ic.addContainerProperty("Date", String.class, "");
+                ic.addContainerProperty("Delete", CheckBox.class, false);
         }
 }

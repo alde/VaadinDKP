@@ -25,15 +25,19 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,7 +71,7 @@ public class CharacterEditWindow extends Window {
                 this.loots.setContainerDataSource(ic);
                 this.loots.setEditable(true);
                 this.loots.setImmediate(true);
-                this.loots.setHeight(150);
+                this.loots.setHeight("450px");
                 this.setCaption("Edit character: " + user.getUsername());
                 this.addStyleName("opaque");
                 this.setPositionX(200);
@@ -77,8 +81,6 @@ public class CharacterEditWindow extends Window {
 
         public void printInfo() throws SQLException {
                 characterInformation();
-                addComponent(new Label("<hr>", Label.CONTENT_XHTML));
-                characterDKP();
                 addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 characterLoots();
                 addComponent(new Label("<hr>", Label.CONTENT_XHTML));
@@ -96,23 +98,54 @@ public class CharacterEditWindow extends Window {
                 String activeStatus = (user.isActive() ? "Active" : "Inactive");
                 final CheckBox active = new CheckBox("Status: " + activeStatus);
                 active.setValue(user.isActive());
-                addComponent(name);
-                addComponent(characterClass);
-                addComponent(active);
+                HorizontalLayout hzl = new HorizontalLayout();
+                VerticalLayout vrt1 = new VerticalLayout();
+                vrt1.addComponent(name);
+                vrt1.addComponent(characterClass);
+                vrt1.addComponent(active);
+                hzl.addComponent(vrt1);
 
+                VerticalLayout vrt2 = new VerticalLayout();
                 Button updateButton = characterEditUpdateButton(name, characterClass, active);
                 Button deleteButton = new Button("Delete Character");
                 deleteButton.addListener(new DeleteButtonClickListener(user));
-                HorizontalLayout hzl = new HorizontalLayout();
                 Label warning = new Label();
                 warning.setWidth("220px");
                 warning.setValue("Can NOT be reverted.");
                 warning.addStyleName("error");
-                hzl.addComponent(updateButton);
-                hzl.addComponent(deleteButton);
-                hzl.addComponent(warning);
+                vrt2.addComponent(updateButton);
+                vrt2.addComponent(deleteButton);
+                vrt2.addComponent(warning);
+                vrt2.setSpacing(true);
+                hzl.addComponent(vrt2);
+
+                GridLayout gl = new GridLayout(2, 4);
+                gl.addComponent(new Label("Shares: "), 0, 0);
+                Label shares = new Label("" + user.getShares());
+                shares.addStyleName("color");
+                gl.addComponent(shares, 1, 0);
+
+                gl.addComponent(new Label("DKP Earned: "), 0, 1);
+                Label dkpearned = new Label("" + user.getDKPEarned());
+                dkpearned.addStyleName("color");
+                gl.addComponent(dkpearned, 1, 1);
+
+                gl.addComponent(new Label("DKP Spent: "), 0, 2);
+                Label dkpspent = new Label("" + user.getDKPSpent());
+                dkpspent.addStyleName("color");
+                gl.addComponent(dkpspent, 1, 2);
+
+                gl.addComponent(new Label("DKP: "), 0, 3);
+                Label dkp = new Label("" + user.getDKP());
+                if (user.getDKP() >= 0) {
+                        dkp.addStyleName("positive");
+                } else {
+                        dkp.addStyleName("negative");
+                }
+                gl.addComponent(dkp, 1, 3);
+                hzl.addComponent(gl);
+                gl.setSpacing(true);
                 hzl.setSpacing(true);
-                hzl.setMargin(true, false, true, false);
                 addComponent(hzl);
         }
 
@@ -147,7 +180,7 @@ public class CharacterEditWindow extends Window {
                 }
                 items.setValue(charitem.getName());
                 items.setNullSelectionAllowed(false);
-                String slot = itemDao.getSlotForItemByName(charitem.getName());;
+                String slot = itemDao.getSlotForItemByName(charitem.getName());
                 addItem.getItemProperty("Name").setValue(items);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Slot").setValue(slot);
@@ -179,7 +212,7 @@ public class CharacterEditWindow extends Window {
                 addComponent(new Label("Raids"));
                 if (raids.size() > 0) {
                         raids.addStyleName("striped");
-                        raids.setWidth("220px");
+                        raids.setWidth("100%");
                         addComponent(raids);
                         raids.addListener(new RaidListClickListener());
                 } else {
@@ -191,51 +224,15 @@ public class CharacterEditWindow extends Window {
                 Table tbl = new Table();
                 tbl.addContainerProperty("Comment", String.class, "");
                 tbl.addContainerProperty("Date", String.class, "");
-                tbl.setHeight("150px");
-                for (Raid charraid : raidDao.getRaidsForCharacter(user.getId())) {
+                tbl.setHeight("200px");
+                List<Raid> cRaids = raidDao.getRaidsForCharacter(user.getId());
+                Collections.sort(cRaids, new CompareDates());
+                for (Raid charraid : cRaids) {
                         Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }
                 return tbl;
-        }
-
-        private void characterDKP() throws OutOfBoundsException, OverlapsException {
-                HorizontalLayout hzl = new HorizontalLayout();
-                hzl.setWidth("200px");
-                hzl.addComponent(new Label("Shares: "));
-                Label shares = new Label("" + user.getShares());
-                shares.addStyleName("color");
-                hzl.addComponent(shares);
-                addComponent(hzl);
-
-                hzl = new HorizontalLayout();
-                hzl.setWidth("200px");
-                hzl.addComponent(new Label("DKP Earned: "));
-                Label dkpearned = new Label("" + user.getDKPEarned());
-                dkpearned.addStyleName("color");
-                hzl.addComponent(dkpearned);
-                addComponent(hzl);
-
-                hzl = new HorizontalLayout();
-                hzl.setWidth("200px");
-                hzl.addComponent(new Label("DKP Spent: "));
-                Label dkpspent = new Label("" + user.getDKPSpent());
-                dkpspent.addStyleName("color");
-                hzl.addComponent(dkpspent);
-                addComponent(hzl);
-
-                hzl = new HorizontalLayout();
-                hzl.setWidth("200px");
-                hzl.addComponent(new Label("DKP: "));
-                Label dkp = new Label("" + user.getDKP());
-                if (user.getDKP() >= 0) {
-                        dkp.addStyleName("positive");
-                } else {
-                        dkp.addStyleName("negative");
-                }
-                hzl.addComponent(dkp);
-                addComponent(hzl);
         }
 
         private void lootList() {
@@ -334,12 +331,12 @@ public class CharacterEditWindow extends Window {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                                ItemDAO itemDao = new ItemDB();
-                                CharacterItem citem = (CharacterItem) event.getItemId();
-                                Items temp = itemDao.getSingleItem(citem.getName());
-                                PopUpControl pop = new PopUpControl(app);
-                                pop.setItemList(itemList);
-                                pop.showProperItemWindow(temp);
+                        ItemDAO itemDao = new ItemDB();
+                        CharacterItem citem = (CharacterItem) event.getItemId();
+                        Items temp = itemDao.getSingleItem(citem.getName());
+                        PopUpControl pop = new PopUpControl(app);
+                        pop.setItemList(itemList);
+                        pop.showProperItemWindow(temp);
                 }
         }
 
@@ -347,11 +344,22 @@ public class CharacterEditWindow extends Window {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                                Raid item = (Raid) event.getItemId();
-                                PopUpControl pop = new PopUpControl(app);
-                                pop.setItemList(itemList);
-                                pop.setRaidList(raidList);
-                                pop.showProperRaidWindow(item);
+                        Raid item = (Raid) event.getItemId();
+                        PopUpControl pop = new PopUpControl(app);
+                        pop.setItemList(itemList);
+                        pop.setRaidList(raidList);
+                        pop.showProperRaidWindow(item);
+                }
+        }
+
+        private static class CompareDates implements Comparator<Raid> {
+
+                public CompareDates() {
+                }
+
+                @Override
+                public int compare(Raid t, Raid t1) {
+                        return t1.getDate().compareTo(t.getDate());
                 }
         }
 }

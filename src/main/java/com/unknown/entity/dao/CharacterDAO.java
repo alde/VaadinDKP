@@ -51,4 +51,6 @@ public interface CharacterDAO {
         public int getSiteUserLevel(String name);
 
         public int countActiveUsers();
+
+        public User getUser(String toString);
 }

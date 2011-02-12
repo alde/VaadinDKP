@@ -486,7 +486,7 @@ public class RaidDB implements RaidDAO {
         }
 
         @Override
-        public Iterable<Raid> getRaidsForCharacter(int charid) {
+        public List<Raid> getRaidsForCharacter(int charid) {
                 List<Raid> raids = new ArrayList<Raid>();
                 DBConnection c = new DBConnection();
                 try {
@@ -734,5 +734,15 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+        }
+
+        @Override
+        public Raid getRaid(String raidcomment, String raiddate) {
+                for (Raid r : getRaids()) {
+                        if (r.getComment().equalsIgnoreCase(raidcomment) && r.getDate().equalsIgnoreCase(raiddate)) {
+                                return r;
+                        }
+                }
+                return null;
         }
 }

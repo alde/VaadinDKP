@@ -417,6 +417,16 @@ public class CharacterDB implements CharacterDAO {
                 return i;
         }
 
+        @Override
+        public User getUser(String username) {
+                for (User u : getUsers()) {
+                        if (u.getUsername().equalsIgnoreCase(username)) {
+                                return u;
+                        }
+                }
+                return null;
+        }
+
         private class HasRolePredicate implements Predicate<User> {
                 private final Role role;
                 public HasRolePredicate(Role role) {
