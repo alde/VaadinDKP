@@ -70,8 +70,6 @@ public class ItemEditWindow extends Window {
         private void createFields() {
                 this.itemDao = new ItemDB();
                 this.ilt = new ItemLooterTable(item);
-                this.ilt.setEditable(true);
-                this.ilt.setImmediate(true);
                 this.ilt.setWidth("100%");
                 this.price = new TextField();
                 this.pricehc = new TextField();

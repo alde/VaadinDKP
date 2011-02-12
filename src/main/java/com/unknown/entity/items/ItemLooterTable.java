@@ -62,7 +62,6 @@ public class ItemLooterTable extends Table {
                 addItem.getItemProperty("Heroic").setValue(isheroic);
                 addItem.getItemProperty("Raid").setValue(looter.getRaid());
                 addItem.getItemProperty("Date").setValue(looter.getDate());
-                addItem.getItemProperty("Delete").setValue("");
         }
 
         private void itemLooterSetHeaders() throws UnsupportedOperationException {
@@ -71,6 +70,5 @@ public class ItemLooterTable extends Table {
                 ic.addContainerProperty("Heroic", Boolean.class, false);
                 ic.addContainerProperty("Raid", String.class, "");
                 ic.addContainerProperty("Date", String.class, "");
-                ic.addContainerProperty("Delete", CheckBox.class, false);
         }
 }
