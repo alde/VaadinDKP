@@ -53,4 +53,6 @@ public interface CharacterDAO {
         public int countActiveUsers();
 
         public User getUser(String toString);
+
+        public Integer getShares(int id);
 }

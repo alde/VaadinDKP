@@ -5,6 +5,7 @@
 package com.unknown.entity.database;
 
 import com.google.common.collect.ImmutableList;
+import com.unknown.entity.character.Adjustment;
 import com.unknown.entity.dao.*;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.character.User;
@@ -172,7 +173,8 @@ public class RaidDB implements RaidDAO {
                 }
                 return raidRewards;
         }
-    @Override
+
+        @Override
         public Collection<RaidItem> getItemsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidItem> raidItems = new ArrayList<RaidItem>();
@@ -182,7 +184,7 @@ public class RaidDB implements RaidDAO {
                         p.setInt(1, raidId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
-                   
+
                                 RaidItem rItem = new RaidItem();
                                 rItem.setId(rs.getInt("items.id"));
                                 rItem.setName(rs.getString("items.name"));
@@ -199,6 +201,7 @@ public class RaidDB implements RaidDAO {
                 }
                 return raidItems;
         }
+
         @Override
         public Collection<RaidChar> getCharsForReward(int id) {
                 Connection c = null;
@@ -744,5 +747,70 @@ public class RaidDB implements RaidDAO {
                         }
                 }
                 return null;
+        }
+
+        @Override
+        public List<Adjustment> getAdjustmentsForCharacter(int charid) {
+                List<Adjustment> pun = new ArrayList<Adjustment>();
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT * FROM adjustments WHERE character_id=?");
+                        p.setInt(1, charid);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                Adjustment pTemp = new Adjustment();
+                                pTemp.setCharId(rs.getInt("character_id"));
+                                pTemp.setComment(rs.getString("comment"));
+                                pTemp.setDate(rs.getString("date"));
+                                pTemp.setId(rs.getInt("id"));
+                                pTemp.setShares(rs.getInt("shares"));
+                                pun.add(pTemp);
+                        }
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return pun;
+        }
+
+        @Override
+        public int addAdjustment(Adjustment p) {
+                p = doAddAdjustment(p);
+                return p.getId();
+        }
+
+        private Adjustment doAddAdjustment(Adjustment p) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement ps = c.prepareStatement("INSERT INTO adjustments (shares, comment, character_id, date) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                        ps.setInt(1, p.getShares());
+                        ps.setString(2, p.getComment());
+                        ps.setInt(3, p.getCharId());
+                        ps.setString(4, p.getDate());
+                        ps.executeUpdate();
+                        ResultSet rs = ps.getGeneratedKeys();
+                        while (rs.next()) {
+                                p.setId(rs.getInt(1));
+                        }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return p;
+        }
+
+        @Override
+        public void removeAdjustment(Adjustment p) {
+                DBConnection c = new DBConnection();
+                try {
+                        PreparedStatement ps = c.prepareStatement("DELETE FROM adjustments WHERE id=?");
+                        ps.setInt(1, p.getId());
+                        ps.executeUpdate();
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
         }
 }

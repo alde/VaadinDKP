@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.character.windows;
 
+import com.unknown.entity.character.Adjustment;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
@@ -125,14 +126,25 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void characterRaids() throws SQLException {
+                HorizontalLayout hraid = new HorizontalLayout();
                 Table raids = raidList(user);
-                addComponent(new Label("Raids"));
+                raids.setCaption("Raids");
                 if (raids.size() > 0) {
                         raids.addStyleName("striped");
-                        addComponent(raids);
+                        hraid.addComponent(raids);
                 } else {
-                        addComponent(new Label("No raids attended yet."));
+                        hraid.addComponent(new Label("No raids attended yet."));
                 }
+                Table punishments = punishmentList(user);
+                punishments.setCaption("Adjustments");
+                if (punishments.size() > 0) {
+                        punishments.addStyleName("striped");
+                        hraid.addComponent(punishments);
+                } else {
+                        hraid.addComponent(new Label("No adjustments."));
+                }
+                addComponent(hraid);
+                hraid.setSpacing(true);
         }
 
         private void characterDKP() throws OutOfBoundsException, OverlapsException {
@@ -198,16 +210,39 @@ public class CharacterInfoWindow extends Window {
                 tbl.addContainerProperty("Date", String.class, "");
                 tbl.setSizeUndefined();
                 tbl.setHeight("150px");
-                
+
                 List<Raid> cRaids = raidDao.getRaidsForCharacter(user.getId());
-                Collections.sort(cRaids, new CompareDates());
+                Collections.sort(cRaids, new CompareRaidDates());
                 for (Raid charraid : cRaids) {
                         Item addItem = tbl.addItem(charraid);
                         addItem.getItemProperty("Comment").setValue(charraid.getComment());
                         addItem.getItemProperty("Date").setValue(charraid.getDate());
                 }
                 tbl.addListener(new RaidListClickListener());
-                if (tbl.getWidth()<500) {
+                if (tbl.getWidth() < 500) {
+                        tbl.setWidth("500px");
+                }
+                return tbl;
+        }
+
+        private Table punishmentList(User user) throws SQLException {
+                Table tbl = new Table();
+                tbl.addContainerProperty("Comment", String.class, "");
+                tbl.addContainerProperty("Shares", Integer.class, 0);
+                tbl.addContainerProperty("Date", String.class, "");
+                tbl.setSizeUndefined();
+                tbl.setHeight("150px");
+
+                List<Adjustment> cPun = raidDao.getAdjustmentsForCharacter(user.getId());
+                Collections.sort(cPun, new ComparePunishmentDates());
+                for (Adjustment pun : cPun) {
+                        Item addItem = tbl.addItem(pun);
+                        addItem.getItemProperty("Comment").setValue(pun.getComment());
+                        addItem.getItemProperty("Shares").setValue(pun.getShares());
+                        addItem.getItemProperty("Date").setValue(pun.getDate());
+                }
+                tbl.addListener(new RaidListClickListener());
+                if (tbl.getWidth() < 500) {
                         tbl.setWidth("500px");
                 }
                 return tbl;
@@ -219,9 +254,9 @@ public class CharacterInfoWindow extends Window {
                 Double percent = Double.parseDouble(attendance);
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
-                if (percent>=0 && percent<50){
+                if (percent >= 0 && percent < 50) {
                         attended.setStyleName("negative");
-                } else if(percent > 50 && percent < 65) {
+                } else if (percent > 50 && percent < 65) {
                         attended.setStyleName("uncommon");
                 } else if (percent >= 65 && percent < 75) {
                         attended.setStyleName("rare");
@@ -250,6 +285,7 @@ public class CharacterInfoWindow extends Window {
         }
 
         private class RaidListClickListener implements ItemClickListener {
+
                 @Override
                 public void itemClick(ItemClickEvent event) {
                         if (event.isDoubleClick()) {
@@ -261,9 +297,17 @@ public class CharacterInfoWindow extends Window {
                 }
         }
 
-            private class CompareDates implements Comparator<Raid> {
+        private class CompareRaidDates implements Comparator<Raid> {
+
                 @Override
                 public int compare(Raid t, Raid t1) {
+                        return t1.getDate().compareTo(t.getDate());
+                }
+        }
+
+        private class ComparePunishmentDates implements Comparator<Adjustment> {
+                @Override
+                public int compare(Adjustment t, Adjustment t1) {
                         return t1.getDate().compareTo(t.getDate());
                 }
         }

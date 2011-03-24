@@ -34,7 +34,8 @@ public final class DBConnection {
 
     private Connection connect() {
         try {
-            conn = DriverManager.getConnection("jdbc:mysql://" + properties.getProperty("db.url") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.db"), properties.getProperty("db.username"), properties.getProperty("db.password"));
+//            conn = DriverManager.getConnection("jdbc:mysql://" + properties.getProperty("db.url") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.db"), properties.getProperty("db.username"), properties.getProperty("db.password"));
+            conn = DriverManager.getConnection("jdbc:mysql://unknown-entity.com:3306/dkpdevel", "root", "piccolo");
             return conn;
         } catch (SQLException ex) {
             ex.printStackTrace();

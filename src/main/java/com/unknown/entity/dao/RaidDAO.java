@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.dao;
 
+import com.unknown.entity.character.Adjustment;
 import com.unknown.entity.character.User;
 import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidChar;
@@ -74,4 +75,10 @@ public interface RaidDAO {
         public Collection<RaidItem> getItemsForRaid(int id);
 
         public Raid getRaid(String raidname, String raiddate);
+
+        public List<Adjustment> getAdjustmentsForCharacter(int charid);
+
+        public int addAdjustment(Adjustment p);
+
+        public void removeAdjustment(Adjustment p);
 }

@@ -4,6 +4,7 @@
  */
 package com.unknown.entity.character.windows;
 
+import com.unknown.entity.character.AdjustmentTable;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.*;
@@ -25,55 +26,61 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.GridLayout.OutOfBoundsException;
-import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.awt.event.KeyListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.plaf.basic.BasicSplitPaneUI.KeyboardDownRightHandler;
 
 /**
  *
  * @author alde
  */
-public class CharacterEditWindow extends Window {
+public class CharacterEditWindow extends Window implements CharacterInfoListener {
 
-        private final User user;
+        private User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private RaidDAO raidDao;
         private ItemDAO itemDao;
         private CharacterDAO charDao;
         private IndexedContainer ic;
+        private IndexedContainer icp;
         private Table loots;
         private Application app;
         private ItemList itemList;
+        private DkpList dkpList;
         private RaidList raidList;
+        private Label shares;
+        private Label noPun;
+        private Table punishments;
+        private CharacterEditWindow charInfo = this;
+        private HorizontalLayout hraid;
 
-        public CharacterEditWindow(User user, Application app, RaidList raidList, ItemList itemList) {
+        public CharacterEditWindow(User user, Application app, RaidList raidList, ItemList itemList, DkpList dkpList) {
                 this.user = user;
                 this.app = app;
                 this.raidList = raidList;
                 this.itemList = itemList;
+                this.dkpList = dkpList;
                 this.raidDao = new RaidDB();
                 this.charDao = new CharacterDB();
                 this.itemDao = new ItemDB();
                 this.ic = new IndexedContainer();
                 this.loots = new Table();
                 this.loots.setContainerDataSource(ic);
+                this.punishments = new AdjustmentTable(user);
                 this.loots.setEditable(true);
                 this.loots.setImmediate(true);
-                this.loots.setHeight("450px");
+                this.loots.setHeight("400px");
                 this.setCaption("Edit character: " + user.getUsername());
                 this.addStyleName("opaque");
                 this.setPositionX(60);
@@ -89,6 +96,11 @@ public class CharacterEditWindow extends Window {
                 characterRaids();
                 addComponent(new Label("<hr>", Label.CONTENT_XHTML));
                 raidsAttended();
+        }
+
+        private void addRaidListRow(Item addItem, Raid charraid) throws ConversionException, ReadOnlyException {
+                addItem.getItemProperty("Comment").setValue(charraid.getComment());
+                addItem.getItemProperty("Date").setValue(charraid.getDate());
         }
 
         private void characterInformation() {
@@ -123,7 +135,7 @@ public class CharacterEditWindow extends Window {
 
                 GridLayout gl = new GridLayout(2, 4);
                 gl.addComponent(new Label("Shares: "), 0, 0);
-                Label shares = new Label("" + user.getShares());
+                this.shares = new Label("" + user.getShares());
                 shares.addStyleName("color");
                 gl.addComponent(shares, 1, 0);
 
@@ -146,6 +158,9 @@ public class CharacterEditWindow extends Window {
                 }
                 gl.addComponent(dkp, 1, 3);
                 hzl.addComponent(gl);
+                Button addPunishmentButton = new Button("Add Adjustment");
+                addPunishmentButton.addListener(new AddPunishmentListener());
+                hzl.addComponent(addPunishmentButton);
                 gl.setSpacing(true);
                 hzl.setSpacing(true);
                 addComponent(hzl);
@@ -190,6 +205,11 @@ public class CharacterEditWindow extends Window {
                 addItem.getItemProperty("Delete").setValue("");
         }
 
+        private void setRaidListHeaders(Table tbl) throws UnsupportedOperationException {
+                tbl.addContainerProperty("Comment", String.class, "");
+                tbl.addContainerProperty("Date", String.class, "");
+        }
+
         private int updateCharacter(String name, String charclass, boolean active) {
                 return charDao.updateCharacter(user, name, charclass, active);
         }
@@ -210,34 +230,50 @@ public class CharacterEditWindow extends Window {
         }
 
         private void characterRaids() throws SQLException {
+                hraid = new HorizontalLayout();
+                hraid.addComponent(raiTable());
+                hraid.addComponent(punTable());
+                addComponent(hraid);
+        }
+        private Component raiTable() throws SQLException {
                 Table raids = raidList(user);
-                addComponent(new Label("Raids"));
+                raids.setCaption("Raids");
                 if (raids.size() > 0) {
                         raids.addStyleName("striped");
-                        addComponent(raids);
                         raids.addListener(new RaidListClickListener());
+                        return raids;
                 } else {
-                        addComponent(new Label("No raids attended yet."));
+                        return new Label("No raids attended yet.");
+                }
+        }
+
+        private Component punTable() {
+                punishments.setCaption("Adjustments");
+                if (punishments.size() > 0) {
+                        punishments.addStyleName("striped");
+                        punishments.addListener(new PunishmentClickListener());
+                        return punishments;
+
+                } else {
+                        noPun = new Label("No adjustments.");
+                        return noPun;
                 }
         }
 
         private Table raidList(User user) throws SQLException {
                 Table tbl = new Table();
-                tbl.addContainerProperty("Comment", String.class, "");
-                tbl.addContainerProperty("Date", String.class, "");
+                setRaidListHeaders(tbl);
                 tbl.setHeight("200px");
                 List<Raid> cRaids = raidDao.getRaidsForCharacter(user.getId());
                 Collections.sort(cRaids, new CompareDates());
                 for (Raid charraid : cRaids) {
                         Item addItem = tbl.addItem(charraid);
-                        addItem.getItemProperty("Comment").setValue(charraid.getComment());
-                        addItem.getItemProperty("Date").setValue(charraid.getDate());
+                        addRaidListRow(addItem, charraid);
                 }
-                if (tbl.getWidth() < 500) {
-                        tbl.setWidth("500px");
+                if (tbl.getWidth() < 300) {
+                        tbl.setWidth("300px");
                 }
                 return tbl;
-
         }
 
         private void lootList() {
@@ -248,7 +284,7 @@ public class CharacterEditWindow extends Window {
                 }
         }
 
-        public void addCharacterInfoListener(CharacterInfoListener listener) {
+        public final void addCharacterInfoListener(CharacterInfoListener listener) {
                 listeners.add(listener);
         }
 
@@ -266,6 +302,25 @@ public class CharacterEditWindow extends Window {
                 charDao.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
         }
 
+        public void update() {
+                clear();
+                shares.setValue(user.getShares());
+                punishments = new AdjustmentTable(user);
+                hraid.addComponent(punTable());
+        }
+
+        private void clear() {
+                this.user = charDao.getUser(user.getUsername());
+                shares.setValue("");
+                hraid.removeComponent(punishments);
+                hraid.removeComponent(noPun);
+        }
+
+        @Override
+        public void onCharacterInfoChange() {
+                update();
+        }
+
         private class updateBtnClickListener implements ClickListener {
 
                 private final TextField name;
@@ -280,7 +335,7 @@ public class CharacterEditWindow extends Window {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        int success = updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
+                        updateCharacter(name.getValue().toString(), characterClass.getValue().toString(), (Boolean) active.getValue());
                         notifyListeners();
                         close();
                 }
@@ -369,14 +424,37 @@ public class CharacterEditWindow extends Window {
                 }
         }
 
-        private static class CompareDates implements Comparator<Raid> {
-
-                public CompareDates() {
-                }
+        private class CompareDates implements Comparator<Raid> {
 
                 @Override
                 public int compare(Raid t, Raid t1) {
                         return t1.getDate().compareTo(t.getDate());
+                }
+        }
+
+        private class AddPunishmentListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        AddPunishmentWindow addItem = new AddPunishmentWindow(user.getId());
+                        addItem.addCharacterInfoListener(dkpList);
+                        addItem.addCharacterInfoListener(charInfo);
+                        addItem.printInfo();
+                        app.getMainWindow().addWindow(addItem);
+                }
+        }
+
+        private class PunishmentClickListener implements ItemClickListener {
+
+                @Override
+                public void itemClick(ItemClickEvent event) {
+                        if (event.isCtrlKey() && event.isShiftKey()) {
+                                Adjustment p = (Adjustment) event.getItemId();
+                                RaidDAO rdao = new RaidDB();
+                                rdao.removeAdjustment(p);
+                                notifyListeners();
+                                update();
+                        }
                 }
         }
 }

@@ -53,6 +53,7 @@ public class CharacterDB implements CharacterDAO {
                 try {
                         c = new DBConnection().getConnection();
                         int totalshares = 0;
+                        int totaladjustments = 0;
                         double loot_value = 0.0;
                         PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
                         ResultSet rs = p.executeQuery();
@@ -62,12 +63,18 @@ public class CharacterDB implements CharacterDAO {
                         ResultSet rss = ps.executeQuery();
                         PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
                         ResultSet rsTotalShares = totalShares.executeQuery();
+                        PreparedStatement pAdjust = c.prepareStatement("SELECT SUM(shares) AS pun FROM adjustments");
+                        ResultSet rsAdjust = pAdjust.executeQuery();
+                        while (rsAdjust.next()) {
+                                totaladjustments = rsAdjust.getInt("pun");
+                        }
                         while (rsTotalShares.next()) {
                                 if (rsTotalShares.getBoolean("characters.active")) {
                                         totalshares += rsTotalShares.getInt("rewards.number_of_shares");
                                 }
                         }
-
+                        totalshares += totaladjustments;
+                        
                         Multimap<Integer, Double> prices = LinkedListMultimap.create();
                         Map<Integer, String> charnames = new HashMap<Integer, String>();
                         Map<Integer, String> charroles = new HashMap<Integer, String>();
@@ -111,8 +118,8 @@ public class CharacterDB implements CharacterDAO {
 
         private User calculateDKP(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
                 int shares = 0;
+                int adjustments = getTotalAdjustmentsForCharacter(userid);
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, share_value = 0.0;
-
                 Collection<Double> priceCollection = prices.get(userid);
                 for (Double dkpvalue : priceCollection) {
                         dkp_spent = dkp_spent + dkpvalue;
@@ -122,6 +129,7 @@ public class CharacterDB implements CharacterDAO {
                 for (Integer sharetemp : shareCollection) {
                         shares = shares + sharetemp;
                 }
+                shares += adjustments;
 
                 if (totalshares > 0) {
                         share_value = loot_value / totalshares;
@@ -140,7 +148,7 @@ public class CharacterDB implements CharacterDAO {
                 user.addCharItems(getItemsForCharacter(userid));
                 return user;
         }
-        
+
         @Override
         public int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();
@@ -408,7 +416,7 @@ public class CharacterDB implements CharacterDAO {
 
         @Override
         public int countActiveUsers() {
-                int i=0;
+                int i = 0;
                 for (User u : getUsers()) {
                         if (u.isActive()) {
                                 i++;
@@ -427,8 +435,44 @@ public class CharacterDB implements CharacterDAO {
                 return null;
         }
 
+        private int getTotalAdjustmentsForCharacter(int userid) {
+                DBConnection c = new DBConnection();
+                int total = 0;
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT SUM(shares) AS pun FROM adjustments WHERE character_id=?");
+                        p.setInt(1, userid);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next())
+                                total = rs.getInt("pun");
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return total;
+        }
+
+        @Override
+        public Integer getShares(int id) {
+                int adjustments = getTotalAdjustmentsForCharacter(id);
+                int shares = 0;
+                DBConnection c = new DBConnection();
+                try {
+                         PreparedStatement p = c.prepareStatement("SELECT SUM(number_of_shares) AS shares FROM rewards JOIN character_rewards WHERE rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
+                         p.setInt(1, id);
+                         ResultSet rs = p.executeQuery();
+                         while (rs.next())
+                                 shares = rs.getInt("shares");
+                } catch (SQLException ex) {
+                } finally {
+                        c.close();
+                }
+                return shares - adjustments;
+        }
+
         private class HasRolePredicate implements Predicate<User> {
+
                 private final Role role;
+
                 public HasRolePredicate(Role role) {
                         this.role = role;
                 }
