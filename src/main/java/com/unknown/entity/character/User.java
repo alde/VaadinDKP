@@ -70,6 +70,7 @@ public class User implements SiteUser {
                 return role;
         }
 
+        /** Character name */
         public String getUsername() {
                 return username;
         }
@@ -116,6 +117,7 @@ public class User implements SiteUser {
                 this.siteusername = name;
         }
 
+        /** SiteUserName */
         @Override
         public String getName() {
                 return this.siteusername;

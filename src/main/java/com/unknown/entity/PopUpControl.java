@@ -108,6 +108,7 @@ public class PopUpControl extends Window {
         private void showItemEditWindow(Items item) throws NullPointerException, IllegalArgumentException {
                 ItemEditWindow info = new ItemEditWindow(item);
                 info.printInfo();
+                info.addApplication(app);
                 info.addItemInfoListener(itemList);
                 info.addCharacterInfoListener(charList);
                 info.addCharacterInfoListener(dkpList);
@@ -131,6 +132,7 @@ public class PopUpControl extends Window {
         private void showRaidEditWindow(Raid raid) throws NullPointerException, IllegalArgumentException {
                 RaidEditWindow info = new RaidEditWindow(raid, dkpList, charList, itemList);
                 info.printInfo();
+                info.addApplication(app);
                 info.addRaidInfoListener(raidList);
                 info.addCharacterInfoListener(charList);
                 info.addCharacterInfoListener(dkpList);
@@ -160,6 +162,7 @@ public class PopUpControl extends Window {
                 RaidRewardEditWindow info = new RaidRewardEditWindow(rreward);
                 info.printInfo();
                 info.addRaidRewardInfoListener(raidRewardList);
+                info.addApplication(app);
                 info.addCharacterInfoListener(dkpList);
                 info.addCharacterInfoListener(charList);
                 app.getMainWindow().addWindow(info);
@@ -182,6 +185,7 @@ public class PopUpControl extends Window {
                 info.printInfo();
                 info.addRaidLootInfoListener(raidLootList);
                 info.addCharacterInfoListener(dkpList);
+                info.addApplication(app);
                 info.addCharacterInfoListener(charList);
                 info.addItemInfoListener(itemList);
                 app.getMainWindow().addWindow(info);

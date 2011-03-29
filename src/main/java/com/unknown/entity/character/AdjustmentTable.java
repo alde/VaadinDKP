@@ -4,8 +4,6 @@
  */
 package com.unknown.entity.character;
 
-import com.unknown.entity.character.Adjustment;
-import com.unknown.entity.character.User;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.CharacterDB;
@@ -37,14 +35,14 @@ public class AdjustmentTable extends Table {
 
         private void printList() {
                 this.ic = new IndexedContainer();
-                punishmentTableSetHeaders();
+                adjustmentTableSetHeaders();
                 setHeight("200px");
                 setContainerDataSource(ic);
                 List<Adjustment> puns = raidDao.getAdjustmentsForCharacter(user.getId());
                 Collections.sort(puns, new ComparePunishmentDates());
                 for (Adjustment cPun : puns) {
                         Item addItem = addItem(cPun);
-                        punishmentTableAddRow(addItem, cPun);
+                        adjustmentTableAddRow(addItem, cPun);
                 }
                 if (this.getWidth() < 300) {
                         this.setWidth("300px");
@@ -58,13 +56,13 @@ public class AdjustmentTable extends Table {
                 this.requestRepaint();
         }
 
-        private void punishmentTableAddRow(Item addItem, Adjustment pun) throws ConversionException, ReadOnlyException {
+        private void adjustmentTableAddRow(Item addItem, Adjustment pun) throws ConversionException, ReadOnlyException {
                 addItem.getItemProperty("Comment").setValue(pun.getComment());
                 addItem.getItemProperty("Shares").setValue(pun.getShares());
                 addItem.getItemProperty("Date").setValue(pun.getDate());
         }
 
-        private void punishmentTableSetHeaders() throws UnsupportedOperationException {
+        private void adjustmentTableSetHeaders() throws UnsupportedOperationException {
                 ic.addContainerProperty("Comment", String.class, "");
                 ic.addContainerProperty("Shares", Integer.class, 0);
                 ic.addContainerProperty("Date", String.class, "");

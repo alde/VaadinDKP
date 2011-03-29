@@ -12,6 +12,7 @@ import com.unknown.entity.database.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidLootListener;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
@@ -51,6 +52,7 @@ public class RaidLootAddWindow extends Window {
         private TextField price;
         private ComboBox name;
         private Button addButton;
+        private Application app;
 
         RaidLootAddWindow(Raid raid) {
                 this.raid = raid;
@@ -65,7 +67,7 @@ public class RaidLootAddWindow extends Window {
                 this.setSizeUndefined();
         }
 
-        public void printInfo() throws SQLException {
+        public void printInfo() {
                 HashSet<Items> lootlist = getLootList();
                 this.loots = lootListComboBox(lootlist);
                 this.heroic = new CheckBox("Heroic");
@@ -110,6 +112,7 @@ public class RaidLootAddWindow extends Window {
         }
 
         private void addRaidLoot(String name, String loot, boolean isheroic, double price) {
+                raidDao.setApplication(app);
                 raidDao.addLootToRaid(raid, name, loot, isheroic, price);
         }
 
@@ -215,6 +218,10 @@ public class RaidLootAddWindow extends Window {
                         }
 
                 }
+        }
+
+        void addApplication(Application app) {
+                this.app = app;
         }
 
         private class LootChangeListener implements ValueChangeListener {

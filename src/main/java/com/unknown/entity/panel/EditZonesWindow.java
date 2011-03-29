@@ -7,6 +7,7 @@ package com.unknown.entity.panel;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.RaidInfoListener;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -15,10 +16,10 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
-import org.vaadin.henrik.superimmediatetextfield.SuperImmediateTextField;
 
 /**
  *
@@ -30,8 +31,9 @@ class EditZonesWindow extends Window {
         private ComboBox zoneList;
         private RaidDAO raidDao;
         private CheckBox deleteZone;
-        private SuperImmediateTextField zoneName;
+        private TextField zoneName;
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
+        private Application app;
 
         public EditZonesWindow() {
                 this.setCaption("Edit Zones");
@@ -46,7 +48,7 @@ class EditZonesWindow extends Window {
 
                 Label addZoneLabel = new Label("Add Zone");
                 addComponent(addZoneLabel);
-                zoneName = new SuperImmediateTextField();
+                zoneName = new TextField();
                 zoneName.setImmediate(true);
                 zoneName.setWidth("200px");
                 zoneName.addStyleName("textfieldfont");
@@ -142,6 +144,11 @@ class EditZonesWindow extends Window {
                 for (RaidInfoListener raidListener : listeners) {
                         raidListener.onRaidInfoChanged();
                 }
+        }
+
+        void addApplication(Application app) {
+                this.app = app;
+                raidDao.setApplication(app);
         }
 
         private class CloseButtonListener implements ClickListener {

@@ -65,6 +65,7 @@ public class UnknownEntityDKP extends Application {
                 adminPanel.setItemList(itemList);
                 adminPanel.setCharacterList(charList);
                 adminPanel.setDkpList(dkpList);
+                adminPanel.addApplication(this);
                 adminPanel.addCharacterInfoListener(charList);
                 adminPanel.addCharacterInfoListener(dkpList);
                 adminPanel.addItemInfoListener(itemList);

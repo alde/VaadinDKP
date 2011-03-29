@@ -21,7 +21,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
-import org.vaadin.henrik.superimmediatetextfield.SuperImmediateTextField;
 
 /**
  *
@@ -72,7 +71,8 @@ public class TablePanel {
                 vertItem.addComponent(new Label("Items"));
                 vertItem.addComponent(itemList);
                 HorizontalLayout hzl = new HorizontalLayout();
-                SuperImmediateTextField itemname = itemNameFilterField();
+//                SuperImmediateTextField itemname = itemNameFilterField();
+                TextField itemname = itemNameFilterField();
                 itemname.setStyleName("textfieldfont");
                 ComboBox itemslot = itemSlotFilterBox();
                 ComboBox itemtype = itemTypeFilterBox();
@@ -85,8 +85,8 @@ public class TablePanel {
                 return vertItem;
         }
 
-        private SuperImmediateTextField itemNameFilterField() {
-                SuperImmediateTextField itemname = new SuperImmediateTextField("Filter itemname");
+        private TextField itemNameFilterField() {
+                TextField itemname = new TextField("Filter itemname");
                 itemname.setImmediate(true);
                 itemname.addListener(new ItemNameFieldValueChangeListener(itemList, itemname));
                 return itemname;

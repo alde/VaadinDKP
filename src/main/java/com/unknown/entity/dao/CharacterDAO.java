@@ -7,6 +7,7 @@ package com.unknown.entity.dao;
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.User;
+import com.vaadin.Application;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +53,9 @@ public interface CharacterDAO {
 
         public int countActiveUsers();
 
-        public User getUser(String toString);
+        public User getUser(String name);
 
         public Integer getShares(int id);
+
+        public void setApplication(Application application);
 }

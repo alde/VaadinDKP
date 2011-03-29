@@ -159,7 +159,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 gl.addComponent(dkp, 1, 3);
                 hzl.addComponent(gl);
                 Button addPunishmentButton = new Button("Add Adjustment");
-                addPunishmentButton.addListener(new AddPunishmentListener());
+                addPunishmentButton.addListener(new AddAdjustmentListener());
                 hzl.addComponent(addPunishmentButton);
                 gl.setSpacing(true);
                 hzl.setSpacing(true);
@@ -210,8 +210,9 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 tbl.addContainerProperty("Date", String.class, "");
         }
 
-        private int updateCharacter(String name, String charclass, boolean active) {
-                return charDao.updateCharacter(user, name, charclass, active);
+        private void updateCharacter(String name, String charclass, boolean active) {
+                charDao.setApplication(app);
+                charDao.updateCharacter(user, name, charclass, active);
         }
 
         private void characterLoots() {
@@ -229,13 +230,13 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 }
         }
 
-        private void characterRaids() throws SQLException {
+        private void characterRaids() {
                 hraid = new HorizontalLayout();
                 hraid.addComponent(raiTable());
                 hraid.addComponent(punTable());
                 addComponent(hraid);
         }
-        private Component raiTable() throws SQLException {
+        private Component raiTable() {
                 Table raids = raidList(user);
                 raids.setCaption("Raids");
                 if (raids.size() > 0) {
@@ -251,7 +252,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 punishments.setCaption("Adjustments");
                 if (punishments.size() > 0) {
                         punishments.addStyleName("striped");
-                        punishments.addListener(new PunishmentClickListener());
+                        punishments.addListener(new AdjustmentClickListener());
                         return punishments;
 
                 } else {
@@ -260,7 +261,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 }
         }
 
-        private Table raidList(User user) throws SQLException {
+        private Table raidList(User user) {
                 Table tbl = new Table();
                 setRaidListHeaders(tbl);
                 tbl.setHeight("200px");
@@ -295,25 +296,23 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void removeLootFromCharacter(Item item) {
+                charDao.setApplication(app);
                 charDao.removeLootFromCharacter(item.getItemProperty("Name").toString(), user);
         }
 
         private void updateLootForCharacter(Item item, int lootid) {
+                charDao.setApplication(app);
                 charDao.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
         }
 
         public void update() {
-                clear();
-                shares.setValue(user.getShares());
-                punishments = new AdjustmentTable(user);
-                hraid.addComponent(punTable());
-        }
-
-        private void clear() {
                 this.user = charDao.getUser(user.getUsername());
                 shares.setValue("");
-                hraid.removeComponent(punishments);
-                hraid.removeComponent(noPun);
+                hraid.removeAllComponents();
+                shares.setValue(user.getShares());
+                punishments = new AdjustmentTable(user);
+                hraid.addComponent(raiTable());
+                hraid.addComponent(punTable());
         }
 
         @Override
@@ -351,6 +350,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
 
                 @Override
                 public void buttonClick(ClickEvent event) {
+                        charDao.setApplication(app);
                         charDao.deleteCharacter(user);
                         notifyListeners();
                         close();
@@ -432,25 +432,28 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 }
         }
 
-        private class AddPunishmentListener implements ClickListener {
+        private class AddAdjustmentListener implements ClickListener {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        AddPunishmentWindow addItem = new AddPunishmentWindow(user.getId());
+                        AddAdjustmentWindow addItem = new AddAdjustmentWindow(user.getId());
                         addItem.addCharacterInfoListener(dkpList);
                         addItem.addCharacterInfoListener(charInfo);
+                        addItem.addApplication(app);
                         addItem.printInfo();
                         app.getMainWindow().addWindow(addItem);
+
                 }
         }
 
-        private class PunishmentClickListener implements ItemClickListener {
+        private class AdjustmentClickListener implements ItemClickListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
                         if (event.isCtrlKey() && event.isShiftKey()) {
                                 Adjustment p = (Adjustment) event.getItemId();
                                 RaidDAO rdao = new RaidDB();
+                                rdao.setApplication(app);
                                 rdao.removeAdjustment(p);
                                 notifyListeners();
                                 update();

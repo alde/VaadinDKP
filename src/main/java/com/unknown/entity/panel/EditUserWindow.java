@@ -33,17 +33,17 @@ import java.util.List;
  */
 class EditUserWindow extends Window {
 
-        CharacterDAO characterDao;
-        final ComboBox allUsernames;
-        final TextField oldPassword;
-        final TextField newPassword;
-        final TextField newPasswordCheck;
-        final ComboBox level;
-        final String user;
+        private CharacterDAO characterDao;
+        final private ComboBox allUsernames;
+        final private TextField oldPassword;
+        final private TextField newPassword;
+        final private TextField newPasswordCheck;
+        final private ComboBox level;
+        final private String user;
         private ILoginDao loginDao;
-        Application app;
-        VerticalLayout vert;
-        Label error;
+        private Application app;
+        private VerticalLayout vert;
+        private Label error;
 
         EditUserWindow(Application app) {
                 this.characterDao = new CharacterDB();
@@ -199,6 +199,11 @@ class EditUserWindow extends Window {
                 } else {
                         return "Admin";
                 }
+        }
+
+        void addApplication(Application app) {
+                this.app = app;
+                this.characterDao.setApplication(app);
         }
 
         private class CloseBtnListener implements ClickListener {

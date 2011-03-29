@@ -9,6 +9,7 @@ import com.unknown.entity.database.*;
 import com.unknown.entity.character.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.*;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
@@ -40,6 +41,7 @@ public class RaidLootEditWindow extends Window {
         private ComboBox itemname;
         private TextField price;
         private CheckBox heroic;
+        private Application app;
 
         public RaidLootEditWindow(Raid raid, RaidItem item) {
                 this.item = item;
@@ -126,14 +128,19 @@ public class RaidLootEditWindow extends Window {
         }
 
         private int deleteItem(RaidItem item) {
+                raidDao.setApplication(app);
                 return raidDao.removeLootFromRaid(item);
+        }
+
+        public void addApplication(Application app) {
+                this.app = app;
         }
 
         private class DeleteItemListener implements ClickListener {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        int success = deleteItem(item);
+                        deleteItem(item);
                         notifyListeners();
                         close();
                 }
@@ -156,14 +163,15 @@ public class RaidLootEditWindow extends Window {
                 boolean isheroic = Boolean.parseBoolean(heroic.getValue().toString());
                 String newlooter = charname.getValue().toString();
                 String newitem = itemname.getValue().toString();
-                int success = updateItem(newlooter, newitem, newprice, isheroic);
+                updateItem(newlooter, newitem, newprice, isheroic);
                 notifyListeners();
                 close();
         }
 
-        private int updateItem(String looter, String itemname, double price, boolean heroic) {
+        private void updateItem(String looter, String itemname, double price, boolean heroic) {
                 int lootid = itemDao.getLootId(item.getId(), characterDao.getCharacterId(item.getLooter()), item.getPrice(), item.isHeroic(), raid.getId());
-                return raidDao.doUpdateLoot(lootid, looter, itemname, price, heroic, raid.getId());
+                raidDao.setApplication(app);
+                raidDao.doUpdateLoot(lootid, looter, itemname, price, heroic, raid.getId());
         }
 
         private class UpdateItemListener implements ClickListener {

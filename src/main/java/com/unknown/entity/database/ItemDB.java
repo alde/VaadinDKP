@@ -5,15 +5,18 @@
 package com.unknown.entity.database;
 
 import com.unknown.entity.DBConnection;
+import com.unknown.entity.Logg;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.character.CharacterItem;
+import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.raids.RaidItem;
+import com.vaadin.Application;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,6 +35,7 @@ import java.util.logging.Logger;
 public class ItemDB implements ItemDAO {
 
         private static List<Items> itemCache = new ArrayList<Items>();
+        private Application app;
 
         @Override
         public List<Items> getItems() {
@@ -138,6 +142,7 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Added Multiplier [ilvl: " + ilvl + " | " + "multiplier: " + multiplier + "]");
         }
 
         @Override
@@ -184,6 +189,28 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         closeConnection(c);
                 }
+                String foo = "";
+                if (!newname.equalsIgnoreCase(item.getName())) {
+                        foo = item.getName() + " -> " + newname + " | ";
+                } else {
+                        foo = item.getName() + " | ";
+                }
+                if (!newslot.toString().equalsIgnoreCase(item.getSlot())) {
+                        foo += item.getSlot() + " -> " + newslot.toString() + " | ";
+                }
+                if (!newtype.toString().equalsIgnoreCase(item.getType().toString())) {
+                        foo += item.getType().toString() + " -> " + newtype.toString() + " | ";
+                }
+                if (item.getPrice() != newprice) {
+                        foo += "Price: " + item.getPrice() + " -> " + newprice + " | ";
+                }
+                if (item.getPrice_hc() != newpricehc) {
+                        foo += "Price (H): " + item.getPrice_hc() + " -> " + newpricehc + " | ";
+                }
+                if (foo.endsWith(" | ")) {
+                        foo = foo.substring(0, foo.length() - 3);
+                }
+                addLog("Updated Item [" + foo + "]");
                 return success;
         }
 
@@ -213,6 +240,7 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Added Item [" + name + "]");
                 return result;
         }
 
@@ -311,18 +339,18 @@ public class ItemDB implements ItemDAO {
         @Override
         public void updateDefaultPrice(String slot, double normalprice) {
                 Connection c = null;
-                int success = 0;
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("UPDATE default_prices SET price_normal=? WHERE slot=? ");
                         p.setDouble(1, normalprice);
                         p.setString(2, slot);
-                        success = p.executeUpdate();
+                        p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Updated Default Price [" + slot + " | " + normalprice + "]");
         }
 
         @Override
@@ -342,6 +370,7 @@ public class ItemDB implements ItemDAO {
                         c.closeStatement();
                         c.close();
                 }
+                addLog("Deleted Item {" + getItemById(id).getName() + "]");
                 return success;
         }
 
@@ -420,6 +449,7 @@ public class ItemDB implements ItemDAO {
         public void updateLoots(Items item, String price, String pricehc) {
                 updateHeroic(item, pricehc);
                 updateNormal(item, price);
+                addLog("Updated Prices for [" + item.getName() + "]");
         }
 
         private void updateHeroic(Items item, String pricehc) {
@@ -449,6 +479,7 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Updated Multiplier [ilvl: " + ilvl + " | multiplier: " + multiplier + "]");
         }
 
         @Override
@@ -462,6 +493,7 @@ public class ItemDB implements ItemDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Deleted Multiplier [id: " + id + "]");
         }
 
         @Override
@@ -562,5 +594,20 @@ public class ItemDB implements ItemDAO {
         @Override
         public String getSlotForItemByName(String name) {
                 return getItemById(getItemId(name)).getSlot();
+        }
+
+        @Override
+        public void setApplication(Application app) {
+                this.app = app;
+        }
+
+        private void addLog(String message) {
+                String name = "";
+                if (app == null) {
+                        name = "<unknown>";
+                } else {
+                        name = ((SiteUser) app.getUser()).getName();
+                }
+                Logg.addLog(message, name, "item");
         }
 }

@@ -12,12 +12,15 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.unknown.entity.DBConnection;
+import com.unknown.entity.Logg;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterItem;
+import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.character.User;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.dao.RaidDAO;
+import com.vaadin.Application;
 import java.math.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,6 +43,7 @@ public class CharacterDB implements CharacterDAO {
         RaidDAO raidDao = new RaidDB();
         ItemDAO itemDao = new ItemDB();
         private static List<User> cachedUsers = new ArrayList<User>();
+        private Application app;
 
         @Override
         public List<User> getUsers() {
@@ -74,7 +78,7 @@ public class CharacterDB implements CharacterDAO {
                                 }
                         }
                         totalshares += totaladjustments;
-                        
+
                         Multimap<Integer, Double> prices = LinkedListMultimap.create();
                         Map<Integer, String> charnames = new HashMap<Integer, String>();
                         Map<Integer, String> charroles = new HashMap<Integer, String>();
@@ -228,8 +232,7 @@ public class CharacterDB implements CharacterDAO {
         }
 
         @Override
-        public Collection<User> getUsersWithRole(
-                final Role role) {
+        public Collection<User> getUsersWithRole(final Role role) {
                 return Collections2.filter(getUsers(), new HasRolePredicate(role));
         }
 
@@ -249,6 +252,7 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Added Site User ["+ username+"] with Rank: "+ rank);
                 return success;
         }
 
@@ -288,12 +292,13 @@ public class CharacterDB implements CharacterDAO {
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
-                        int success = p.executeUpdate();
+                        p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
                 } finally {
                         closeConnection(c);
                 }
+                 addLog("Removed Loot [" + itemname + " from " + user.getUsername() + "]");
         }
 
         @Override
@@ -318,6 +323,7 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Updated Loot for " + user.getUsername() + " [" + itemname + " | " + price + "dkp]");
         }
 
         private void closeConnection(Connection c) {
@@ -331,18 +337,17 @@ public class CharacterDB implements CharacterDAO {
         @Override
         public void deleteCharacter(User user) {
                 Connection c = null;
-                int success = 0;
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("DELETE FROM characters WHERE id=?");
                         p.setInt(1, user.getId());
-                        success = p.executeUpdate();
+                        p.executeUpdate();
                 } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {
                         closeConnection(c);
                 }
-
+                addLog("Deleted Character [" + user.getUsername() + " | " + user.getRole().toString() + "]");
         }
 
         @Override
@@ -393,6 +398,7 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         c.close();
                 }
+                 addLog("Updated Site User [" + username + " | Rank: " + level + "]");
         }
 
         @Override
@@ -442,8 +448,9 @@ public class CharacterDB implements CharacterDAO {
                         PreparedStatement p = c.prepareStatement("SELECT SUM(shares) AS pun FROM adjustments WHERE character_id=?");
                         p.setInt(1, userid);
                         ResultSet rs = p.executeQuery();
-                        while (rs.next())
+                        while (rs.next()) {
                                 total = rs.getInt("pun");
+                        }
                 } catch (SQLException ex) {
                 } finally {
                         c.close();
@@ -457,16 +464,22 @@ public class CharacterDB implements CharacterDAO {
                 int shares = 0;
                 DBConnection c = new DBConnection();
                 try {
-                         PreparedStatement p = c.prepareStatement("SELECT SUM(number_of_shares) AS shares FROM rewards JOIN character_rewards WHERE rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
-                         p.setInt(1, id);
-                         ResultSet rs = p.executeQuery();
-                         while (rs.next())
-                                 shares = rs.getInt("shares");
+                        PreparedStatement p = c.prepareStatement("SELECT SUM(number_of_shares) AS shares FROM rewards JOIN character_rewards WHERE rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
+                        p.setInt(1, id);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                shares = rs.getInt("shares");
+                        }
                 } catch (SQLException ex) {
                 } finally {
                         c.close();
                 }
                 return shares - adjustments;
+        }
+
+        @Override
+        public void setApplication(Application app) {
+                this.app = app;
         }
 
         private class HasRolePredicate implements Predicate<User> {
@@ -508,6 +521,7 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Added character [" + name + " | " + role.toString() + "]");
                 return update;
         }
 
@@ -537,6 +551,17 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Updated Character [" + user.getName() + " -> " + name + " | " + user.getRole().toString() + " -> " + charclass + " | Active: " + active + "]");
                 return success;
+        }
+
+        private void addLog(String message) {
+                String name = "";
+                if (app == null) {
+                        name = "<unknown>";
+                } else {
+                        name = ((SiteUser) app.getUser()).getName();
+                }
+                Logg.addLog(message, name, "char");
         }
 }

@@ -14,6 +14,7 @@ import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidChar;
 import com.unknown.entity.raids.RaidReward;
 import com.unknown.entity.raids.RaidRewardListener;
+import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -41,6 +42,7 @@ public class RaidRewardAddWindow extends Window {
         CharacterDAO chardao = new CharacterDB();
         private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
+        private Application app;
 
         public RaidRewardAddWindow(Raid raid) {
                 this.raid = raid;
@@ -88,9 +90,9 @@ public class RaidRewardAddWindow extends Window {
         private void addReward(String comment, Integer shares, List<String> attendantlist, Raid raid) {
                 List<String> invalidchars = findInvalidCharacters(attendantlist);
                 if (invalidchars.isEmpty()) {
+                        raidDao.setApplication(app);
                         RaidReward raidReward = new RaidReward(comment, 0, raid.getId(), shares);
                         Collection<RaidChar> chars = raidDao.getRaidCharsForRaid(attendantlist, raid.getId());
-
                         raidReward.setRewardChars(chars);
                         raidDao.addReward(raidReward);
                         updateReward(raidReward, attendantlist, shares, comment);
@@ -101,6 +103,7 @@ public class RaidRewardAddWindow extends Window {
         }
 
         private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
+                raidDao.setApplication(app);
                 return raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
@@ -115,6 +118,10 @@ public class RaidRewardAddWindow extends Window {
                 List<String> invalid = new ArrayList<String>(attendantlist);
                 invalid.removeAll(chardao.getUserNames());
                 return ImmutableList.copyOf(invalid);
+        }
+
+        void addApplication(Application app) {
+                this.app = app;
         }
 
         private class AddRewardListener implements ClickListener {

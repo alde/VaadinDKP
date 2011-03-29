@@ -18,8 +18,6 @@ import com.vaadin.ui.Table;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -102,12 +100,8 @@ public class ItemList extends Table implements ItemInfoListener {
                 }
 
                 this.setColumnCollapsingAllowed(true);
-                try {
-                        this.setColumnCollapsed("Slot", true);
-                        this.setColumnCollapsed("Type", true);
-                } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
-                }
+                this.setColumnCollapsed("Slot", true);
+                this.setColumnCollapsed("Type", true);
         }
 
         private String filterString(Object value) {

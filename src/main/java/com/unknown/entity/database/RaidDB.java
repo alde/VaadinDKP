@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.unknown.entity.Logg;
+import com.unknown.entity.character.SiteUser;
+import com.vaadin.Application;
 import org.joda.time.DateTime;
 
 /**
@@ -31,6 +34,7 @@ import org.joda.time.DateTime;
 public class RaidDB implements RaidDAO {
 
         private static List<Raid> raidCache = new ArrayList<Raid>();
+        private Application app;
 
         @Override
         public List<Raid> getRaids() {
@@ -108,11 +112,9 @@ public class RaidDB implements RaidDAO {
 
         @Override
         public int addNewRaid(String zone, String comment, String date) {
-
                 Connection c = null;
                 int result = 0;
                 int zoneId = 0;
-
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement ps = c.prepareStatement("INSERT INTO raids (zone_id, date, comment) VALUES(?,?,?)");
@@ -131,6 +133,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Added Raid [" + zone + " | " + comment + "]");
                 return result;
         }
 
@@ -247,6 +250,19 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                String foo = "";
+                if (raid.getComment().equalsIgnoreCase(raidcomment)) {
+                        foo = raid.getComment() + " | ";
+                } else {
+                        foo = raid.getComment() + " -> " + raidcomment + " | ";
+                }
+                if (!raid.getDate().equalsIgnoreCase(raiddate)) {
+                        foo = foo + raid.getDate() + " -> " + raiddate + " | ";
+                }
+                if (!raid.getRaidname().equalsIgnoreCase(raidzoneName)) {
+                        foo = foo + raid.getRaidname() + " -> " + raidzoneName;
+                }
+                addLog("Updated Raid [" + foo + "]");
                 return success;
         }
 
@@ -299,15 +315,33 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                String foo = "";
+                if (reward.getComment().equalsIgnoreCase(newComment)) {
+                        foo = reward.getComment() + " | ";
+                } else {
+                        foo = reward.getComment() + " -> " + newComment + " | ";
+                }
+                if (reward.getShares() != newShares) {
+                        foo = foo + reward.getShares() + " -> " + newShares + " shares | ";
+                }
+                if (!newAttendants.isEmpty()) {
+                        foo = foo + "New Attendants: ( ";
+                        for (String a : newAttendants) {
+                                foo = foo + a + " ";
+                        }
+                        foo = foo + ")";
+                }
+
+                addLog("Updated Reward [" + foo + "]");
                 return success;
         }
 
         private void doUpdateCharacters(Connection c, RaidReward reward, List<String> newAttendants) throws SQLException {
                 List<Integer> newcharid = new ArrayList<Integer>();
-                CharacterDAO characterDao = new CharacterDB();
                 newAttendants = removeDuplicates(newAttendants);
+                CharacterDAO charDao = new CharacterDB();
                 for (String s : newAttendants) {
-                        newcharid.add(characterDao.getCharacterId(s));
+                        newcharid.add(charDao.getCharacterId(s));
                 }
                 removeAllExistingCharactersFromReward(reward, newAttendants, newcharid);
                 addCharsToReward(newcharid, reward);
@@ -344,12 +378,12 @@ public class RaidDB implements RaidDAO {
         @Override
         public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) {
                 Connection c = null;
+                CharacterDAO charDao = new CharacterDB();
                 try {
                         c = new DBConnection().getConnection();
-                        CharacterDAO characterDao = new CharacterDB();
                         ItemDAO itemDao = new ItemDB();
                         int itemid = itemDao.getItemId(loot);
-                        int charid = characterDao.getCharacterId(name);
+                        int charid = charDao.getCharacterId(name);
                         PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, character_id, price, heroic) VALUES(?,?,?,?,?)");
                         ps.setInt(1, itemid);
                         ps.setInt(2, raid.getId());
@@ -362,6 +396,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Added Loot [" + name + " looted " + loot + " in " + raid.getComment() + "]");
         }
 
         @Override
@@ -381,6 +416,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Removed Reward [" + reward.getComment() + "]");
                 return success;
         }
 
@@ -408,6 +444,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Added Reward [" + reward.getComment() + " | " + reward.getShares() + " shares]");
                 return reward;
         }
 
@@ -431,8 +468,8 @@ public class RaidDB implements RaidDAO {
         public int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
-                CharacterDAO characterDao = new CharacterDB();
-                int charid = characterDao.getCharacterId(item.getLooter());
+                CharacterDAO charDao = new CharacterDB();
+                int charid = charDao.getCharacterId(item.getLooter());
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
@@ -445,12 +482,14 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         closeConnection(c);
                 }
+                addLog("Removed Loot [" + item.getName() + " from " + item.getLooter() + "]");
                 return success;
         }
 
         @Override
-        public List<String> findInvalidCharacters(List<String> attendantlist, CharacterDAO charDao) {
+        public List<String> findInvalidCharacters(List<String> attendantlist) {
                 List<String> invalid = new ArrayList<String>(attendantlist);
+                CharacterDAO charDao = new CharacterDB();
                 invalid.removeAll(charDao.getUserNames());
                 return ImmutableList.copyOf(invalid);
         }
@@ -458,9 +497,9 @@ public class RaidDB implements RaidDAO {
         @Override
         public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId) {
                 Set<RaidChar> chars = new HashSet<RaidChar>();
-                final CharacterDB characterDB = new CharacterDB();
+                CharacterDAO charDao = new CharacterDB();
                 for (String string : attendantlist) {
-                        int characterId = characterDB.getCharacterId(string);
+                        int characterId = charDao.getCharacterId(string);
                         chars.add(getRaidChar(characterId, raidId));
                 }
                 return chars;
@@ -558,8 +597,8 @@ public class RaidDB implements RaidDAO {
         public boolean getLootedHeroic(String charname, int itemid, double price) {
                 DBConnection c = new DBConnection();
                 boolean isheroic = false;
-                CharacterDAO characterDao = new CharacterDB();
-                int charid = characterDao.getCharacterId(charname);
+                CharacterDAO charDao = new CharacterDB();
+                int charid = charDao.getCharacterId(charname);
                 try {
                         PreparedStatement p = c.prepareStatement("SELECT DISTINCT * FROM loots WHERE item_id=? AND character_id=? AND price=?");
                         p.setInt(1, itemid);
@@ -580,8 +619,8 @@ public class RaidDB implements RaidDAO {
         @Override
         public int doUpdateLoot(int lootid, String looter, String itemname, double price, boolean heroic, int raidid) {
                 ItemDAO itemDao = new ItemDB();
-                CharacterDAO charDao = new CharacterDB();
                 int itemid = itemDao.getItemId(itemname);
+                CharacterDAO charDao = new CharacterDB();
                 int charid = charDao.getCharacterId(looter);
                 int success = 0;
                 DBConnection c = new DBConnection();
@@ -599,6 +638,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Updated Loot [" + itemname + " looted by " + looter + " (id: " + lootid + ")]");
                 return success;
         }
 
@@ -622,6 +662,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Removed Zone [" + zone + "]");
         }
 
         @Override
@@ -635,6 +676,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Added Zone [" + zone + "]");
         }
 
         private void fixExistingZonesToDefaultWhenRemovingThatZone(String zone) {
@@ -666,6 +708,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Renamed Zone [" + oldZone + " to " + newZone + "]");
         }
 
         private int getValidZoneByName(String raidzoneName) {
@@ -737,6 +780,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Removed Raid [" + raid.getDate() + " | " + raid.getComment() + " | " + raid.getRaidname() + "]");
         }
 
         @Override
@@ -797,6 +841,7 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Added adjustment [" + p.getDate() + " | " + p.getComment() + " (" + p.getShares() + " shares)] to " + getCharacter(p.getCharId()));
                 return p;
         }
 
@@ -812,5 +857,40 @@ public class RaidDB implements RaidDAO {
                 } finally {
                         c.close();
                 }
+                addLog("Removed adjustment [" + p.getDate() + " | " + p.getComment() + " (" + p.getShares() + " shares)] from " + getCharacter(p.getCharId()));
+
+        }
+
+        @Override
+        public void setApplication(Application app) {
+                this.app = app;
+        }
+
+        private void addLog(String message) {
+                String name = "";
+                if (app == null) {
+                        name = "<unknown>";
+                } else {
+                        name = ((SiteUser) app.getUser()).getName();
+                }
+                Logg.addLog(message, name, "raid");
+        }
+
+        private String getCharacter(int id) {
+                DBConnection c = new DBConnection();
+                String foo = "";
+                try {
+                        PreparedStatement p = c.prepareStatement("SELECT name FROM characters WHERE id=?");
+                        p.setInt(1, id);
+                        ResultSet rs = p.executeQuery();
+                        while (rs.next()) {
+                                foo = rs.getString("name");
+                        }
+                } catch (SQLException ex) {
+                        ex.printStackTrace();
+                } finally {
+                        c.close();
+                }
+                return foo;
         }
 }

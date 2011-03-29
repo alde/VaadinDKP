@@ -93,11 +93,8 @@ public class DkpList extends Table implements CharacterInfoListener {
                         }
                 }
                 this.setColumnCollapsingAllowed(true);
-                try {
-                        this.setColumnCollapsed("Armor", true);
-                } catch (IllegalAccessException ex) {
-                        ex.printStackTrace();
-                }
+                this.setColumnCollapsed("Armor", true);
+
         }
 
         private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException {
@@ -105,8 +102,8 @@ public class DkpList extends Table implements CharacterInfoListener {
                 charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
                 addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Armor").setValue(user.getArmor());
-                Label dkp = new Label(""+user.getDKP());
-                if (user.getDKP()>=0) {
+                Label dkp = new Label("" + user.getDKP());
+                if (user.getDKP() >= 0) {
                         dkp.addStyleName("positive");
                 } else {
                         dkp.addStyleName("negative");
@@ -135,13 +132,13 @@ public class DkpList extends Table implements CharacterInfoListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                                User user = (User) event.getItemId();
-                                PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
-                                pop.setItemList(itemList);
-                                pop.setRaidList(raidList);
-                                pop.setDkpList(dkpList);
-                                pop.setCharacterList(charList);
-                                pop.showProperCharWindow(user);
+                        User user = (User) event.getItemId();
+                        PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
+                        pop.setItemList(itemList);
+                        pop.setRaidList(raidList);
+                        pop.setDkpList(dkpList);
+                        pop.setCharacterList(charList);
+                        pop.showProperCharWindow(user);
                 }
         }
 }

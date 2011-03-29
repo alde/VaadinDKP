@@ -6,6 +6,7 @@ package com.unknown.entity.character.windows;
 
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.database.CharacterDB;
+import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -29,6 +30,7 @@ public class AddNewUserWindow extends Window {
         final TextField password;
         final TextField passwordCheck;
         final ComboBox level;
+        private Application app;
 
         public AddNewUserWindow() {
                 this.username = new TextField("Username");
@@ -70,6 +72,10 @@ public class AddNewUserWindow extends Window {
 
         }
 
+        public void addApplication(Application app) {
+                this.app = app;
+        }
+
         private class CancelButtonListener implements ClickListener {
 
                 @Override
@@ -88,7 +94,8 @@ public class AddNewUserWindow extends Window {
                         }
 
                         String hashedpassword = hashPassword(password.getValue().toString());
-                        int success = characterDao.addNewSiteUser(username.getValue().toString(), hashedpassword, userlevel);
+                        characterDao.setApplication(app);
+                        characterDao.addNewSiteUser(username.getValue().toString(), hashedpassword, userlevel);
                 } else {
                         Label err = new Label("Passwords must match!");
                         err.addStyleName("error");

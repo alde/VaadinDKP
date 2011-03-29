@@ -9,6 +9,7 @@ import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.dao.ILoginDao;
 import com.unknown.entity.dao.LoginDao;
 import com.unknown.entity.panel.MyLoginListener;
+import com.vaadin.Application;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -32,6 +33,7 @@ public class LoginWindow extends Window {
         private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
         private ILoginDao loginDao = new LoginDao();
         private HorizontalLayout hzl;
+        private Application app;
 
         public LoginWindow() {
                 this.hzl = new HorizontalLayout();
@@ -88,6 +90,10 @@ public class LoginWindow extends Window {
 
         public void addLoginListener(MyLoginListener listener) {
                 listeners.add(listener);
+        }
+
+        public void addApplication(Application app) {
+                this.app = app;
         }
 
         private class LoginClickListener implements ClickListener {

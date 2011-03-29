@@ -7,6 +7,7 @@ package com.unknown.entity.items.windows;
 import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.ItemPrices;
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
@@ -33,6 +34,7 @@ public class EditDefaultPricesWindow extends Window {
         List<ItemPrices> prices = new ArrayList<ItemPrices>();
         IndexedContainer ic;
         private int longest;
+        private Application app;
 
         public EditDefaultPricesWindow() throws SQLException {
                 this.setCaption("Edit default Prices");
@@ -71,6 +73,7 @@ public class EditDefaultPricesWindow extends Window {
                 for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
                         ItemPrices iid = (ItemPrices) i.next();
                         Item item = ic.getItem(iid);
+                        itemDao.setApplication(app);
                         itemDao.updateDefaultPrice(item.getItemProperty("Slot").toString(), Double.parseDouble((item.getItemProperty("Normal")).toString()));
                 }
         }
@@ -93,6 +96,10 @@ public class EditDefaultPricesWindow extends Window {
                 Label slot = new Label(ip.getSlotString());
                 addItem.getItemProperty("Slot").setValue(slot);
                 addItem.getItemProperty("Normal").setValue(ip.getPrice());
+        }
+
+        public void addApplication(Application app) {
+                this.app = app;
         }
 
         private class CloseButtonListener implements ClickListener {

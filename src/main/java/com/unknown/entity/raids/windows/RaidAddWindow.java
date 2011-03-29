@@ -7,6 +7,7 @@ package com.unknown.entity.raids.windows;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.RaidInfoListener;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.ui.Button;
@@ -32,6 +33,7 @@ import java.util.List;
 public class RaidAddWindow extends Window {
 
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
+        private Application app;
 
         public RaidAddWindow() {
                 this.setCaption("Add Raid");
@@ -82,6 +84,10 @@ public class RaidAddWindow extends Window {
                 return cbtn;
         }
 
+        public void addApplication(Application app) {
+                this.app = app;
+        }
+
         private Button raidAddWindowAddButton(final ComboBox zone, final TextField comment, final DateField datum) {
                 final Button btn = new Button("Add");
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -128,9 +134,10 @@ public class RaidAddWindow extends Window {
                 return zone;
         }
 
-        private int addRaid(String zone, String comment, String date) {
+        private void addRaid(String zone, String comment, String date) {
                 RaidDAO raidDao = new RaidDB();
-                return raidDao.addNewRaid(zone, comment, date);
+                raidDao.setApplication(app);
+                raidDao.addNewRaid(zone, comment, date);
         }
 
         private class AddButtonClickListener implements ClickListener {
@@ -150,7 +157,7 @@ public class RaidAddWindow extends Window {
                         String rzone = zone.getValue().toString();
                         String rcomment = comment.getValue().toString();
                         String rdate = datum;
-                        int success = addRaid(rzone, rcomment, rdate);
+                        addRaid(rzone, rcomment, rdate);
                         notifyListeners();
                         close();
                 }

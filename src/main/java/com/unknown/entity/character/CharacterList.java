@@ -105,6 +105,7 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         public void update() {
                 printList();
         }
+
         private static class ToStringComparator implements Comparator<Role> {
 
                 public ToStringComparator() {

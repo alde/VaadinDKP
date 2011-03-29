@@ -8,6 +8,7 @@ import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.Adjustment;
 import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
+import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -26,15 +27,16 @@ import java.util.List;
  *
  * @author alde
  */
-class AddPunishmentWindow extends Window {
+class AddAdjustmentWindow extends Window {
 
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private int userid;
         private TextField comment;
         private TextField shares;
         private DateField date;
+        private Application app;
 
-        public AddPunishmentWindow(int userid) {
+        public AddAdjustmentWindow(int userid) {
                 this.setCaption("Add Adjustment");
                 this.addStyleName("opaque");
                 this.setPositionX(200);
@@ -101,7 +103,7 @@ class AddPunishmentWindow extends Window {
 
         private Button addPunishmentButton() {
                 Button addbutton = new Button("Add");
-                addbutton.addListener(new AddPunishmentListener());
+                addbutton.addListener(new AddAdjustmentListener());
                 return addbutton;
         }
 
@@ -109,6 +111,10 @@ class AddPunishmentWindow extends Window {
                 Button closebutton = new Button("Close");
                 closebutton.addListener(new CloseListener());
                 return closebutton;
+        }
+
+        void addApplication(Application app) {
+                this.app = app;
         }
 
         private class CloseListener implements ClickListener {
@@ -119,7 +125,7 @@ class AddPunishmentWindow extends Window {
                 }
         }
 
-        private class AddPunishmentListener implements ClickListener {
+        private class AddAdjustmentListener implements ClickListener {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
@@ -131,6 +137,7 @@ class AddPunishmentWindow extends Window {
                         p.setComment(comment.getValue().toString());
                         p.setDate(dateFormat.format(date.getValue()));
                         p.setShares(share);
+                        rdao.setApplication(app);
                         rdao.addAdjustment(p);
                         notifyListeners();
                         close();

@@ -11,6 +11,7 @@ import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.*;
+import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -39,6 +40,7 @@ public class RaidEditWindow extends Window {
         private RaidLootList rlList;
         private final ItemList itemList;
         private RaidDAO raidDao;
+        private Application app;
 
         public RaidEditWindow(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
                 this.raid = raid;
@@ -109,7 +111,7 @@ public class RaidEditWindow extends Window {
                 hzl.addComponent(comment);
                 hzl.addComponent(datum);
                 hzl.setSpacing(true);
-                
+
                 addComponent(hzl);
 
                 HorizontalLayout hoributtons = new HorizontalLayout();
@@ -124,13 +126,15 @@ public class RaidEditWindow extends Window {
         }
 
         private void deleteRaid() {
+                raidDao.setApplication(app);
                 raidDao.safelyRemoveRaid(raid);
                 notifyListeners();
                 close();
         }
 
-        private int updateRaid(String raidzoneName, String raidcomment, String raiddate) throws SQLException {
-                return raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
+        private void updateRaid(String raidzoneName, String raidcomment, String raiddate) {
+                raidDao.setApplication(app);
+                raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
         }
 
         public void addRaidInfoListener(RaidInfoListener listener) {
@@ -150,6 +154,10 @@ public class RaidEditWindow extends Window {
                 }
         }
 
+        public void addApplication(Application app) {
+                this.app = app;
+        }
+
         private class UpdateButtonListener implements ClickListener {
 
                 private final ComboBox zone;
@@ -167,11 +175,7 @@ public class RaidEditWindow extends Window {
                         final String raidzoneName = zone.getValue().toString();
                         final String raidcomment = comment.getValue().toString();
                         final String raiddate = datum.getValue().toString();
-                        try {
-                                final int success = updateRaid(raidzoneName, raidcomment, raiddate);
-                        } catch (SQLException ex) {
-                                Logger.getLogger(RaidEditWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        updateRaid(raidzoneName, raidcomment, raiddate);
                         notifyListeners();
                 }
         }
@@ -183,13 +187,10 @@ public class RaidEditWindow extends Window {
                         RaidLootAddWindow rlootadd = new RaidLootAddWindow(raid);
                         rlootadd.addCharacterInfoListener(dkplist);
                         rlootadd.addCharacterInfoListener(clist);
+                        rlootadd.addApplication(app);
                         rlootadd.addRaidInfoListener(rlList);
                         rlootadd.addItemInfoListener(itemList);
-                        try {
-                                rlootadd.printInfo();
-                        } catch (SQLException ex) {
-                                Logger.getLogger(RaidEditWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        rlootadd.printInfo();
                         getApplication().getMainWindow().addWindow(rlootadd);
                 }
         }
@@ -202,15 +203,13 @@ public class RaidEditWindow extends Window {
                         rewardadd.addCharacterInfoListener(dkplist);
                         rewardadd.addCharacterInfoListener(clist);
                         rewardadd.addRaidInfoListener(rrList);
+                        rewardadd.addApplication(app);
                         rewardadd.printInfo();
                         getApplication().getMainWindow().addWindow(rewardadd);
                 }
         }
 
         private class DeleteButtonListener implements ClickListener {
-
-                public DeleteButtonListener() {
-                }
 
                 @Override
                 public void buttonClick(ClickEvent event) {

@@ -12,6 +12,7 @@ import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.raids.RaidItem;
+import com.vaadin.Application;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,4 +71,6 @@ public interface ItemDAO {
         public List<CharacterItem> getLootForCharacter(String toString);
 
         public String getSlotForItemByName(String name);
+
+        public void setApplication(Application app);
 }

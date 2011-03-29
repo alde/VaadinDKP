@@ -8,6 +8,7 @@ import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterInfoListener;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.ui.Button;
@@ -34,6 +35,7 @@ import java.util.logging.Logger;
 public class CharacterAddWindow extends Window {
 
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
+        private Application app;
 
         public CharacterAddWindow() {
                 this.setCaption("Add Character");
@@ -104,10 +106,15 @@ public class CharacterAddWindow extends Window {
                 return nameField;
         }
 
-        private int addChar(String name, String role, boolean isActive) throws SQLException {
+        private void addChar(String name, String role, boolean isActive) throws SQLException {
                 CharacterDAO characterDao = new CharacterDB();
-                return characterDao.addNewCharacter(name, role, isActive);
+                characterDao.setApplication(app);
+                characterDao.addNewCharacter(name, role, isActive);
+                
+        }
 
+        public void addApplication(Application app) {
+                this.app = app;
         }
 
         private class closeBtnClickListener implements ClickListener {
@@ -145,13 +152,11 @@ public class CharacterAddWindow extends Window {
                         final String charactername = (String) nameField.getValue();
                         final String characterclass = classCombo.getValue().toString();
                         final boolean characteractive = (Boolean) activeCheck.getValue();
-                        int success = 0;
                         try {
-                                success = addChar(charactername, characterclass, characteractive);
+                                addChar(charactername, characterclass, characteractive);
                         } catch (SQLException ex) {
                                 Logger.getLogger(CharacterAddWindow.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        addComponent(new Label("Update :" + success));
                         notifyListeners();
                         close();
                 }

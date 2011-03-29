@@ -9,6 +9,7 @@ import com.unknown.entity.*;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.dao.*;
 import com.unknown.entity.items.*;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.terminal.ExternalResource;
@@ -56,6 +57,7 @@ public class ItemEditWindow extends Window {
         private VerticalLayout lout;
         private TextField ilvl;
         private TextField quality;
+        private Application app;
 
         public ItemEditWindow(Items item) {
                 this.item = item;
@@ -232,6 +234,7 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
+                itemDao.setApplication(app);
                 itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()), quality.getValue().toString());
                 notifyListeners();
                 update();
@@ -253,6 +256,7 @@ public class ItemEditWindow extends Window {
 
         private void applyPrices() {
                 updateItem();
+                itemDao.setApplication(app);
                 itemDao.updateLoots(item, price.getValue().toString(), pricehc.getValue().toString());
                 lout.removeComponent(ilt);
                 ilt = new ItemLooterTable(itemDao.getSingleItem(name.getValue().toString()));
@@ -260,8 +264,9 @@ public class ItemEditWindow extends Window {
                 notifyListeners();
         }
 
-        private int deleteItem(Items item) throws SQLException {
-                return itemDao.deleteItem(item.getId());
+        private void deleteItem(Items item) throws SQLException {
+                itemDao.setApplication(app);
+                itemDao.deleteItem(item.getId());
         }
 
         public void addItemInfoListener(ItemInfoListener listener) {
@@ -322,11 +327,14 @@ public class ItemEditWindow extends Window {
                 lout.removeAllComponents();
         }
 
+        public void addApplication(Application app) {
+                this.app = app;
+        }
+
         private class UpdateButtonClickListener implements ClickListener {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-
                         updateItem();
                 }
         }

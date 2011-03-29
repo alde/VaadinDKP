@@ -9,6 +9,7 @@ import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
 import com.unknown.entity.raids.*;
+import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -36,7 +37,7 @@ public class RaidRewardEditWindow extends Window {
         private final RaidReward reward;
         private final String oldcomment;
         private final RaidDAO raidDao;
-        private final CharacterDAO chardao;
+        private Application app;
 
         public RaidRewardEditWindow(RaidReward reward) {
                 this.reward = reward;
@@ -48,7 +49,6 @@ public class RaidRewardEditWindow extends Window {
                 this.addStyleName("opaque");
                 this.setCaption("Edit reward: " + reward.getComment());
                 this.raidDao = new RaidDB();
-                this.chardao = new CharacterDB();
                 this.getContent().setSizeUndefined();
         }
 
@@ -86,8 +86,9 @@ public class RaidRewardEditWindow extends Window {
                 addComponent(hzl);
         }
 
-        private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) throws SQLException {
-                return raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
+        private void updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
+                raidDao.setApplication(app);
+                raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
         private TextField charList() {
@@ -112,8 +113,9 @@ public class RaidRewardEditWindow extends Window {
                 }
         }
 
-        private int removeReward(RaidReward reward) {
-                return raidDao.removeReward(reward);
+        private void removeReward(RaidReward reward) {
+                raidDao.setApplication(app);
+                raidDao.removeReward(reward);
         }
 
         private void showInvalidUsers(List<String> invalidchars) {
@@ -121,6 +123,10 @@ public class RaidRewardEditWindow extends Window {
                 for (String s : invalidchars) {
                         addComponent(new Label(s));
                 }
+        }
+
+        public void addApplication(Application app) {
+                this.app = app;
         }
 
         private class UpdateButtonClickListener implements ClickListener {
@@ -140,18 +146,11 @@ public class RaidRewardEditWindow extends Window {
                         final ImmutableList<String> attendantlist = splitCharsToArray(attendants.getValue().toString());
                         final int newShares = Integer.parseInt(share.getValue().toString());
                         String newComment = comment.getValue().toString();
-                        try {
-                                List<String> invalidchars = raidDao.findInvalidCharacters(attendantlist, chardao);
-                                if (invalidchars.isEmpty()) {
-                                        updateReward(reward, attendantlist, newShares, newComment);
-                                        // System.out.println("Blaaaaaaaaaaaaa"+ reward.getComment());
-                                } else {
-                                        showInvalidUsers(invalidchars);
-                                        // System.out.println(invalidchars.toString());
-                                }
-
-                        } catch (SQLException ex) {
-                                Logger.getLogger(RaidRewardEditWindow.class.getName()).log(Level.SEVERE, null, ex);
+                        List<String> invalidchars = raidDao.findInvalidCharacters(attendantlist);
+                        if (invalidchars.isEmpty()) {
+                                updateReward(reward, attendantlist, newShares, newComment);
+                        } else {
+                                showInvalidUsers(invalidchars);
                         }
                         notifyListeners();
                 }
@@ -172,22 +171,15 @@ public class RaidRewardEditWindow extends Window {
 
         private class RemoveButtonClickListener implements ClickListener {
 
-                public RemoveButtonClickListener() {
-                }
-
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        int success = removeReward(reward);
-                        // System.out.println(success + " rewards removed.");
+                        removeReward(reward);
                         notifyListeners();
                         close();
                 }
         }
 
         private class CloseButtonClickListener implements ClickListener {
-
-                public CloseButtonClickListener() {
-                }
 
                 @Override
                 public void buttonClick(ClickEvent event) {
