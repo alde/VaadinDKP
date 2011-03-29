@@ -21,7 +21,7 @@ class LogTable extends Table {
         public LogTable(String caption) {
                 this.ic = new IndexedContainer();
                 this.setCaption(caption);
-                this.setWidth("880px");
+                this.setWidth("860px");
                 this.addStyleName("striped");
                 setTableHeaders();
                 for (Log l : Logg.readLog()) {
