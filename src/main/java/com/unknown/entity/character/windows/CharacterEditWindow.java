@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.character.windows;
 
-import com.unknown.entity.character.AdjustmentTable;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.*;
@@ -53,7 +52,6 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         private ItemDAO itemDao;
         private CharacterDAO charDao;
         private IndexedContainer ic;
-        private IndexedContainer icp;
         private Table loots;
         private Application app;
         private ItemList itemList;
@@ -64,6 +62,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         private Table punishments;
         private CharacterEditWindow charInfo = this;
         private HorizontalLayout hraid;
+        private TextField nameField;
 
         public CharacterEditWindow(User user, Application app, RaidList raidList, ItemList itemList, DkpList dkpList) {
                 this.user = user;
@@ -104,8 +103,9 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void characterInformation() {
-                final TextField name = new TextField("Name: ", user.getUsername());
-                name.setWidth("150px");
+                nameField = new TextField("Name: ", user.getUsername());
+                nameField.setWidth("150px");
+                nameField.setImmediate(true);
                 final ComboBox characterClass = characterEditClassComboBox();
                 characterClass.setWidth("150px");
                 characterClass.addStyleName("select-button");
@@ -114,13 +114,13 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 active.setValue(user.isActive());
                 HorizontalLayout hzl = new HorizontalLayout();
                 VerticalLayout vrt1 = new VerticalLayout();
-                vrt1.addComponent(name);
+                vrt1.addComponent(nameField);
                 vrt1.addComponent(characterClass);
                 vrt1.addComponent(active);
                 hzl.addComponent(vrt1);
 
                 VerticalLayout vrt2 = new VerticalLayout();
-                Button updateButton = characterEditUpdateButton(name, characterClass, active);
+                Button updateButton = characterEditUpdateButton(nameField, characterClass, active);
                 Button deleteButton = new Button("Delete Character");
                 deleteButton.addListener(new DeleteButtonClickListener(user));
                 Label warning = new Label();

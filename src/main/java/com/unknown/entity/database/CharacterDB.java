@@ -551,7 +551,17 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
-                addLog("Updated Character [" + user.getName() + " -> " + name + " | " + user.getRole().toString() + " -> " + charclass + " | Active: " + active + "]");
+                String foo = "";
+                if (user.getUsername().equalsIgnoreCase(name)) {
+                        foo = name + " | ";
+                } else {
+                        foo = user.getUsername() + " -> " + name + " | ";
+                }
+                if (!user.getRole().toString().equalsIgnoreCase(charclass)) {
+                        foo = foo + user.getRole().toString() + " -> " + charclass + " | ";
+                }
+
+                addLog("Updated Character [" + foo + "Active: " + active + "]");
                 return success;
         }
 
