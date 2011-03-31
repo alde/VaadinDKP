@@ -8,7 +8,6 @@ import com.unknown.entity.character.Adjustment;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
-import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.*;
@@ -34,8 +33,6 @@ import java.util.List;
  * @author bobo
  */
 public class CharacterInfoWindow extends Window {
-
-        private RaidDAO raidDao;
         private final User user;
         private Application app;
         private ItemList itemList;
@@ -48,7 +45,6 @@ public class CharacterInfoWindow extends Window {
                 this.app = app;
                 this.raidList = raidList;
                 this.itemList = itemList;
-                this.raidDao = new RaidDB();
                 this.longest = 1;
                 this.addStyleName("opaque");
                 this.setCaption("Character information: " + user.getUsername());
@@ -72,8 +68,7 @@ public class CharacterInfoWindow extends Window {
         private void characterInfoLootTableAddRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
                 Label itemname = new Label(charitem.getName());
                 itemname.addStyleName(charitem.getQuality().toLowerCase());
-                ItemDAO itemDao = new ItemDB();
-                String slot = itemDao.getSlotForItemByName(itemname.getValue().toString());
+                String slot = ItemDB.getSlotForItemByName(itemname.getValue().toString());
                 addItem.getItemProperty("Name").setValue(itemname);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Slot").setValue(slot);
@@ -211,7 +206,7 @@ public class CharacterInfoWindow extends Window {
                 tbl.setSizeUndefined();
                 tbl.setHeight("150px");
 
-                List<Raid> cRaids = raidDao.getRaidsForCharacter(user.getId());
+                List<Raid> cRaids = RaidDB.getRaidsForCharacter(user.getId());
                 Collections.sort(cRaids, new CompareRaidDates());
                 for (Raid charraid : cRaids) {
                         Item addItem = tbl.addItem(charraid);
@@ -233,8 +228,8 @@ public class CharacterInfoWindow extends Window {
                 tbl.setSizeUndefined();
                 tbl.setHeight("150px");
 
-                List<Adjustment> cPun = raidDao.getAdjustmentsForCharacter(user.getId());
-                Collections.sort(cPun, new ComparePunishmentDates());
+                List<Adjustment> cPun = RaidDB.getAdjustmentsForCharacter(user.getId());
+                Collections.sort(cPun, new CompareAdjustmentDates());
                 for (Adjustment pun : cPun) {
                         Item addItem = tbl.addItem(pun);
                         addItem.getItemProperty("Comment").setValue(pun.getComment());
@@ -249,20 +244,18 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void raidsAttended() {
-                CharacterDAO charDao = new CharacterDB();
-                String attendance = charDao.getAttendanceRaids(user);
-                Double percent = Double.parseDouble(attendance);
+                Double attendance = user.getAttendance();
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
-                if (percent >= 0 && percent < 50) {
+                if (attendance >= 0 && attendance < 50) {
                         attended.setStyleName("negative");
-                } else if (percent > 50 && percent < 65) {
+                } else if (attendance > 50 && attendance < 65) {
                         attended.setStyleName("uncommon");
-                } else if (percent >= 65 && percent < 75) {
+                } else if (attendance >= 65 && attendance < 75) {
                         attended.setStyleName("rare");
-                } else if (percent >= 75 && percent < 90) {
+                } else if (attendance >= 75 && attendance < 90) {
                         attended.setStyleName("epic");
-                } else if (percent >= 90) {
+                } else if (attendance >= 90) {
                         attended.setStyleName("legendary");
                 }
                 addComponent(attended);
@@ -274,9 +267,8 @@ public class CharacterInfoWindow extends Window {
                 public void itemClick(ItemClickEvent event) {
 
                         if (event.isDoubleClick()) {
-                                ItemDAO itemDao = new ItemDB();
                                 CharacterItem citem = (CharacterItem) event.getItemId();
-                                Items temp = itemDao.getSingleItem(citem.getName());
+                                Items temp = ItemDB.getSingleItem(citem.getName());
                                 PopUpControl pop = new PopUpControl(app);
                                 pop.setItemList(itemList);
                                 pop.showProperItemWindow(temp);
@@ -305,7 +297,7 @@ public class CharacterInfoWindow extends Window {
                 }
         }
 
-        private class ComparePunishmentDates implements Comparator<Adjustment> {
+        private class CompareAdjustmentDates implements Comparator<Adjustment> {
                 @Override
                 public int compare(Adjustment t, Adjustment t1) {
                         return t1.getDate().compareTo(t.getDate());

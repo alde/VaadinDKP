@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.raids;
 
-import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.Items;
 
@@ -86,7 +85,6 @@ public class RaidItem {
         }
 
         public Items toItem() {
-                ItemDAO itemDao = new ItemDB();
-                return itemDao.getSingleItem(this.name);
+                return ItemDB.getSingleItem(this.name);
         }
 }

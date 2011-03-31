@@ -4,8 +4,7 @@
  */
 package com.unknown.entity.character.windows;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -25,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
  */
 public class AddNewUserWindow extends Window {
 
-        CharacterDAO characterDao;
         final TextField username;
         final TextField password;
         final TextField passwordCheck;
@@ -46,7 +44,6 @@ public class AddNewUserWindow extends Window {
                 this.center();
                 this.addStyleName("opaque");
                 this.getContent().setSizeUndefined();
-                this.characterDao = new CharacterDB();
         }
 
         public void printInfo() {
@@ -94,8 +91,8 @@ public class AddNewUserWindow extends Window {
                         }
 
                         String hashedpassword = hashPassword(password.getValue().toString());
-                        characterDao.setApplication(app);
-                        characterDao.addNewSiteUser(username.getValue().toString(), hashedpassword, userlevel);
+                        CharDB.setApplication(app);
+                        CharDB.addNewSiteUser(username.getValue().toString(), hashedpassword, userlevel);
                 } else {
                         Label err = new Label("Passwords must match!");
                         err.addStyleName("error");

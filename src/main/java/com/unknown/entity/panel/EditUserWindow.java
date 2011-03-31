@@ -8,7 +8,7 @@ import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.ILoginDao;
 import com.unknown.entity.dao.LoginDao;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.vaadin.Application;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -32,8 +32,6 @@ import java.util.List;
  * @author alde
  */
 class EditUserWindow extends Window {
-
-        private CharacterDAO characterDao;
         final private ComboBox allUsernames;
         final private TextField oldPassword;
         final private TextField newPassword;
@@ -46,7 +44,6 @@ class EditUserWindow extends Window {
         private Label error;
 
         EditUserWindow(Application app) {
-                this.characterDao = new CharacterDB();
                 this.vert = new VerticalLayout();
                 this.loginDao = new LoginDao();
                 this.app = app;
@@ -119,10 +116,10 @@ class EditUserWindow extends Window {
                                 }
                                 String pass = hashPassword(newPassword.getValue().toString());
                                 if (isAdmin()) {
-                                        characterDao.updateSiteUser(user, pass, userlevel);
+                                        CharDB.updateSiteUser(user, pass, userlevel);
                                         error.setValue("Password Changed.");
                                 } else if (isSuperAdmin()) {
-                                        characterDao.updateSiteUser(allUsernames.getValue().toString(), pass, userlevel);
+                                        CharDB.updateSiteUser(allUsernames.getValue().toString(), pass, userlevel);
                                         error.setValue("Password Changed.");
                                 }
                         } else {
@@ -163,7 +160,7 @@ class EditUserWindow extends Window {
 
         private void doFillAllUsernames() {
                 List<String> names = new ArrayList<String>();
-                names.addAll(characterDao.getSiteUsers());
+                names.addAll(CharDB.getSiteUsers());
                 for (String s : names) {
                         allUsernames.addItem(s);
                 }
@@ -193,7 +190,7 @@ class EditUserWindow extends Window {
         }
 
         private String getUserLevel(String name) {
-                int userLevel = characterDao.getSiteUserLevel(name);
+                int userLevel = CharDB.getSiteUserLevel(name);
                 if (userLevel == 2) {
                         return "SuperAdmin";
                 } else {
@@ -203,7 +200,7 @@ class EditUserWindow extends Window {
 
         void addApplication(Application app) {
                 this.app = app;
-                this.characterDao.setApplication(app);
+                CharDB.setApplication(app);
         }
 
         private class CloseBtnListener implements ClickListener {

@@ -1,9 +1,6 @@
 package com.unknown.entity;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.*;
@@ -34,19 +31,20 @@ public class UnknownEntityDKP extends Application {
         }
 
         private void doDrawings() {
-                RaidDAO raidDAO = new RaidDB();
-                CharacterDAO characterDAO = new CharacterDB();
-                ItemDAO itemDAO = new ItemDB();
-
-
-                dkpList = new DkpList(characterDAO, this);
-                charList = new CharacterList(characterDAO, dkpList, this);
+                System.out.println(this.toString());
+                dkpList = new DkpList(this);
+                dkpList.attach();
+                RaidDB.setApplication(this);
+                ItemDB.setApplication(this);
+                CharDB.setApplication(this);
+                charList = new CharacterList(dkpList, this);
                 charList.attach();
                 dkpList.setCharacterList(charList);
                 dkpList.addStyleName("striped");
-                raidList = new RaidList(raidDAO);
+                raidList = new RaidList();
+                raidList.attach();
                 raidList.addStyleName("striped");
-                itemList = new ItemList(itemDAO);
+                itemList = new ItemList();
                 itemList.addStyleName("striped");
                 raidList.setCharList(charList);
                 raidList.setDkpList(dkpList);
@@ -55,8 +53,8 @@ public class UnknownEntityDKP extends Application {
                 itemList.setLists(charList, dkpList, raidList);
                 raidList.setItemList(itemList);
 
-
-                TablePanel tp = new TablePanel(dkpList, itemList, raidList);
+                TablePanel tp = new TablePanel(dkpList, itemList, raidList, this);
+                
                 final HorizontalLayout hzl = tp.HorizontalSegment();
 
                 window.addComponent(adminPanel);

@@ -4,19 +4,20 @@
  */
 package com.unknown.entity.character;
 
-import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.Armor;
 import com.unknown.entity.PopUpControl;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.RaidList;
 import com.vaadin.Application;
 import com.vaadin.data.Item;
+import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ItemSorter;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -26,16 +27,14 @@ import java.util.List;
  */
 public class DkpList extends Table implements CharacterInfoListener {
 
-        private CharacterDAO charDao;
         private IndexedContainer ic;
         private DkpList dkpList = this;
         private CharacterList charList;
-        private Application app;
         private ItemList itemList;
         private RaidList raidList;
+        private Application app;
 
-        public DkpList(CharacterDAO characterDAO, Application app) {
-                this.charDao = characterDAO;
+        public DkpList(Application app) {
                 this.ic = new IndexedContainer();
                 this.app = app;
                 dkpListSetColumnHeaders();
@@ -43,7 +42,6 @@ public class DkpList extends Table implements CharacterInfoListener {
                 this.setWidth("185px");
                 this.setHeight("650px");
                 this.setPageLength(0);
-
                 this.addListener(new dkpListClickListener());
         }
 
@@ -57,6 +55,30 @@ public class DkpList extends Table implements CharacterInfoListener {
                 ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Armor", Armor.class, "");
                 ic.addContainerProperty("DKP", Label.class, 0);
+                ic.addContainerProperty("Attendance", Double.class, 0.0);
+                ic.setItemSorter(new DefaultItemSorter(new Comparator<Object>() {
+
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                                if (o1 instanceof Label && o2 instanceof Label) {
+                                        String one = ((Label) o1).getValue().toString();
+                                        String two = ((Label) o2).getValue().toString();
+                                        Double d1, d2;
+                                        try {
+                                                d1 = Double.parseDouble(one);
+                                                d2 = Double.parseDouble(two);
+                                                return d1 < d2 ? 1 : 0;
+                                        } catch(NumberFormatException nfe) {
+                                                nfe.printStackTrace();
+                                        }
+                                        return one.compareToIgnoreCase(two);
+                                } else if (o1 instanceof Double && o2 instanceof Double) {
+                                        return (Double) o1 < (Double) o2 ? 1 : 0;
+                                } else {
+                                        return 0;
+                                }
+                        }
+                }));
                 this.setContainerDataSource(ic);
         }
 
@@ -66,7 +88,7 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         @Override
         public void onCharacterInfoChange() {
-                charDao.clearCache();
+                CharDB.clearCache();
                 update();
         }
 
@@ -78,14 +100,8 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         public void printList() {
                 clear();
-                List<User> users = charDao.getUsers();
-                Collections.sort(users, new Comparator<User>() {
+                List<User> users = CharDB.getUsersSortedByDKP();
 
-                        @Override
-                        public int compare(User t, User t1) {
-                                return t.getDKP() < t1.getDKP() ? 1 : 0;
-                        }
-                });
                 for (final User user : users) {
                         if (user.isActive()) {
                                 Item addItem = addItem(user);
@@ -94,6 +110,7 @@ public class DkpList extends Table implements CharacterInfoListener {
                 }
                 this.setColumnCollapsingAllowed(true);
                 this.setColumnCollapsed("Armor", true);
+                this.setColumnCollapsed("Attendance", true);
 
         }
 
@@ -103,17 +120,20 @@ public class DkpList extends Table implements CharacterInfoListener {
                 addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Armor").setValue(user.getArmor());
                 Label dkp = new Label("" + user.getDKP());
+                dkp.setContentMode(Label.CONTENT_XHTML);
                 if (user.getDKP() >= 0) {
                         dkp.addStyleName("positive");
                 } else {
                         dkp.addStyleName("negative");
                 }
                 addItem.getItemProperty("DKP").setValue(dkp);
+                addItem.getItemProperty("Attendance").setValue(user.getAttendance());
         }
 
         public void filter(Object value) {
                 ic.removeAllContainerFilters();
-                ic.addContainerFilter("Armor", filterString(value), true, false);
+                String foo = filterString(value);
+                ic.addContainerFilter("Armor", foo, true, false);
         }
 
         private String filterString(Object value) {

@@ -4,8 +4,7 @@
  */
 package com.unknown.entity.items;
 
-import com.unknown.entity.dao.ItemDAO;
-import java.sql.SQLException;
+import com.unknown.entity.database.ItemDB;
 import java.util.List;
 
 /**
@@ -13,14 +12,8 @@ import java.util.List;
  * @author alde
  */
 public class DefaultPrices {
-
-	private final ItemDAO itemDao;
-
-	public DefaultPrices(ItemDAO itemDao) {
-		this.itemDao = itemDao;
-	}
 	
-    public List<ItemPrices> getPrices() throws SQLException {
-           return itemDao.getDefaultPrices();
+    public List<ItemPrices> getPrices() {
+           return ItemDB.getDefaultPrices();
     }
 }

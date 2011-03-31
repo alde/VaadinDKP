@@ -3,9 +3,7 @@ package com.unknown.entity.raids;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.ItemList;
 import com.vaadin.data.Item;
@@ -29,7 +27,6 @@ public class RaidLootList extends Table implements RaidLootListener {
         private final CharacterList clist;
         private final ItemList itemList;
         private int longest;
-        CharacterDAO charDao;
         private int longestname;
 
         public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
@@ -44,7 +41,6 @@ public class RaidLootList extends Table implements RaidLootListener {
                 this.addListener(new RewardListClickListener());
                 this.longest = 1;
                 this.longestname = 1;
-                this.charDao = new CharacterDB();
                 raidRewardListSetHeaders();
                 printList();
         }
@@ -57,7 +53,7 @@ public class RaidLootList extends Table implements RaidLootListener {
 
         @Override
         public void onRaidInfoChanged() {
-                charDao.clearCache();
+                CharDB.clearCache();
                 update();
         }
 
@@ -74,9 +70,8 @@ public class RaidLootList extends Table implements RaidLootListener {
         }
 
         private void printList() {
-                ItemDAO itemDao = new ItemDB();
                 ArrayList<RaidItem> temp;
-                temp = itemDao.getItemsForRaid(raid.getId());
+                temp = ItemDB.getItemsForRaid(raid.getId());
                 for (RaidItem item : temp) {
                         Item addItem = ic.addItem(item);
                         raidListAddRow(addItem, item);
@@ -93,7 +88,7 @@ public class RaidLootList extends Table implements RaidLootListener {
 
         private void raidListAddRow(Item addItem, RaidItem item) {
                 Label looter = new Label(item.getLooter());
-                looter.addStyleName(charDao.getRoleForCharacter(item.getLooter()).toLowerCase().replace(" ", ""));
+                looter.addStyleName(CharDB.getRoleForCharacter(item.getLooter()).toLowerCase().replace(" ", ""));
                 addItem.getItemProperty("Name").setValue(looter);
                 Label itemname = new Label(item.getName());
                 itemname.addStyleName(item.getQuality().toLowerCase());

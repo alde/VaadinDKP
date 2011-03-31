@@ -4,9 +4,6 @@
  */
 package com.unknown.entity.character;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -20,16 +17,11 @@ import java.util.List;
  * @author alde
  */
 public class AdjustmentTable extends Table {
-
-        IndexedContainer ic = new IndexedContainer();
-        User user;
-        CharacterDAO charDao;
-        RaidDAO raidDao;
+        private IndexedContainer ic = new IndexedContainer();
+        private User user;
 
         public AdjustmentTable(User user) {
                 this.user = user;
-                this.charDao = new CharacterDB();
-                this.raidDao = new RaidDB();
                 printList();
         }
 
@@ -38,7 +30,7 @@ public class AdjustmentTable extends Table {
                 adjustmentTableSetHeaders();
                 setHeight("200px");
                 setContainerDataSource(ic);
-                List<Adjustment> puns = raidDao.getAdjustmentsForCharacter(user.getId());
+                List<Adjustment> puns = RaidDB.getAdjustmentsForCharacter(user.getId());
                 Collections.sort(puns, new ComparePunishmentDates());
                 for (Adjustment cPun : puns) {
                         Item addItem = addItem(cPun);

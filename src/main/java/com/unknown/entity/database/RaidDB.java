@@ -6,7 +6,6 @@ package com.unknown.entity.database;
 
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.character.Adjustment;
-import com.unknown.entity.dao.*;
 import com.unknown.entity.DBConnection;
 import com.unknown.entity.character.User;
 import com.unknown.entity.raids.*;
@@ -31,13 +30,13 @@ import org.joda.time.DateTime;
  *
  * @author alde
  */
-public class RaidDB implements RaidDAO {
+public class RaidDB {
 
         private static List<Raid> raidCache = new ArrayList<Raid>();
-        private Application app;
+        private static Application app;
 
-        @Override
-        public List<Raid> getRaids() {
+        
+        public static List<Raid> getRaids() {
                 if (raidCache != null) {
                         if (!raidCache.isEmpty()) {
                                 return new ArrayList(raidCache);
@@ -62,12 +61,12 @@ public class RaidDB implements RaidDAO {
                 return raids;
         }
 
-        @Override
-        public void clearCache() {
+        
+        public static void clearCache() {
                 raidCache.clear();
         }
 
-        public List<RaidChar> getCharsForRaid(int raidId) {
+        public static List<RaidChar> getCharsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
@@ -91,8 +90,8 @@ public class RaidDB implements RaidDAO {
                 return raidChars;
         }
 
-        @Override
-        public List<String> getRaidZoneList() {
+        
+        public static List<String> getRaidZoneList() {
                 List<String> zones = new ArrayList<String>();
                 Connection c = null;
                 try {
@@ -110,8 +109,8 @@ public class RaidDB implements RaidDAO {
                 return zones;
         }
 
-        @Override
-        public int addNewRaid(String zone, String comment, String date) {
+        
+        public static int addNewRaid(String zone, String comment, String date) {
                 Connection c = null;
                 int result = 0;
                 int zoneId = 0;
@@ -137,7 +136,7 @@ public class RaidDB implements RaidDAO {
                 return result;
         }
 
-        private void addCharsToReward(List<Integer> newcharid, RaidReward reward) throws SQLException {
+        private static void addCharsToReward(List<Integer> newcharid, RaidReward reward) throws SQLException {
                 DBConnection connection = new DBConnection();
                 try {
                         PreparedStatement p = connection.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) VALUES (?,?)");
@@ -152,8 +151,8 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        @Override
-        public Collection<RaidReward> getRewardsForRaid(int raidId) {
+        
+        public static Collection<RaidReward> getRewardsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
                 try {
@@ -177,8 +176,8 @@ public class RaidDB implements RaidDAO {
                 return raidRewards;
         }
 
-        @Override
-        public Collection<RaidItem> getItemsForRaid(int raidId) {
+        
+        public static Collection<RaidItem> getItemsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidItem> raidItems = new ArrayList<RaidItem>();
                 try {
@@ -205,8 +204,8 @@ public class RaidDB implements RaidDAO {
                 return raidItems;
         }
 
-        @Override
-        public Collection<RaidChar> getCharsForReward(int id) {
+        
+        public static Collection<RaidChar> getCharsForReward(int id) {
                 Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
@@ -232,8 +231,8 @@ public class RaidDB implements RaidDAO {
                 return raidChars;
         }
 
-        @Override
-        public int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) {
+        
+        public static int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) {
                 int success = 0;
                 Connection c = null;
                 int zoneid = getZoneIdByName(raidzoneName);
@@ -266,8 +265,8 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        @Override
-        public int getZoneIdByName(String raidzoneName) {
+        
+        public static int getZoneIdByName(String raidzoneName) {
                 DBConnection c = new DBConnection();
                 int zoneid = 1;
                 try {
@@ -284,8 +283,8 @@ public class RaidDB implements RaidDAO {
                 return zoneid;
         }
 
-        @Override
-        public String getZoneNameById(int raidzoneid) {
+        
+        public static String getZoneNameById(int raidzoneid) {
                 DBConnection c = new DBConnection();
                 String zonename = "";
                 try {
@@ -302,8 +301,8 @@ public class RaidDB implements RaidDAO {
                 return zonename;
         }
 
-        @Override
-        public int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
+        
+        public static int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -336,19 +335,18 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        private void doUpdateCharacters(Connection c, RaidReward reward, List<String> newAttendants) throws SQLException {
+        private static void doUpdateCharacters(Connection c, RaidReward reward, List<String> newAttendants) throws SQLException {
                 List<Integer> newcharid = new ArrayList<Integer>();
                 newAttendants = removeDuplicates(newAttendants);
-                CharacterDAO charDao = new CharacterDB();
                 for (String s : newAttendants) {
-                        newcharid.add(charDao.getCharacterId(s));
+                        newcharid.add(CharDB.getCharacterId(s));
                 }
                 removeAllExistingCharactersFromReward(reward, newAttendants, newcharid);
                 addCharsToReward(newcharid, reward);
 
         }
 
-        private void removeAllExistingCharactersFromReward(RaidReward reward, List<String> newAttendants, List<Integer> newcharclassid) throws SQLException {
+        private static void removeAllExistingCharactersFromReward(RaidReward reward, List<String> newAttendants, List<Integer> newcharclassid) throws SQLException {
                 DBConnection c = new DBConnection();
                 try {
 
@@ -360,7 +358,7 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        private int doUpdateSharesAndComment(Connection c, RaidReward reward, int newShares, String newComment) throws SQLException {
+        private static int doUpdateSharesAndComment(Connection c, RaidReward reward, int newShares, String newComment) throws SQLException {
                 PreparedStatement p = c.prepareStatement("UPDATE rewards SET number_of_shares=? , comment=? WHERE id=?");
                 p.setInt(1, newShares);
                 p.setString(2, newComment);
@@ -368,22 +366,20 @@ public class RaidDB implements RaidDAO {
                 return p.executeUpdate();
         }
 
-        private List<String> removeDuplicates(List<String> attendants) {
+        private static List<String> removeDuplicates(List<String> attendants) {
                 HashSet hs = new HashSet(attendants);
                 List<String> clean = new ArrayList<String>();
                 clean.addAll(hs);
                 return clean;
         }
 
-        @Override
-        public void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) {
+        
+        public static void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) {
                 Connection c = null;
-                CharacterDAO charDao = new CharacterDB();
                 try {
                         c = new DBConnection().getConnection();
-                        ItemDAO itemDao = new ItemDB();
-                        int itemid = itemDao.getItemId(loot);
-                        int charid = charDao.getCharacterId(name);
+                        int itemid = ItemDB.getItemId(loot);
+                        int charid = CharDB.getCharacterId(name);
                         PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, character_id, price, heroic) VALUES(?,?,?,?,?)");
                         ps.setInt(1, itemid);
                         ps.setInt(2, raid.getId());
@@ -399,8 +395,8 @@ public class RaidDB implements RaidDAO {
                 addLog("Added Loot [" + name + " looted " + loot + " in " + raid.getComment() + "]");
         }
 
-        @Override
-        public int removeReward(RaidReward reward) {
+        
+        public static int removeReward(RaidReward reward) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -420,14 +416,14 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        @Override
-        public int addReward(RaidReward reward) {
+        
+        public static int addReward(RaidReward reward) {
                 reward = doAddReward(reward);
                 doAddCharacterReward(reward);
                 return reward.getId();
         }
 
-        private RaidReward doAddReward(RaidReward reward) {
+        private static RaidReward doAddReward(RaidReward reward) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -448,7 +444,7 @@ public class RaidDB implements RaidDAO {
                 return reward;
         }
 
-        private void doAddCharacterReward(RaidReward reward) {
+        private static void doAddCharacterReward(RaidReward reward) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
@@ -464,12 +460,11 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        @Override
-        public int removeLootFromRaid(RaidItem item) {
+        
+        public static int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
-                CharacterDAO charDao = new CharacterDB();
-                int charid = charDao.getCharacterId(item.getLooter());
+                int charid = CharDB.getCharacterId(item.getLooter());
                 try {
                         c = new DBConnection().getConnection();
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
@@ -486,26 +481,24 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        @Override
-        public List<String> findInvalidCharacters(List<String> attendantlist) {
+        
+        public static List<String> findInvalidCharacters(List<String> attendantlist) {
                 List<String> invalid = new ArrayList<String>(attendantlist);
-                CharacterDAO charDao = new CharacterDB();
-                invalid.removeAll(charDao.getUserNames());
+                invalid.removeAll(CharDB.getUserNames());
                 return ImmutableList.copyOf(invalid);
         }
 
-        @Override
-        public Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId) {
+        
+        public static Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId) {
                 Set<RaidChar> chars = new HashSet<RaidChar>();
-                CharacterDAO charDao = new CharacterDB();
                 for (String string : attendantlist) {
-                        int characterId = charDao.getCharacterId(string);
+                        int characterId = CharDB.getCharacterId(string);
                         chars.add(getRaidChar(characterId, raidId));
                 }
                 return chars;
         }
 
-        public RaidChar getRaidChar(int charId, int raidId) {
+        public static RaidChar getRaidChar(int charId, int raidId) {
                 DBConnection c = new DBConnection();
                 RaidChar rchar = new RaidChar();
                 try {
@@ -527,8 +520,8 @@ public class RaidDB implements RaidDAO {
                 return rchar;
         }
 
-        @Override
-        public List<Raid> getRaidsForCharacter(int charid) {
+        
+        public static List<Raid> getRaidsForCharacter(int charid) {
                 List<Raid> raids = new ArrayList<Raid>();
                 DBConnection c = new DBConnection();
                 try {
@@ -546,8 +539,8 @@ public class RaidDB implements RaidDAO {
                 return raids;
         }
 
-        @Override
-        public int getTotalRaidsLastThirtyDays() {
+        
+        public static int getTotalRaidsLastThirtyDays() {
                 int total_raids = 0;
                 DateTime dt = new DateTime();
                 String startdate = dt.toYearMonthDay().minusDays(30).toString();
@@ -569,8 +562,8 @@ public class RaidDB implements RaidDAO {
                 return total_raids;
         }
 
-        @Override
-        public int getAttendedRaidsLastThirtyDays(User user) {
+        
+        public static int getAttendedRaidsLastThirtyDays(User user) {
                 int i = 0;
                 DateTime dt = new DateTime();
                 String startdate = dt.toYearMonthDay().minusDays(30).toString();
@@ -593,12 +586,11 @@ public class RaidDB implements RaidDAO {
                 return i;
         }
 
-        @Override
-        public boolean getLootedHeroic(String charname, int itemid, double price) {
+        
+        public static boolean getLootedHeroic(String charname, int itemid, double price) {
                 DBConnection c = new DBConnection();
                 boolean isheroic = false;
-                CharacterDAO charDao = new CharacterDB();
-                int charid = charDao.getCharacterId(charname);
+                int charid = CharDB.getCharacterId(charname);
                 try {
                         PreparedStatement p = c.prepareStatement("SELECT DISTINCT * FROM loots WHERE item_id=? AND character_id=? AND price=?");
                         p.setInt(1, itemid);
@@ -616,12 +608,10 @@ public class RaidDB implements RaidDAO {
                 return isheroic;
         }
 
-        @Override
-        public int doUpdateLoot(int lootid, String looter, String itemname, double price, boolean heroic, int raidid) {
-                ItemDAO itemDao = new ItemDB();
-                int itemid = itemDao.getItemId(itemname);
-                CharacterDAO charDao = new CharacterDB();
-                int charid = charDao.getCharacterId(looter);
+        
+        public static int doUpdateLoot(int lootid, String looter, String itemname, double price, boolean heroic, int raidid) {
+                int itemid = ItemDB.getItemId(itemname);
+                int charid = CharDB.getCharacterId(looter);
                 int success = 0;
                 DBConnection c = new DBConnection();
                 try {
@@ -642,7 +632,7 @@ public class RaidDB implements RaidDAO {
                 return success;
         }
 
-        private void closeConnection(Connection c) {
+        private static void closeConnection(Connection c) {
                 try {
                         c.close();
                 } catch (SQLException ex) {
@@ -650,8 +640,8 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        @Override
-        public void removeZone(String zone) {
+        
+        public static void removeZone(String zone) {
                 fixExistingZonesToDefaultWhenRemovingThatZone(zone);
                 DBConnection c = new DBConnection();
                 try {
@@ -665,8 +655,8 @@ public class RaidDB implements RaidDAO {
                 addLog("Removed Zone [" + zone + "]");
         }
 
-        @Override
-        public void addZone(String zone) {
+        
+        public static void addZone(String zone) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO zones (name) VALUES(?)");
@@ -679,7 +669,7 @@ public class RaidDB implements RaidDAO {
                 addLog("Added Zone [" + zone + "]");
         }
 
-        private void fixExistingZonesToDefaultWhenRemovingThatZone(String zone) {
+        private static void fixExistingZonesToDefaultWhenRemovingThatZone(String zone) {
                 DBConnection c = new DBConnection();
                 int zoneid = 1;
                 try {
@@ -694,8 +684,8 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        @Override
-        public void updateZoneName(String oldZone, String newZone) {
+        
+        public static void updateZoneName(String oldZone, String newZone) {
                 DBConnection c = new DBConnection();
                 int zoneid = 0;
                 try {
@@ -711,7 +701,7 @@ public class RaidDB implements RaidDAO {
                 addLog("Renamed Zone [" + oldZone + " to " + newZone + "]");
         }
 
-        private int getValidZoneByName(String raidzoneName) {
+        private static int getValidZoneByName(String raidzoneName) {
                 DBConnection c = new DBConnection();
                 int zoneid = 0;
                 try {
@@ -728,8 +718,8 @@ public class RaidDB implements RaidDAO {
                 return zoneid;
         }
 
-        @Override
-        public boolean isValidZone(String oldzone) {
+        
+        public static boolean isValidZone(String oldzone) {
                 int id = 0;
                 id = getValidZoneByName(oldzone);
                 if (id == 0) {
@@ -739,14 +729,14 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        @Override
-        public void safelyRemoveRaid(Raid raid) {
+        
+        public static void safelyRemoveRaid(Raid raid) {
                 deleteRewardsForRaid(raid);
                 deleteLootsForRaid(raid);
                 deleteRaid(raid);
         }
 
-        private void deleteRewardsForRaid(Raid raid) {
+        private static void deleteRewardsForRaid(Raid raid) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("DELETE FROM rewards WHERE raid_id=?");
@@ -758,7 +748,7 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        private void deleteLootsForRaid(Raid raid) {
+        private static void deleteLootsForRaid(Raid raid) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE raid_id=?");
@@ -770,7 +760,7 @@ public class RaidDB implements RaidDAO {
                 }
         }
 
-        private void deleteRaid(Raid raid) {
+        private static void deleteRaid(Raid raid) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("DELETE FROM raids WHERE id=?");
@@ -783,8 +773,8 @@ public class RaidDB implements RaidDAO {
                 addLog("Removed Raid [" + raid.getDate() + " | " + raid.getComment() + " | " + raid.getRaidname() + "]");
         }
 
-        @Override
-        public Raid getRaid(String raidcomment, String raiddate) {
+        
+        public static Raid getRaid(String raidcomment, String raiddate) {
                 for (Raid r : getRaids()) {
                         if (r.getComment().equalsIgnoreCase(raidcomment) && r.getDate().equalsIgnoreCase(raiddate)) {
                                 return r;
@@ -793,8 +783,8 @@ public class RaidDB implements RaidDAO {
                 return null;
         }
 
-        @Override
-        public List<Adjustment> getAdjustmentsForCharacter(int charid) {
+        
+        public static List<Adjustment> getAdjustmentsForCharacter(int charid) {
                 List<Adjustment> pun = new ArrayList<Adjustment>();
                 DBConnection c = new DBConnection();
                 try {
@@ -817,13 +807,13 @@ public class RaidDB implements RaidDAO {
                 return pun;
         }
 
-        @Override
-        public int addAdjustment(Adjustment p) {
+        
+        public static int addAdjustment(Adjustment p) {
                 p = doAddAdjustment(p);
                 return p.getId();
         }
 
-        private Adjustment doAddAdjustment(Adjustment p) {
+        private static Adjustment doAddAdjustment(Adjustment p) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("INSERT INTO adjustments (shares, comment, character_id, date) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -845,8 +835,8 @@ public class RaidDB implements RaidDAO {
                 return p;
         }
 
-        @Override
-        public void removeAdjustment(Adjustment p) {
+        
+        public static void removeAdjustment(Adjustment p) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("DELETE FROM adjustments WHERE id=?");
@@ -861,12 +851,12 @@ public class RaidDB implements RaidDAO {
 
         }
 
-        @Override
-        public void setApplication(Application app) {
-                this.app = app;
+        
+        public static void setApplication(Application app) {
+                RaidDB.app = app;
         }
 
-        private void addLog(String message) {
+        private static void addLog(String message) {
                 String name = "";
                 if (app == null) {
                         name = "<unknown>";
@@ -876,7 +866,7 @@ public class RaidDB implements RaidDAO {
                 Logg.addLog(message, name, "raid");
         }
 
-        private String getCharacter(int id) {
+        private static String getCharacter(int id) {
                 DBConnection c = new DBConnection();
                 String foo = "";
                 try {

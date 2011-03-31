@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.items.windows;
 
-import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
@@ -28,11 +27,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -52,7 +48,6 @@ public class ItemAddWindow extends Window {
         private TextField itemlevel;
         private TextField quality;
         private List<ItemPrices> prices;
-        private ItemDAO itemDao;
         private Application app;
 
         public ItemAddWindow() {
@@ -65,15 +60,11 @@ public class ItemAddWindow extends Window {
 
         public void printInfo() {
 
-                DefaultPrices def = new DefaultPrices(new ItemDB());
+                DefaultPrices def = new DefaultPrices();
                 this.prices = new ArrayList<ItemPrices>();
-                try {
-                        prices = def.getPrices();
-                } catch (SQLException ex) {
-                        Logger.getLogger(ItemAddWindow.class.getName()).log(Level.SEVERE, null, ex);
-                }
 
-                this.itemDao = new ItemDB();
+                prices = def.getPrices();
+
                 VerticalLayout addItem = new VerticalLayout();
                 vrt = new VerticalLayout();
                 addComponent(addItem);
@@ -168,8 +159,8 @@ public class ItemAddWindow extends Window {
         }
 
         private int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String qual) {
-                itemDao.setApplication(app);
-                return itemDao.addItem(name, wowid, wowid_hc, price, price_hc, slot, type, ilvl, qual);
+                ItemDB.setApplication(app);
+                return ItemDB.addItem(name, wowid, wowid_hc, price, price_hc, slot, type, ilvl, qual);
         }
 
         public void addItemInfoListener(ItemInfoListener listener) {
@@ -202,10 +193,10 @@ public class ItemAddWindow extends Window {
                 BigDecimal formattedprice = new BigDecimal(0), formattedpricehc = new BigDecimal(0);
                 for (ItemPrices ip : prices) {
                         if (ip.getSlotString().equals(slotvalue)) {
-                                Multiplier mp = itemDao.getMultiplierForItemlevel(ilvl);
+                                Multiplier mp = ItemDB.getMultiplierForItemlevel(ilvl);
                                 defprice = ip.getPrice() * mp.getMultiplier();
                                 formattedprice = new BigDecimal(defprice).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                                mp = itemDao.getMultiplierForItemlevel(ilvl + 13);
+                                mp = ItemDB.getMultiplierForItemlevel(ilvl + 13);
                                 defpricehc = ip.getPrice() * mp.getMultiplier();
                                 formattedpricehc = new BigDecimal(defpricehc).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                         }

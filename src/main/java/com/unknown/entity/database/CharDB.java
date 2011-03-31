@@ -16,10 +16,7 @@ import com.unknown.entity.Logg;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.SiteUser;
-import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.character.User;
-import com.unknown.entity.dao.ItemDAO;
-import com.unknown.entity.dao.RaidDAO;
 import com.vaadin.Application;
 import java.math.*;
 import java.sql.Connection;
@@ -28,6 +25,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,15 +37,12 @@ import java.util.logging.Logger;
  *
  * @author alde 
  */
-public class CharacterDB implements CharacterDAO {
-
-        RaidDAO raidDao = new RaidDB();
-        ItemDAO itemDao = new ItemDB();
+public class CharDB {
         private static List<User> cachedUsers = new ArrayList<User>();
-        private Application app;
+        private static Application app;
 
-        @Override
-        public List<User> getUsers() {
+        
+        public static List<User> getUsers() {
                 if (cachedUsers != null) {
                         if (!cachedUsers.isEmpty()) {
                                 return new ArrayList(cachedUsers);
@@ -115,12 +111,12 @@ public class CharacterDB implements CharacterDAO {
                 return users;
         }
 
-        @Override
-        public void clearCache() {
+        
+        public static void clearCache() {
                 cachedUsers.clear();
         }
 
-        private User calculateDKP(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
+        private static User calculateDKP(Multimap<Integer, Double> prices, Multimap<Integer, Integer> shareslist, Map<Integer, String> charnames, Map<Integer, String> charroles, int userid, Boolean active, int totalshares, double loot_value) {
                 int shares = 0;
                 int adjustments = getTotalAdjustmentsForCharacter(userid);
                 double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, share_value = 0.0;
@@ -150,15 +146,16 @@ public class CharacterDB implements CharacterDAO {
                 Role userrole = Role.valueOf(charroles.get(userid));
                 User user = new User(userid, username, userrole, active, shares, formatted_dkp_earned.doubleValue(), formatted_dkp_spent.doubleValue(), formatted_dkp.doubleValue());
                 user.addCharItems(getItemsForCharacter(userid));
+                user.setAttendance(getAttendanceRaids(user));
                 return user;
         }
 
-        @Override
-        public int getCharacterClassId(String charclass) {
+        
+        public static int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();
                 int classid = 0;
                 try {
-                        PreparedStatement pclass = c.prepareStatement("SELECT * FROM character_classes WHERE name=?");
+                        PreparedStatement pclass = c.prepareStatement("SELECT id FROM character_classes WHERE name=?");
                         pclass.setString(1, fixRole(charclass));
                         ResultSet rclass = pclass.executeQuery();
                         while (rclass.next()) {
@@ -171,12 +168,12 @@ public class CharacterDB implements CharacterDAO {
                 return classid;
         }
 
-        @Override
-        public int getCharacterId(String charname) {
+        
+        public static int getCharacterId(String charname) {
                 DBConnection c = new DBConnection();
                 int charid = 0;
                 try {
-                        PreparedStatement pclass = c.prepareStatement("SELECT * FROM characters WHERE name=?");
+                        PreparedStatement pclass = c.prepareStatement("SELECT id FROM characters WHERE name=?");
                         pclass.setString(1, charname);
                         ResultSet rclass = pclass.executeQuery();
                         while (rclass.next()) {
@@ -189,7 +186,7 @@ public class CharacterDB implements CharacterDAO {
                 return charid;
         }
 
-        private List<CharacterItem> getItemsForCharacter(int charId) {
+        private static List<CharacterItem> getItemsForCharacter(int charId) {
                 Connection c = null;
                 List<CharacterItem> itemlist = new ArrayList<CharacterItem>();
                 try {
@@ -213,8 +210,8 @@ public class CharacterDB implements CharacterDAO {
                 return itemlist;
         }
 
-        @Override
-        public String getRoleForCharacter(String name) {
+        
+        public static String getRoleForCharacter(String name) {
                 DBConnection c = new DBConnection();
                 String foo = "";
                 try {
@@ -231,13 +228,13 @@ public class CharacterDB implements CharacterDAO {
                 return foo;
         }
 
-        @Override
-        public Collection<User> getUsersWithRole(final Role role) {
+        
+        public static Collection<User> getUsersWithRole(final Role role) {
                 return Collections2.filter(getUsers(), new HasRolePredicate(role));
         }
 
-        @Override
-        public int addNewSiteUser(String username, String password, int rank) {
+        
+        public static int addNewSiteUser(String username, String password, int rank) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -252,12 +249,12 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
-                addLog("Added Site User ["+ username+"] with Rank: "+ rank);
+                addLog("Added Site User [" + username + "] with Rank: " + rank);
                 return success;
         }
 
-        @Override
-        public ImmutableList<String> getUserNames() {
+        
+        public static ImmutableList<String> getUserNames() {
                 Builder<String> userNameBuilder = ImmutableList.builder();
                 for (User user : getUsers()) {
                         userNameBuilder.add(user.getUsername());
@@ -266,29 +263,29 @@ public class CharacterDB implements CharacterDAO {
 
         }
 
-        @Override
-        public String getAttendanceRaids(User user) {
-                String foo = "";
-                int amountofRaids = raidDao.getTotalRaidsLastThirtyDays();
-                int attendedRaids = raidDao.getAttendedRaidsLastThirtyDays(user);
+        
+        public static Double getAttendanceRaids(User user) {
+                Double foo = 0.0;
+                int amountofRaids = RaidDB.getTotalRaidsLastThirtyDays();
+                int attendedRaids = RaidDB.getAttendedRaidsLastThirtyDays(user);
                 double temp = 0;
                 if (amountofRaids == 0) {
                         temp = 0;
                 } else {
                         temp = attendedRaids * 100 / amountofRaids;
                 }
-                foo = "" + temp;
+                foo = temp;
                 return foo;
         }
 
-        @Override
-        public void removeLootFromCharacter(String itemname, User user) {
+        
+        public static void removeLootFromCharacter(String itemname, User user) {
                 Connection c = null;
 
                 try {
                         c = new DBConnection().getConnection();
                         int charid = getCharacterId(user.getUsername());
-                        int itemid = itemDao.getItemId(itemname);
+                        int itemid = ItemDB.getItemId(itemname);
                         PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
@@ -298,18 +295,18 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         closeConnection(c);
                 }
-                 addLog("Removed Loot [" + itemname + " from " + user.getUsername() + "]");
+                addLog("Removed Loot [" + itemname + " from " + user.getUsername() + "]");
         }
 
-        @Override
-        public void updateLootForCharacter(String itemname, double price, boolean heroic, User user,
+        
+        public static void updateLootForCharacter(String itemname, double price, boolean heroic, User user,
                 int lootid) {
                 Connection c = null;
 
                 try {
                         c = new DBConnection().getConnection();
                         int charid = getCharacterId(user.getUsername());
-                        int itemid = itemDao.getItemId(itemname);
+                        int itemid = ItemDB.getItemId(itemname);
 
                         PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
                         p.setInt(1, itemid);
@@ -326,16 +323,16 @@ public class CharacterDB implements CharacterDAO {
                 addLog("Updated Loot for " + user.getUsername() + " [" + itemname + " | " + price + "dkp]");
         }
 
-        private void closeConnection(Connection c) {
+        private static void closeConnection(Connection c) {
                 try {
                         c.close();
                 } catch (SQLException ex) {
-                        Logger.getLogger(CharacterDB.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(CharDB.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
 
-        @Override
-        public void deleteCharacter(User user) {
+        
+        public static void deleteCharacter(User user) {
                 Connection c = null;
                 try {
                         c = new DBConnection().getConnection();
@@ -350,8 +347,8 @@ public class CharacterDB implements CharacterDAO {
                 addLog("Deleted Character [" + user.getUsername() + " | " + user.getRole().toString() + "]");
         }
 
-        @Override
-        public List<String> getSiteUsers() {
+        
+        public static List<String> getSiteUsers() {
                 DBConnection c = new DBConnection();
                 List<String> users = new ArrayList<String>();
                 try {
@@ -367,7 +364,7 @@ public class CharacterDB implements CharacterDAO {
                 return users;
         }
 
-        public int getSiteUserId(String username) {
+        public static int getSiteUserId(String username) {
                 DBConnection c = new DBConnection();
                 int id = 0;
                 try {
@@ -384,8 +381,8 @@ public class CharacterDB implements CharacterDAO {
                 return id;
         }
 
-        @Override
-        public void updateSiteUser(String username, String password, int level) {
+        
+        public static void updateSiteUser(String username, String password, int level) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("UPDATE users SET name=? , password = ? , rank = ? WHERE id = ?");
@@ -398,11 +395,11 @@ public class CharacterDB implements CharacterDAO {
                 } finally {
                         c.close();
                 }
-                 addLog("Updated Site User [" + username + " | Rank: " + level + "]");
+                addLog("Updated Site User [" + username + " | Rank: " + level + "]");
         }
 
-        @Override
-        public int getSiteUserLevel(String name) {
+        
+        public static int getSiteUserLevel(String name) {
                 DBConnection c = new DBConnection();
                 int level = 1;
                 try {
@@ -420,8 +417,8 @@ public class CharacterDB implements CharacterDAO {
                 return level;
         }
 
-        @Override
-        public int countActiveUsers() {
+        
+        public static int countActiveUsers() {
                 int i = 0;
                 for (User u : getUsers()) {
                         if (u.isActive()) {
@@ -431,8 +428,8 @@ public class CharacterDB implements CharacterDAO {
                 return i;
         }
 
-        @Override
-        public User getUser(String username) {
+        
+        public static User getUser(String username) {
                 for (User u : getUsers()) {
                         if (u.getUsername().equalsIgnoreCase(username)) {
                                 return u;
@@ -441,7 +438,7 @@ public class CharacterDB implements CharacterDAO {
                 return null;
         }
 
-        private int getTotalAdjustmentsForCharacter(int userid) {
+        private static int getTotalAdjustmentsForCharacter(int userid) {
                 DBConnection c = new DBConnection();
                 int total = 0;
                 try {
@@ -458,8 +455,8 @@ public class CharacterDB implements CharacterDAO {
                 return total;
         }
 
-        @Override
-        public Integer getShares(int id) {
+        
+        public static Integer getShares(int id) {
                 int adjustments = getTotalAdjustmentsForCharacter(id);
                 int shares = 0;
                 DBConnection c = new DBConnection();
@@ -477,12 +474,24 @@ public class CharacterDB implements CharacterDAO {
                 return shares - adjustments;
         }
 
-        @Override
-        public void setApplication(Application app) {
-                this.app = app;
+        
+        public static void setApplication(Application app) {
+                CharDB.app = app;
         }
 
-        private class HasRolePredicate implements Predicate<User> {
+        public static List<User> getUsersSortedByDKP() {
+                List<User> users = getUsers();
+                Collections.sort(users, new Comparator<User>() {
+
+                        @Override
+                        public int compare(User t, User t1) {
+                                return t.getDKP() < t1.getDKP() ? 1 : 0;
+                        }
+                });
+                return users;
+        }
+
+        private static class HasRolePredicate implements Predicate<User> {
 
                 private final Role role;
 
@@ -490,14 +499,14 @@ public class CharacterDB implements CharacterDAO {
                         this.role = role;
                 }
 
-                @Override
+                
                 public boolean apply(User user) {
                         return user.getRole().equals(role);
                 }
         }
 
-        @Override
-        public int addNewCharacter(String name, String role, Boolean isActive) {
+        
+        public static int addNewCharacter(String name, String role, Boolean isActive) {
                 Connection c = null;
                 int class_id = 0, update = 0;
 
@@ -525,7 +534,7 @@ public class CharacterDB implements CharacterDAO {
                 return update;
         }
 
-        private String fixRole(String role) {
+        private static String fixRole(String role) {
                 if (role.equals("DeathKnight")) {
                         return "Death Knight";
                 } else {
@@ -533,8 +542,8 @@ public class CharacterDB implements CharacterDAO {
                 }
         }
 
-        @Override
-        public int updateCharacter(User user, String name, String charclass, boolean active) {
+        
+        public static int updateCharacter(User user, String name, String charclass, boolean active) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -565,7 +574,7 @@ public class CharacterDB implements CharacterDAO {
                 return success;
         }
 
-        private void addLog(String message) {
+        private static void addLog(String message) {
                 String name = "";
                 if (app == null) {
                         name = "<unknown>";
@@ -573,5 +582,18 @@ public class CharacterDB implements CharacterDAO {
                         name = ((SiteUser) app.getUser()).getName();
                 }
                 Logg.addLog(message, name, "char");
+        }
+
+        public static List<User> getUsersSortedByAttendance() {
+                List<User> users = getUsers();
+                Collections.sort(users, new Comparator<User>() {
+
+                        @Override
+                        public int compare(User o1, User o2) {
+                                 return o1.getAttendance() < o2.getAttendance() ? 1 : 0;
+                        }
+
+                });
+                return users;
         }
 }

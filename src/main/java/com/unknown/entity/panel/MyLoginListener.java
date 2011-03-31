@@ -10,8 +10,5 @@ package com.unknown.entity.panel;
  * @author bobo
  */
 public interface MyLoginListener {
-
-
-
 	public void onLogin();
 }

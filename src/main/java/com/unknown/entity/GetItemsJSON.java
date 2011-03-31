@@ -34,8 +34,7 @@ public class GetItemsJSON extends HttpServlet {
                 response.setContentType("text/html;charset=UTF-8");
                 PrintWriter out = response.getWriter();
                 try {
-                        ItemDAO itemDao = new ItemDB();
-                        List<Items> itm = itemDao.getItems();
+                        List<Items> itm = ItemDB.getItems();
                         Gson gson = new Gson();
                         String userJson = gson.toJson(itm);
                         System.out.println(userJson);

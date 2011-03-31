@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.items;
 
-import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -20,7 +19,6 @@ import java.util.List;
  */
 public class MultiplierList extends Table {
 
-        ItemDAO itemDao = null;
         IndexedContainer ic;
         List<Multiplier> multipliers = new ArrayList<Multiplier>();
 
@@ -29,7 +27,6 @@ public class MultiplierList extends Table {
                 this.setSelectable(true);
                 this.setEditable(true);
                 this.setSizeUndefined();
-                this.itemDao = new ItemDB();
                 setContainerDataSource(ic);
                 printList();
         }
@@ -46,7 +43,7 @@ public class MultiplierList extends Table {
 
         public void printList() {
                 clear();
-                multipliers.addAll(itemDao.getMultipliers());
+                multipliers.addAll(ItemDB.getMultipliers());
                 addContainerProperty("Itemlevel", Integer.class, "");
                 addContainerProperty("Multiplier", Double.class, 0);
                 addContainerProperty("Delete", CheckBox.class, false);
@@ -71,11 +68,11 @@ public class MultiplierList extends Table {
                         if (Boolean.parseBoolean(item.getItemProperty("Delete").toString())) {
                                 idstodelete.add(iid.getId());
                         } else {
-                                itemDao.updateItemLevels(iid.getId(), Integer.parseInt(item.getItemProperty("Itemlevel").toString()), Double.parseDouble((item.getItemProperty("Multiplier")).toString()));
+                                ItemDB.updateItemLevels(iid.getId(), Integer.parseInt(item.getItemProperty("Itemlevel").toString()), Double.parseDouble((item.getItemProperty("Multiplier")).toString()));
                         }
                 }
                 for (int i : idstodelete) {
-                        itemDao.deleteItemLevelsMultiplier(i);
+                        ItemDB.deleteItemLevelsMultiplier(i);
                 }
                 update();
         }

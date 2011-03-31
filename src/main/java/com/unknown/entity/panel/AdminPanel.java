@@ -12,8 +12,7 @@ import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.character.windows.CharacterAddWindow;
 import com.unknown.entity.character.SiteUser;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.windows.EditMultiplierWindow;
@@ -23,7 +22,6 @@ import com.unknown.entity.raids.RaidList;
 import com.unknown.entity.raids.windows.RaidAddWindow;
 import com.vaadin.Application;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.terminal.gwt.server.ApplicationServlet;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -63,7 +61,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private DkpList dkpList = null;
         private ItemList itemList = null;
         private Application app = null;
-        private final CharacterDAO charDao = new CharacterDB();
 
         public void addApplication(Application app) {
                 this.app = app;
@@ -73,7 +70,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 setListeners();
                 styleLoginLogoutRefresh();
                 this.setSpacing(true);
-                activeUsers.setCaption("Active users: " + charDao.countActiveUsers());
+                activeUsers.setCaption("Active users: " + CharDB.countActiveUsers());
         }
 
         private void notifyListeners() {

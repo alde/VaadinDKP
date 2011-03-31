@@ -7,7 +7,7 @@ package com.unknown.entity.items;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
-import com.unknown.entity.dao.ItemDAO;
+import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.raids.RaidList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -24,17 +24,14 @@ import java.util.List;
  * @author bobo
  */
 public class ItemList extends Table implements ItemInfoListener {
-
-        private ItemDAO itemDao;
-        IndexedContainer ic;
+        private IndexedContainer ic;
         private final ItemList itemList = this;
         private CharacterList charLiist;
         private RaidList raidList;
         private DkpList dkpList;
         private int longest;
 
-        public ItemList(ItemDAO itemDAO) {
-                this.itemDao = itemDAO;
+        public ItemList() {
                 this.ic = new IndexedContainer();
                 this.setSizeUndefined();
                 this.setHeight("650px");
@@ -80,7 +77,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 if (this.getWidth() < 550) {
                         this.setWidth("550px");
                 }
-                List<Items> itemses = itemDao.getItems();
+                List<Items> itemses = ItemDB.getItems();
                 Collections.sort(itemses, new Comparator<Items>() {
 
                         @Override
@@ -132,7 +129,7 @@ public class ItemList extends Table implements ItemInfoListener {
 
         @Override
         public void onItemInfoChange() {
-                itemDao.clearCache();
+                ItemDB.clearCache();
                 update();
         }
 

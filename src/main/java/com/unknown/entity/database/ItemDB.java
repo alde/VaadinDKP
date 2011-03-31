@@ -10,7 +10,6 @@ import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.SiteUser;
-import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
@@ -32,13 +31,12 @@ import java.util.logging.Logger;
  *
  * @author alde
  */
-public class ItemDB implements ItemDAO {
+public class ItemDB {
 
         private static List<Items> itemCache = new ArrayList<Items>();
-        private Application app;
+        private static Application app;
 
-        @Override
-        public List<Items> getItems() {
+        public static List<Items> getItems() {
                 if (itemCache != null) {
                         if (!itemCache.isEmpty()) {
                                 return new ArrayList(itemCache);
@@ -65,12 +63,12 @@ public class ItemDB implements ItemDAO {
                 return items;
         }
 
-        @Override
-        public void clearCache() {
+        
+        public static void clearCache() {
                 itemCache.clear();
         }
 
-        private Collection<ItemLooter> getLootersFormItems(int itemId) {
+        private static Collection<ItemLooter> getLootersFormItems(int itemId) {
                 List<ItemLooter> looters = new ArrayList<ItemLooter>();
                 Connection c = null;
                 try {
@@ -95,8 +93,8 @@ public class ItemDB implements ItemDAO {
                 return looters;
         }
 
-        @Override
-        public List<ItemPrices> getDefaultPrices() {
+        
+        public static List<ItemPrices> getDefaultPrices() {
                 DBConnection c = new DBConnection();
                 List<ItemPrices> prices = new ArrayList<ItemPrices>();
                 try {
@@ -113,8 +111,8 @@ public class ItemDB implements ItemDAO {
                 return prices;
         }
 
-        @Override
-        public List<Multiplier> getMultipliers() {
+        
+        public static List<Multiplier> getMultipliers() {
                 DBConnection c = new DBConnection();
                 List<Multiplier> multi = new ArrayList<Multiplier>();
                 try {
@@ -130,8 +128,8 @@ public class ItemDB implements ItemDAO {
                 return multi;
         }
 
-        @Override
-        public void addMultiplier(int ilvl, double multiplier) {
+        
+        public static void addMultiplier(int ilvl, double multiplier) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("INSERT INTO multiplier (ilvl, multiplier) VALUES(?, ?)");
@@ -145,8 +143,8 @@ public class ItemDB implements ItemDAO {
                 addLog("Added Multiplier [ilvl: " + ilvl + " | " + "multiplier: " + multiplier + "]");
         }
 
-        @Override
-        public Multiplier getMultiplierForItemlevel(int ilvl) {
+        
+        public static Multiplier getMultiplierForItemlevel(int ilvl) {
                 DBConnection c = new DBConnection();
                 Multiplier mp = null;
                 try {
@@ -166,8 +164,8 @@ public class ItemDB implements ItemDAO {
                 return mp;
         }
 
-        @Override
-        public int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality) {
+        
+        public static int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality) {
                 Connection c = null;
                 int success = 0;
                 try {
@@ -214,8 +212,8 @@ public class ItemDB implements ItemDAO {
                 return success;
         }
 
-        @Override
-        public int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String quality) {
+        
+        public static int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String quality) {
                 Connection c = null;
                 int result = 0;
                 try {
@@ -244,8 +242,8 @@ public class ItemDB implements ItemDAO {
                 return result;
         }
 
-        @Override
-        public Object getItemPrice(String itemname, boolean heroic) {
+        
+        public static Object getItemPrice(String itemname, boolean heroic) {
                 Double price = 0.0;
                 Connection c = null;
                 try {
@@ -268,8 +266,8 @@ public class ItemDB implements ItemDAO {
                 return price;
         }
 
-        @Override
-        public int getItemId(String loot) {
+        
+        public static int getItemId(String loot) {
                 DBConnection c = new DBConnection();
                 int itemid = 0;
                 try {
@@ -286,8 +284,8 @@ public class ItemDB implements ItemDAO {
                 return itemid;
         }
 
-        @Override
-        public int getLootId(int itemid, int charid, double price, Boolean heroic, int raidid) {
+        
+        public static int getLootId(int itemid, int charid, double price, Boolean heroic, int raidid) {
                 DBConnection c = new DBConnection();
                 int i = 0;
                 try {
@@ -313,8 +311,8 @@ public class ItemDB implements ItemDAO {
                 return i;
         }
 
-        @Override
-        public Items getSingleItem(String name) {
+        
+        public static Items getSingleItem(String name) {
                 Connection c = null;
                 Items item = null;
                 try {
@@ -336,8 +334,8 @@ public class ItemDB implements ItemDAO {
                 return item;
         }
 
-        @Override
-        public void updateDefaultPrice(String slot, double normalprice) {
+        
+        public static void updateDefaultPrice(String slot, double normalprice) {
                 Connection c = null;
                 try {
                         c = new DBConnection().getConnection();
@@ -353,8 +351,8 @@ public class ItemDB implements ItemDAO {
                 addLog("Updated Default Price [" + slot + " | " + normalprice + "]");
         }
 
-        @Override
-        public int deleteItem(int id) {
+        
+        public static int deleteItem(int id) {
                 DBConnection c = new DBConnection();
                 int success = 0;
                 try {
@@ -374,8 +372,8 @@ public class ItemDB implements ItemDAO {
                 return success;
         }
 
-        @Override
-        public ArrayList<RaidItem> getItemsForRaid(int id) {
+        
+        public static ArrayList<RaidItem> getItemsForRaid(int id) {
                 DBConnection c = new DBConnection();
                 ArrayList<RaidItem> items = new ArrayList<RaidItem>();
                 try {
@@ -393,7 +391,7 @@ public class ItemDB implements ItemDAO {
                 return items;
         }
 
-        private void closeConnection(Connection c) {
+        private static void closeConnection(Connection c) {
                 try {
                         c.close();
                 } catch (SQLException ex) {
@@ -401,8 +399,8 @@ public class ItemDB implements ItemDAO {
                 }
         }
 
-        @Override
-        public Items getItemById(int id) {
+        
+        public static Items getItemById(int id) {
                 DBConnection c = new DBConnection();
                 Items tmp = null;
                 try {
@@ -422,7 +420,7 @@ public class ItemDB implements ItemDAO {
                 return tmp;
         }
 
-        private Type typeFromString(String temp) {
+        private static Type typeFromString(String temp) {
                 Type tempType;
                 if (temp.toString().equals("Hunter, Shaman, Warrior")) {
                         tempType = Type.protector;
@@ -436,7 +434,7 @@ public class ItemDB implements ItemDAO {
                 return tempType;
         }
 
-        private boolean itemAlreadyInDatabase(String name) {
+        private static boolean itemAlreadyInDatabase(String name) {
                 Items item = getSingleItem(name);
                 if (item != null) {
                         return true;
@@ -445,14 +443,14 @@ public class ItemDB implements ItemDAO {
                 }
         }
 
-        @Override
-        public void updateLoots(Items item, String price, String pricehc) {
+        
+        public static void updateLoots(Items item, String price, String pricehc) {
                 updateHeroic(item, pricehc);
                 updateNormal(item, price);
                 addLog("Updated Prices for [" + item.getName() + "]");
         }
 
-        private void updateHeroic(Items item, String pricehc) {
+        private static void updateHeroic(Items item, String pricehc) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=1");
@@ -466,8 +464,8 @@ public class ItemDB implements ItemDAO {
                 }
         }
 
-        @Override
-        public void updateItemLevels(int id, int ilvl, double multiplier) {
+        
+        public static void updateItemLevels(int id, int ilvl, double multiplier) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("UPDATE multiplier SET ilvl=? , multiplier=? WHERE id=? ");
@@ -482,8 +480,8 @@ public class ItemDB implements ItemDAO {
                 addLog("Updated Multiplier [ilvl: " + ilvl + " | multiplier: " + multiplier + "]");
         }
 
-        @Override
-        public void deleteItemLevelsMultiplier(int id) {
+        
+        public static void deleteItemLevelsMultiplier(int id) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement p = c.prepareStatement("DELETE FROM multiplier WHERE id=?");
@@ -496,8 +494,8 @@ public class ItemDB implements ItemDAO {
                 addLog("Deleted Multiplier [id: " + id + "]");
         }
 
-        @Override
-        public double getDefaultPrice(Items item) {
+        
+        public static double getDefaultPrice(Items item) {
                 DBConnection c = new DBConnection();
                 double d = 0.0;
                 try {
@@ -514,7 +512,7 @@ public class ItemDB implements ItemDAO {
                 return d;
         }
 
-        private void updateNormal(Items item, String price) {
+        private static void updateNormal(Items item, String price) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE item_id=? AND heroic=0");
@@ -528,8 +526,8 @@ public class ItemDB implements ItemDAO {
                 }
         }
 
-        @Override
-        public void updateItemPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
+        
+        public static void updateItemPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("UPDATE items SET price_normal=? , price_heroic=? WHERE id=?");
@@ -545,8 +543,8 @@ public class ItemDB implements ItemDAO {
                 }
         }
 
-        @Override
-        public void updateLootedPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
+        
+        public static void updateLootedPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
                 DBConnection c = new DBConnection();
                 try {
                         PreparedStatement ps = c.prepareStatement("UPDATE loots SET price=? WHERE id=? AND HEROIC=0");
@@ -566,8 +564,8 @@ public class ItemDB implements ItemDAO {
                 }
         }
 
-        @Override
-        public List<CharacterItem> getLootForCharacter(String name) {
+        
+        public static List<CharacterItem> getLootForCharacter(String name) {
                 List<CharacterItem> foo = new ArrayList<CharacterItem>();
                 DBConnection c = new DBConnection();
                 try {
@@ -591,17 +589,17 @@ public class ItemDB implements ItemDAO {
                 return foo;
         }
 
-        @Override
-        public String getSlotForItemByName(String name) {
+        
+        public static String getSlotForItemByName(String name) {
                 return getItemById(getItemId(name)).getSlot();
         }
 
-        @Override
-        public void setApplication(Application app) {
-                this.app = app;
+        
+        public static void setApplication(Application app) {
+                ItemDB.app = app;
         }
 
-        private void addLog(String message) {
+        private static void addLog(String message) {
                 String name = "";
                 if (app == null) {
                         name = "<unknown>";

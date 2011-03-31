@@ -4,8 +4,7 @@
  */
 package com.unknown.entity.character.windows;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.vaadin.Application;
@@ -15,7 +14,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -107,9 +105,8 @@ public class CharacterAddWindow extends Window {
         }
 
         private void addChar(String name, String role, boolean isActive) throws SQLException {
-                CharacterDAO characterDao = new CharacterDB();
-                characterDao.setApplication(app);
-                characterDao.addNewCharacter(name, role, isActive);
+                CharDB.setApplication(app);
+                CharDB.addNewCharacter(name, role, isActive);
                 
         }
 

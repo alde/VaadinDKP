@@ -7,7 +7,7 @@ package com.unknown.entity.raids;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
-import com.unknown.entity.dao.*;
+import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.items.ItemList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
@@ -23,8 +23,6 @@ import java.util.List;
  * @author alde
  */
 public class RaidList extends Table implements RaidInfoListener {
-
-        private RaidDAO raidDAO;
         IndexedContainer ic;
         private final RaidList raidList = this;
         private CharacterList clist;
@@ -32,8 +30,7 @@ public class RaidList extends Table implements RaidInfoListener {
         private ItemList itemList;
         private int longest;
 
-        public RaidList(RaidDAO raidDAO) {
-                this.raidDAO = raidDAO;
+        public RaidList() {
                 this.ic = new IndexedContainer();
                 this.setSelectable(true);
                 this.setSizeUndefined();
@@ -63,7 +60,7 @@ public class RaidList extends Table implements RaidInfoListener {
 
         @Override
         public void onRaidInfoChanged() {
-                raidDAO.clearCache();
+                RaidDB.clearCache();
                 update();
         }
 
@@ -81,7 +78,7 @@ public class RaidList extends Table implements RaidInfoListener {
         }
 
         public void printList() {
-                List<Raid> raids = raidDAO.getRaids();
+                List<Raid> raids = RaidDB.getRaids();
                 Collections.sort(raids, new Comparator<Raid>() {
                         @Override
                         public int compare(Raid t, Raid t1) {

@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.raids.windows;
 
-import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.RaidInfoListener;
 import com.vaadin.Application;
@@ -44,9 +43,7 @@ public class RaidAddWindow extends Window {
         }
 
         public void printInfo() {
-
-                RaidDAO raidDAO = new RaidDB();
-                List<String> zoneList = raidDAO.getRaidZoneList();
+                List<String> zoneList = RaidDB.getRaidZoneList();
 
                 VerticalLayout addItem = new VerticalLayout();
 
@@ -135,9 +132,8 @@ public class RaidAddWindow extends Window {
         }
 
         private void addRaid(String zone, String comment, String date) {
-                RaidDAO raidDao = new RaidDB();
-                raidDao.setApplication(app);
-                raidDao.addNewRaid(zone, comment, date);
+                // RaidDB.setApplication(app);
+                RaidDB.addNewRaid(zone, comment, date);
         }
 
         private class AddButtonClickListener implements ClickListener {

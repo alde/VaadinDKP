@@ -7,7 +7,6 @@ package com.unknown.entity.raids.windows;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
-import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.Raid;
@@ -37,10 +36,7 @@ import java.util.logging.Logger;
  */
 public class RaidLootAddWindow extends Window {
 
-        Raid raid;
-        RaidDAO raidDao;
-        ItemDAO itemDao;
-        CharacterDAO characterDao;
+        private Raid raid;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
         private List<ItemInfoListener> iteminfolisteners = new ArrayList<ItemInfoListener>();
@@ -59,9 +55,6 @@ public class RaidLootAddWindow extends Window {
                 this.setCaption(raid.getComment().toString());
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
-                this.raidDao = new RaidDB();
-                this.itemDao = new ItemDB();
-                this.characterDao = new CharacterDB();
                 this.setPositionX(600);
                 this.setPositionY(300);
                 this.setSizeUndefined();
@@ -112,8 +105,8 @@ public class RaidLootAddWindow extends Window {
         }
 
         private void addRaidLoot(String name, String loot, boolean isheroic, double price) {
-                raidDao.setApplication(app);
-                raidDao.addLootToRaid(raid, name, loot, isheroic, price);
+                // RaidDB.setApplication(app);
+                RaidDB.addLootToRaid(raid, name, loot, isheroic, price);
         }
 
         private ComboBox nameComboList() throws UnsupportedOperationException {
@@ -121,7 +114,7 @@ public class RaidLootAddWindow extends Window {
                 cname.setWidth("300px");
                 HashSet<User> charlist = new HashSet<User>();
                 TreeSet<String> sortedlist = new TreeSet<String>();
-                charlist.addAll(characterDao.getUsers());
+                charlist.addAll(CharDB.getUsers());
                 for (User eachname : charlist) {
                         sortedlist.add(eachname.getUsername());
                 }
@@ -157,12 +150,12 @@ public class RaidLootAddWindow extends Window {
         }
 
         private Double getDefaultPrice(String itemname, boolean isheroic) throws SQLException {
-                return (Double) itemDao.getItemPrice(itemname, isheroic);
+                return (Double) ItemDB.getItemPrice(itemname, isheroic);
         }
 
         private HashSet<Items> getLootList() {
                 HashSet<Items> lootlist = new HashSet<Items>();
-                lootlist.addAll(itemDao.getItems());
+                lootlist.addAll(ItemDB.getItems());
                 return lootlist;
         }
 
@@ -193,11 +186,11 @@ public class RaidLootAddWindow extends Window {
         private void UpdateNotice() {
                 notice.setValue("");
                 if (name.getValue() != null && !name.getValue().toString().isEmpty()) {
-                        String slot = itemDao.getItemById(itemDao.getItemId(loots.getValue().toString())).getSlot();
+                        String slot = ItemDB.getItemById(ItemDB.getItemId(loots.getValue().toString())).getSlot();
                         List<CharacterItem> prev = new ArrayList<CharacterItem>();
-                        List<CharacterItem> items = itemDao.getLootForCharacter(name.getValue().toString());
+                        List<CharacterItem> items = ItemDB.getLootForCharacter(name.getValue().toString());
                         for (CharacterItem i : items) {
-                                String tempslot = itemDao.getSlotForItemByName(i.getName());
+                                String tempslot = ItemDB.getSlotForItemByName(i.getName());
                                 if (tempslot.equalsIgnoreCase(slot)) {
                                         prev.add(i);
                                 }

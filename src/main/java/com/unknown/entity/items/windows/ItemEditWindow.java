@@ -7,7 +7,6 @@ package com.unknown.entity.items.windows;
 import com.unknown.entity.database.*;
 import com.unknown.entity.*;
 import com.unknown.entity.character.CharacterInfoListener;
-import com.unknown.entity.dao.*;
 import com.unknown.entity.items.*;
 import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
@@ -44,7 +43,6 @@ public class ItemEditWindow extends Window {
 
         private Items item;
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
-        private ItemDAO itemDao;
         private TextField price;
         private TextField pricehc;
         private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
@@ -70,7 +68,6 @@ public class ItemEditWindow extends Window {
         }
 
         private void createFields() {
-                this.itemDao = new ItemDB();
                 this.ilt = new ItemLooterTable(item);
                 this.ilt.setWidth("500px");
                 this.price = new TextField();
@@ -142,11 +139,11 @@ public class ItemEditWindow extends Window {
 
         private void setPricesToDefault() {
                 int itemlvl = Integer.parseInt(ilvl.getValue().toString());
-                double prices = itemDao.getDefaultPrice(item);
-                Multiplier mp = itemDao.getMultiplierForItemlevel(itemlvl);
+                double prices = ItemDB.getDefaultPrice(item);
+                Multiplier mp = ItemDB.getMultiplierForItemlevel(itemlvl);
                 BigDecimal formattedprice = new BigDecimal(prices * mp.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                 price.setValue("" + formattedprice);
-                mp = itemDao.getMultiplierForItemlevel(itemlvl + 13);
+                mp = ItemDB.getMultiplierForItemlevel(itemlvl + 13);
                 BigDecimal formattedpricehc = new BigDecimal(prices * mp.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                 pricehc.setValue("" + formattedpricehc);
         }
@@ -234,8 +231,8 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
-                itemDao.setApplication(app);
-                itemDao.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()), quality.getValue().toString());
+                ItemDB.setApplication(app);
+                ItemDB.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()), quality.getValue().toString());
                 notifyListeners();
                 update();
         }
@@ -256,17 +253,17 @@ public class ItemEditWindow extends Window {
 
         private void applyPrices() {
                 updateItem();
-                itemDao.setApplication(app);
-                itemDao.updateLoots(item, price.getValue().toString(), pricehc.getValue().toString());
+                ItemDB.setApplication(app);
+                ItemDB.updateLoots(item, price.getValue().toString(), pricehc.getValue().toString());
                 lout.removeComponent(ilt);
-                ilt = new ItemLooterTable(itemDao.getSingleItem(name.getValue().toString()));
+                ilt = new ItemLooterTable(ItemDB.getSingleItem(name.getValue().toString()));
                 lout.addComponent(ilt);
                 notifyListeners();
         }
 
         private void deleteItem(Items item) throws SQLException {
-                itemDao.setApplication(app);
-                itemDao.deleteItem(item.getId());
+                ItemDB.setApplication(app);
+                ItemDB.deleteItem(item.getId());
         }
 
         public void addItemInfoListener(ItemInfoListener listener) {
@@ -313,7 +310,7 @@ public class ItemEditWindow extends Window {
 
         private void clear() {
                 this.removeAllComponents();
-                this.item = itemDao.getSingleItem(name.getValue().toString());
+                this.item = ItemDB.getSingleItem(name.getValue().toString());
                 ilt = new ItemLooterTable(item);
                 price.setValue("");
                 pricehc.setValue("");

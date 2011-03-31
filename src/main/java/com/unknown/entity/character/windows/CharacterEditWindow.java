@@ -7,7 +7,6 @@ package com.unknown.entity.character.windows;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.*;
-import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.Items;
@@ -48,9 +47,6 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
 
         private User user;
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
-        private RaidDAO raidDao;
-        private ItemDAO itemDao;
-        private CharacterDAO charDao;
         private IndexedContainer ic;
         private Table loots;
         private Application app;
@@ -70,9 +66,6 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 this.raidList = raidList;
                 this.itemList = itemList;
                 this.dkpList = dkpList;
-                this.raidDao = new RaidDB();
-                this.charDao = new CharacterDB();
-                this.itemDao = new ItemDB();
                 this.ic = new IndexedContainer();
                 this.loots = new Table();
                 this.loots.setContainerDataSource(ic);
@@ -192,12 +185,12 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
 
         private void characterLootTableSetRow(Item addItem, CharacterItem charitem) throws ReadOnlyException, ConversionException {
                 ComboBox items = new ComboBox();
-                for (Items item : itemDao.getItems()) {
+                for (Items item : ItemDB.getItems()) {
                         items.addItem(item.getName());
                 }
                 items.setValue(charitem.getName());
                 items.setNullSelectionAllowed(false);
-                String slot = itemDao.getSlotForItemByName(charitem.getName());
+                String slot = ItemDB.getSlotForItemByName(charitem.getName());
                 addItem.getItemProperty("Name").setValue(items);
                 addItem.getItemProperty("Price").setValue(charitem.getPrice());
                 addItem.getItemProperty("Slot").setValue(slot);
@@ -211,8 +204,8 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void updateCharacter(String name, String charclass, boolean active) {
-                charDao.setApplication(app);
-                charDao.updateCharacter(user, name, charclass, active);
+                CharDB.setApplication(app);
+                CharDB.updateCharacter(user, name, charclass, active);
         }
 
         private void characterLoots() {
@@ -265,7 +258,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 Table tbl = new Table();
                 setRaidListHeaders(tbl);
                 tbl.setHeight("200px");
-                List<Raid> cRaids = raidDao.getRaidsForCharacter(user.getId());
+                List<Raid> cRaids = RaidDB.getRaidsForCharacter(user.getId());
                 Collections.sort(cRaids, new CompareDates());
                 for (Raid charraid : cRaids) {
                         Item addItem = tbl.addItem(charraid);
@@ -296,17 +289,17 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void removeLootFromCharacter(Item item) {
-                charDao.setApplication(app);
-                charDao.removeLootFromCharacter(item.getItemProperty("Name").toString(), user);
+                CharDB.setApplication(app);
+                CharDB.removeLootFromCharacter(item.getItemProperty("Name").toString(), user);
         }
 
         private void updateLootForCharacter(Item item, int lootid) {
-                charDao.setApplication(app);
-                charDao.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
+                CharDB.setApplication(app);
+                CharDB.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
         }
 
         public void update() {
-                this.user = charDao.getUser(user.getUsername());
+                this.user = CharDB.getUser(user.getUsername());
                 shares.setValue("");
                 hraid.removeAllComponents();
                 shares.setValue(user.getShares());
@@ -350,27 +343,27 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        charDao.setApplication(app);
-                        charDao.deleteCharacter(user);
+                        CharDB.setApplication(app);
+                        CharDB.deleteCharacter(user);
                         notifyListeners();
                         close();
                 }
         }
 
         private void raidsAttended() {
-                String attendance = charDao.getAttendanceRaids(user);
-                Double percent = Double.parseDouble(attendance);
+                Double attendance = user.getAttendance();
+                
                 Label attended = new Label();
                 attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
-                if (percent >= 0 && percent < 50) {
+                if (attendance >= 0 && attendance < 50) {
                         attended.setStyleName("negative");
-                } else if (percent > 50 && percent < 65) {
+                } else if (attendance > 50 && attendance < 65) {
                         attended.setStyleName("uncommon");
-                } else if (percent >= 65 && percent < 75) {
+                } else if (attendance >= 65 && attendance < 75) {
                         attended.setStyleName("rare");
-                } else if (percent >= 75 && percent < 90) {
+                } else if (attendance >= 75 && attendance < 90) {
                         attended.setStyleName("epic");
-                } else if (percent >= 90) {
+                } else if (attendance >= 90) {
                         attended.setStyleName("legendary");
                 }
                 addComponent(attended);
@@ -403,9 +396,8 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                        ItemDAO itemDao = new ItemDB();
                         CharacterItem citem = (CharacterItem) event.getItemId();
-                        Items temp = itemDao.getSingleItem(citem.getName());
+                        Items temp = ItemDB.getSingleItem(citem.getName());
                         PopUpControl pop = new PopUpControl(app);
                         pop.setItemList(itemList);
                         pop.showProperItemWindow(temp);
@@ -452,9 +444,8 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 public void itemClick(ItemClickEvent event) {
                         if (event.isCtrlKey() && event.isShiftKey()) {
                                 Adjustment p = (Adjustment) event.getItemId();
-                                RaidDAO rdao = new RaidDB();
-                                rdao.setApplication(app);
-                                rdao.removeAdjustment(p);
+                                // RaidDB.setApplication(app);
+                                RaidDB.removeAdjustment(p);
                                 notifyListeners();
                                 update();
                         }

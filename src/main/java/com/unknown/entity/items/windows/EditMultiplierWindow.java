@@ -6,7 +6,6 @@ package com.unknown.entity.items.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.items.Multiplier;
-import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.Items;
@@ -29,8 +28,6 @@ import java.util.List;
  * @author alde
  */
 public class EditMultiplierWindow extends Window {
-
-        ItemDAO itemDao = null;
         List<Multiplier> multipliers = new ArrayList<Multiplier>();
         TextField itemlevel;
         TextField multiplier;
@@ -45,7 +42,6 @@ public class EditMultiplierWindow extends Window {
                 this.center();
                 this.setResizable(false);
                 this.getContent().setSizeUndefined();
-                this.itemDao = new ItemDB();
         }
 
         public void printInfo() {
@@ -87,7 +83,7 @@ public class EditMultiplierWindow extends Window {
 
         private void addItemlevel() {
                 String mtp = multiplier.getValue().toString().replace(",", ".");
-                itemDao.addMultiplier(Integer.parseInt(itemlevel.getValue().toString()), Double.parseDouble(mtp.toString()));
+                ItemDB.addMultiplier(Integer.parseInt(itemlevel.getValue().toString()), Double.parseDouble(mtp.toString()));
                 multiplierTable.update();
                 itemlevel.setValue("");
                 multiplier.setValue("");
@@ -112,7 +108,7 @@ public class EditMultiplierWindow extends Window {
 
         public void addApplication(Application app) {
                 this.app = app;
-                this.itemDao.setApplication(app);
+                ItemDB.setApplication(app);
         }
 
         private class AddButtonListener implements ClickListener {
@@ -143,26 +139,25 @@ public class EditMultiplierWindow extends Window {
 
         private void updateDefaultPricesOnAllItems() {
                 List<Items> itemses = new ArrayList<Items>();
-                itemses.addAll(itemDao.getItems());
+                itemses.addAll(ItemDB.getItems());
                 for (Items i : itemses) {
-                        Multiplier mp1 = itemDao.getMultiplierForItemlevel(i.getIlvl());
-                        BigDecimal formattedprice = new BigDecimal(itemDao.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                        Multiplier mp2 = itemDao.getMultiplierForItemlevel(i.getIlvl() + 13);
-                        BigDecimal formattedpricehc = new BigDecimal(itemDao.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                        itemDao.updateItemPrices(i.getId(), formattedprice, formattedpricehc);
+                        Multiplier mp1 = ItemDB.getMultiplierForItemlevel(i.getIlvl());
+                        BigDecimal formattedprice = new BigDecimal(ItemDB.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        Multiplier mp2 = ItemDB.getMultiplierForItemlevel(i.getIlvl() + 13);
+                        BigDecimal formattedpricehc = new BigDecimal(ItemDB.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        ItemDB.updateItemPrices(i.getId(), formattedprice, formattedpricehc);
                 }
         }
 
         private void updateLootedPrices() {
                 List<Items> itemses = new ArrayList<Items>();
-                itemses.addAll(itemDao.getItems());
+                itemses.addAll(ItemDB.getItems());
                 for (Items i : itemses) {
-                        Multiplier mp1 = itemDao.getMultiplierForItemlevel(i.getIlvl());
-                        BigDecimal formattedprice = new BigDecimal(itemDao.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-                        Multiplier mp2 = itemDao.getMultiplierForItemlevel(i.getIlvl() + 13);
-                        BigDecimal formattedpricehc = new BigDecimal(itemDao.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-//                        itemDao.updateLootedPrices(i.getId(), formattedprice, formattedpricehc);
-                        itemDao.updateLoots(i, formattedprice.toString(), formattedpricehc.toString());
+                        Multiplier mp1 = ItemDB.getMultiplierForItemlevel(i.getIlvl());
+                        BigDecimal formattedprice = new BigDecimal(ItemDB.getDefaultPrice(i) * mp1.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        Multiplier mp2 = ItemDB.getMultiplierForItemlevel(i.getIlvl() + 13);
+                        BigDecimal formattedpricehc = new BigDecimal(ItemDB.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                        ItemDB.updateLoots(i, formattedprice.toString(), formattedpricehc.toString());
                         System.out.println(""+i.getId());
                 }
         }

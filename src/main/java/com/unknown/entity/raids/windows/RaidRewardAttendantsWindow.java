@@ -4,8 +4,7 @@
  */
 package com.unknown.entity.raids.windows;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.raids.RaidChar;
 import com.unknown.entity.raids.RaidRewardListener;
 import com.vaadin.data.Item;
@@ -66,8 +65,7 @@ public class RaidRewardAttendantsWindow extends Window {
 
         private void raidCharWindowCharListAddRow(Item addItem, RaidChar rchar) throws ReadOnlyException, ConversionException {
                 Label charname = new Label(rchar.getName());
-                CharacterDAO charDao = new CharacterDB();
-                String charclass = charDao.getRoleForCharacter(rchar.getName());
+                String charclass = CharDB.getRoleForCharacter(rchar.getName());
                 charname.addStyleName(charclass.replace(" ", "").toLowerCase());
                 addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Shares").setValue(rchar.getShares());

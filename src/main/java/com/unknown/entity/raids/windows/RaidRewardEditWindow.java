@@ -6,7 +6,6 @@ package com.unknown.entity.raids.windows;
 
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.character.CharacterInfoListener;
-import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
 import com.unknown.entity.raids.*;
 import com.vaadin.Application;
@@ -18,11 +17,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -36,7 +32,6 @@ public class RaidRewardEditWindow extends Window {
         private final int shares;
         private final RaidReward reward;
         private final String oldcomment;
-        private final RaidDAO raidDao;
         private Application app;
 
         public RaidRewardEditWindow(RaidReward reward) {
@@ -48,7 +43,6 @@ public class RaidRewardEditWindow extends Window {
                 this.setPositionY(100);
                 this.addStyleName("opaque");
                 this.setCaption("Edit reward: " + reward.getComment());
-                this.raidDao = new RaidDB();
                 this.getContent().setSizeUndefined();
         }
 
@@ -87,8 +81,8 @@ public class RaidRewardEditWindow extends Window {
         }
 
         private void updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
-                raidDao.setApplication(app);
-                raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
+                // RaidDB.setApplication(app);
+                RaidDB.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
         private TextField charList() {
@@ -114,8 +108,8 @@ public class RaidRewardEditWindow extends Window {
         }
 
         private void removeReward(RaidReward reward) {
-                raidDao.setApplication(app);
-                raidDao.removeReward(reward);
+                // RaidDB.setApplication(app);
+                RaidDB.removeReward(reward);
         }
 
         private void showInvalidUsers(List<String> invalidchars) {
@@ -146,7 +140,7 @@ public class RaidRewardEditWindow extends Window {
                         final ImmutableList<String> attendantlist = splitCharsToArray(attendants.getValue().toString());
                         final int newShares = Integer.parseInt(share.getValue().toString());
                         String newComment = comment.getValue().toString();
-                        List<String> invalidchars = raidDao.findInvalidCharacters(attendantlist);
+                        List<String> invalidchars = RaidDB.findInvalidCharacters(attendantlist);
                         if (invalidchars.isEmpty()) {
                                 updateReward(reward, attendantlist, newShares, newComment);
                         } else {

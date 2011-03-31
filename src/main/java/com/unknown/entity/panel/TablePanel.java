@@ -9,8 +9,10 @@ import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
+import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.RaidList;
+import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -32,11 +34,13 @@ public class TablePanel {
         private DkpList dkpList;
         private ItemList itemList;
         private RaidList raidList;
+        private Application app;
 
-        public TablePanel(DkpList dkpList, ItemList itemList, RaidList raidList) {
+        public TablePanel(DkpList dkpList, ItemList itemList, RaidList raidList, Application app) {
                 this.dkpList = dkpList;
                 this.itemList = itemList;
                 this.raidList = raidList;
+                this.app = app;
         }
 
         public HorizontalLayout HorizontalSegment() {
@@ -46,7 +50,7 @@ public class TablePanel {
                 // Vertical DKP List
                 VerticalLayout vertDkp = VerticalDKPListLayout();
                 hzl.addComponent(vertDkp);
-                
+
                 // Vertical Item List
                 VerticalLayout vertItem = VerticalItemListLayout();
                 hzl.addComponent(vertItem);
@@ -60,18 +64,17 @@ public class TablePanel {
 
         private VerticalLayout VerticalRaidListLayout() {
                 VerticalLayout vertRaid = new VerticalLayout();
-                vertRaid.addComponent(new Label("Raids"));
                 vertRaid.addComponent(raidList);
+                raidList.setCaption("Raids");
                 raidList.printList();
                 return vertRaid;
         }
 
         private VerticalLayout VerticalItemListLayout() {
                 VerticalLayout vertItem = new VerticalLayout();
-                vertItem.addComponent(new Label("Items"));
+                itemList.setCaption("Items");
                 vertItem.addComponent(itemList);
                 HorizontalLayout hzl = new HorizontalLayout();
-//                SuperImmediateTextField itemname = itemNameFilterField();
                 TextField itemname = itemNameFilterField();
                 itemname.setStyleName("textfieldfont");
                 ComboBox itemslot = itemSlotFilterBox();
@@ -142,10 +145,9 @@ public class TablePanel {
 
         private VerticalLayout VerticalDKPListLayout() throws UnsupportedOperationException {
                 VerticalLayout vertDkp = new VerticalLayout();
-                vertDkp.addComponent(new Label("DKP"));
                 vertDkp.addComponent(dkpList);
+                dkpList.setCaption("DKP");
                 dkpFilterBox(vertDkp);
-
                 dkpList.printList();
                 return vertDkp;
         }

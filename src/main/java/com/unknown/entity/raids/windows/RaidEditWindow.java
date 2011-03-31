@@ -7,7 +7,6 @@ package com.unknown.entity.raids.windows;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
-import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.*;
@@ -19,11 +18,8 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -39,7 +35,6 @@ public class RaidEditWindow extends Window {
         private RaidRewardList rrList;
         private RaidLootList rlList;
         private final ItemList itemList;
-        private RaidDAO raidDao;
         private Application app;
 
         public RaidEditWindow(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
@@ -52,7 +47,6 @@ public class RaidEditWindow extends Window {
                 this.getContent().setSizeUndefined();
                 this.addStyleName("opaque");
                 this.setCaption("Edit raid: " + raid.getRaidname());
-                this.raidDao = new RaidDB();
         }
 
         public void printInfo() {
@@ -84,8 +78,7 @@ public class RaidEditWindow extends Window {
         }
 
         private void raidInformation() {
-                RaidDAO raidDAO = new RaidDB();
-                List<String> zoneList = raidDAO.getRaidZoneList();
+                List<String> zoneList = RaidDB.getRaidZoneList();
 
                 HorizontalLayout hzl = new HorizontalLayout();
                 final ComboBox zone = new ComboBox("Zone");
@@ -126,15 +119,15 @@ public class RaidEditWindow extends Window {
         }
 
         private void deleteRaid() {
-                raidDao.setApplication(app);
-                raidDao.safelyRemoveRaid(raid);
+                // RaidDB.setApplication(app);
+                RaidDB.safelyRemoveRaid(raid);
                 notifyListeners();
                 close();
         }
 
         private void updateRaid(String raidzoneName, String raidcomment, String raiddate) {
-                raidDao.setApplication(app);
-                raidDao.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
+                // RaidDB.setApplication(app);
+                RaidDB.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
         }
 
         public void addRaidInfoListener(RaidInfoListener listener) {

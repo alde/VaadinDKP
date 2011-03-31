@@ -7,8 +7,7 @@ package com.unknown.entity;
 
 import com.google.gson.Gson;
 import com.unknown.entity.character.User;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -35,8 +34,7 @@ public class GetUsersJSON extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            CharacterDAO charDao = new CharacterDB();
-            List<User> usr = charDao.getUsers();
+            List<User> usr = CharDB.getUsers();
 
             Gson gson = new Gson();
             String userJson = gson.toJson(usr);

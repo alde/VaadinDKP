@@ -6,7 +6,6 @@ package com.unknown.entity.character.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.Adjustment;
-import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.Application;
 import com.vaadin.ui.Button;
@@ -129,7 +128,6 @@ class AddAdjustmentWindow extends Window {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        RaidDAO rdao = new RaidDB();
                         Adjustment p = new Adjustment();
                         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                         int share = Integer.parseInt(shares.getValue().toString());
@@ -137,8 +135,8 @@ class AddAdjustmentWindow extends Window {
                         p.setComment(comment.getValue().toString());
                         p.setDate(dateFormat.format(date.getValue()));
                         p.setShares(share);
-                        rdao.setApplication(app);
-                        rdao.addAdjustment(p);
+                        // RaidDB.setApplication(app);
+                        RaidDB.addAdjustment(p);
                         notifyListeners();
                         close();
                 }

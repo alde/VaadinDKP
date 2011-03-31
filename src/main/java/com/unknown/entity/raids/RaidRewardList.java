@@ -7,19 +7,13 @@ package com.unknown.entity.raids;
 import com.unknown.entity.PopUpControl;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -32,8 +26,6 @@ public class RaidRewardList extends Table implements RaidRewardListener {
         private Raid raid;
         private final DkpList dkplist;
         private final CharacterList clist;
-        private final RaidDAO raidDao;
-        private final CharacterDAO charDao;
 
         public RaidRewardList(Raid raid, DkpList dkplist, CharacterList clist) {
                 this.ic = new IndexedContainer();
@@ -44,8 +36,6 @@ public class RaidRewardList extends Table implements RaidRewardListener {
                 this.setSizeUndefined();
                 this.setHeight("500px");
                 this.addListener(new RewardListClickListener());
-                this.raidDao = new RaidDB();
-                this.charDao = new CharacterDB();
                 raidRewardListSetHeaders();
                 printList();
         }
@@ -58,8 +48,8 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
         @Override
         public void onRaidInfoChanged() {
-                raidDao.clearCache();
-                charDao.clearCache();
+                RaidDB.clearCache();
+                RaidDB.clearCache();
                 update();
         }
 
@@ -75,14 +65,10 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
         private void printList() {
                 Collection<RaidReward> rewards;
-                try {
-                        rewards = raidDao.getRewardsForRaid(this.raid.getId());
-                        for (RaidReward rreward : rewards) {
-                                Item addItem = addItem(rreward);
-                                raidListAddRow(addItem, rreward);
-                        }
-                } catch (SQLException ex) {
-                        Logger.getLogger(RaidRewardList.class.getName()).log(Level.SEVERE, null, ex);
+                rewards = RaidDB.getRewardsForRaid(this.raid.getId());
+                for (RaidReward rreward : rewards) {
+                        Item addItem = addItem(rreward);
+                        raidListAddRow(addItem, rreward);
                 }
         }
 
@@ -95,12 +81,12 @@ public class RaidRewardList extends Table implements RaidRewardListener {
 
                 @Override
                 public void itemClick(ItemClickEvent event) {
-                                RaidReward rreward = (RaidReward) event.getItemId();
-                                PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
-                                pop.setRaidRewardList(raidRewardList);
-                                pop.setCharacterList(clist);
-                                pop.setDkpList(dkplist);
-                                pop.showProperRaidRewardWindow(rreward);
+                        RaidReward rreward = (RaidReward) event.getItemId();
+                        PopUpControl pop = new PopUpControl(RaidRewardList.this.getApplication());
+                        pop.setRaidRewardList(raidRewardList);
+                        pop.setCharacterList(clist);
+                        pop.setDkpList(dkplist);
+                        pop.showProperRaidRewardWindow(rreward);
                 }
         }
 }

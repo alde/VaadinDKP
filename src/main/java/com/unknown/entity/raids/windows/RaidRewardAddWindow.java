@@ -6,9 +6,7 @@ package com.unknown.entity.raids.windows;
 
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.character.CharacterInfoListener;
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.Raid;
 import com.unknown.entity.raids.RaidChar;
@@ -38,8 +36,6 @@ public class RaidRewardAddWindow extends Window {
         private final TextField comment = new TextField("Comment");
         VerticalLayout vertError;
         Button addButton = new Button("Add");
-        RaidDAO raidDao = new RaidDB();
-        CharacterDAO chardao = new CharacterDB();
         private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
         private Application app;
@@ -90,11 +86,11 @@ public class RaidRewardAddWindow extends Window {
         private void addReward(String comment, Integer shares, List<String> attendantlist, Raid raid) {
                 List<String> invalidchars = findInvalidCharacters(attendantlist);
                 if (invalidchars.isEmpty()) {
-                        raidDao.setApplication(app);
+                        // RaidDB.setApplication(app);
                         RaidReward raidReward = new RaidReward(comment, 0, raid.getId(), shares);
-                        Collection<RaidChar> chars = raidDao.getRaidCharsForRaid(attendantlist, raid.getId());
+                        Collection<RaidChar> chars = RaidDB.getRaidCharsForRaid(attendantlist, raid.getId());
                         raidReward.setRewardChars(chars);
-                        raidDao.addReward(raidReward);
+                        RaidDB.addReward(raidReward);
                         updateReward(raidReward, attendantlist, shares, comment);
                         close();
                 } else {
@@ -103,8 +99,8 @@ public class RaidRewardAddWindow extends Window {
         }
 
         private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
-                raidDao.setApplication(app);
-                return raidDao.doUpdateReward(reward, newAttendants, newShares, newComment);
+                // RaidDB.setApplication(app);
+                return RaidDB.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
         private void showInvalidUsers(List<String> invalidchars) {
@@ -116,7 +112,7 @@ public class RaidRewardAddWindow extends Window {
 
         private List<String> findInvalidCharacters(List<String> attendantlist) {
                 List<String> invalid = new ArrayList<String>(attendantlist);
-                invalid.removeAll(chardao.getUserNames());
+                invalid.removeAll(CharDB.getUserNames());
                 return ImmutableList.copyOf(invalid);
         }
 

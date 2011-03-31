@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.panel;
 
-import com.unknown.entity.dao.RaidDAO;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.RaidInfoListener;
 import com.vaadin.Application;
@@ -29,22 +28,19 @@ class EditZonesWindow extends Window {
 
         private String oldZone = "";
         private ComboBox zoneList;
-        private RaidDAO raidDao;
         private CheckBox deleteZone;
         private TextField zoneName;
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
-        private Application app;
-
+        
         public EditZonesWindow() {
                 this.setCaption("Edit Zones");
                 this.addStyleName("opaque");
                 this.center();
                 this.getContent().setSizeUndefined();
-                this.raidDao = new RaidDB();
         }
 
         public void printInfo() {
-                List<String> zones = raidDao.getRaidZoneList();
+                List<String> zones = RaidDB.getRaidZoneList();
 
                 Label addZoneLabel = new Label("Add Zone");
                 addComponent(addZoneLabel);
@@ -87,7 +83,7 @@ class EditZonesWindow extends Window {
                 hzl.addComponent(zoneList);
                 hzl.addComponent(deleteZone);
                 hzl.addComponent(updateButton);
-                String defaultzone = raidDao.getZoneNameById(1);
+                String defaultzone = RaidDB.getZoneNameById(1);
                 Label warning = new Label("Don't delete " + defaultzone + " or you'll fuck things up.");
                 warning.addStyleName("error");
 
@@ -101,13 +97,13 @@ class EditZonesWindow extends Window {
 
         private void setOldZone() {
                 String oldzone = zoneList.getValue().toString();
-                if (raidDao.isValidZone(oldzone)) {
+                if (RaidDB.isValidZone(oldzone)) {
                         this.oldZone = oldzone;
                 }
         }
 
         private void removeZone() {
-                raidDao.removeZone(zoneList.getValue().toString());
+                RaidDB.removeZone(zoneList.getValue().toString());
                 update();
         }
 
@@ -126,13 +122,13 @@ class EditZonesWindow extends Window {
         }
 
         private void addZone() {
-                raidDao.addZone(zoneName.getValue().toString());
+                RaidDB.addZone(zoneName.getValue().toString());
                 update();
         }
 
         private void updateZoneName() {
                 String newZone = zoneList.getValue().toString();
-                raidDao.updateZoneName(oldZone, newZone);
+                RaidDB.updateZoneName(oldZone, newZone);
                 update();
         }
 
@@ -147,8 +143,7 @@ class EditZonesWindow extends Window {
         }
 
         void addApplication(Application app) {
-                this.app = app;
-                raidDao.setApplication(app);
+                // RaidDB.setApplication(app);
         }
 
         private class CloseButtonListener implements ClickListener {

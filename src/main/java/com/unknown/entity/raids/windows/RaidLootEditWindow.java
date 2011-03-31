@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.raids.windows;
 
-import com.unknown.entity.dao.*;
 import com.unknown.entity.database.*;
 import com.unknown.entity.character.*;
 import com.unknown.entity.items.*;
@@ -31,9 +30,6 @@ public class RaidLootEditWindow extends Window {
 
         Raid raid;
         RaidItem item;
-        RaidDAO raidDao;
-        CharacterDAO characterDao;
-        ItemDAO itemDao;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
         private List<ItemInfoListener> iteminfolisteners = new ArrayList<ItemInfoListener>();
@@ -45,10 +41,7 @@ public class RaidLootEditWindow extends Window {
 
         public RaidLootEditWindow(Raid raid, RaidItem item) {
                 this.item = item;
-                this.raidDao = new RaidDB();
                 this.raid = raid;
-                this.characterDao = new CharacterDB();
-                this.itemDao = new ItemDB();
                 this.addStyleName("opaque");
                 this.getContent().setSizeUndefined();
                 this.setCaption("Edit loot: " + item.getName() + " for raid : " + raid.getComment());
@@ -79,14 +72,14 @@ public class RaidLootEditWindow extends Window {
                 hzl.addComponent(deleteButton);
                 hzl.addComponent(updateButton);
                 addComponent(hzl);
-                for (String user : characterDao.getUserNames()) {
+                for (String user : CharDB.getUserNames()) {
                         charname.addItem(user);
                 }
                 charname.setValue(item.getLooter());
                 charname.setImmediate(true);
                 charname.setNullSelectionAllowed(false);
 
-                for (Items i : itemDao.getItems()) {
+                for (Items i : ItemDB.getItems()) {
                         itemname.addItem(i.getName());
                 }
                 itemname.setValue(item.getName());
@@ -128,8 +121,8 @@ public class RaidLootEditWindow extends Window {
         }
 
         private int deleteItem(RaidItem item) {
-                raidDao.setApplication(app);
-                return raidDao.removeLootFromRaid(item);
+                // RaidDB.setApplication(app);
+                return RaidDB.removeLootFromRaid(item);
         }
 
         public void addApplication(Application app) {
@@ -155,7 +148,7 @@ public class RaidLootEditWindow extends Window {
         }
 
         private Double getDefaultPrice(String itemname, boolean isheroic) {
-                return (Double) itemDao.getItemPrice(itemname, isheroic);
+                return (Double) ItemDB.getItemPrice(itemname, isheroic);
         }
 
         private void doUpdateLoot() {
@@ -169,9 +162,9 @@ public class RaidLootEditWindow extends Window {
         }
 
         private void updateItem(String looter, String itemname, double price, boolean heroic) {
-                int lootid = itemDao.getLootId(item.getId(), characterDao.getCharacterId(item.getLooter()), item.getPrice(), item.isHeroic(), raid.getId());
-                raidDao.setApplication(app);
-                raidDao.doUpdateLoot(lootid, looter, itemname, price, heroic, raid.getId());
+                int lootid = ItemDB.getLootId(item.getId(), CharDB.getCharacterId(item.getLooter()), item.getPrice(), item.isHeroic(), raid.getId());
+                // RaidDB.setApplication(app);
+                RaidDB.doUpdateLoot(lootid, looter, itemname, price, heroic, raid.getId());
         }
 
         private class UpdateItemListener implements ClickListener {

@@ -29,8 +29,6 @@ import java.util.List;
  * @author alde
  */
 public class EditDefaultPricesWindow extends Window {
-
-        ItemDAO itemDao = null;
         List<ItemPrices> prices = new ArrayList<ItemPrices>();
         IndexedContainer ic;
         private int longest;
@@ -42,8 +40,7 @@ public class EditDefaultPricesWindow extends Window {
                 this.center();
                 this.setResizable(false);
                 this.getContent().setSizeUndefined();
-                this.itemDao = new ItemDB();
-                this.prices.addAll(itemDao.getDefaultPrices());
+                this.prices.addAll(ItemDB.getDefaultPrices());
                 this.ic = new IndexedContainer();
                 this.longest = 1;
         }
@@ -73,8 +70,8 @@ public class EditDefaultPricesWindow extends Window {
                 for (Iterator i = ic.getItemIds().iterator(); i.hasNext();) {
                         ItemPrices iid = (ItemPrices) i.next();
                         Item item = ic.getItem(iid);
-                        itemDao.setApplication(app);
-                        itemDao.updateDefaultPrice(item.getItemProperty("Slot").toString(), Double.parseDouble((item.getItemProperty("Normal")).toString()));
+                        ItemDB.setApplication(app);
+                        ItemDB.updateDefaultPrice(item.getItemProperty("Slot").toString(), Double.parseDouble((item.getItemProperty("Normal")).toString()));
                 }
         }
 

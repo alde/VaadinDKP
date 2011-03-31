@@ -5,8 +5,8 @@
 package com.unknown.entity.character;
 
 import com.unknown.entity.PopUpControl;
-import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.Role;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.RaidList;
 import com.vaadin.Application;
@@ -31,13 +31,11 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         private DkpList dkpList;
         private CharacterList charList = this;
-        private CharacterDAO characterDAO;
         private RaidList raidList;
         private ItemList itemList;
         private Application app;
 
-        public CharacterList(CharacterDAO characherDAO, DkpList dkpList, Application app) {
-                this.characterDAO = characherDAO;
+        public CharacterList(DkpList dkpList, Application app) {
                 this.dkpList = dkpList;
                 this.app = app;
         }
@@ -69,7 +67,7 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
         }
 
         private void addUsersForRole(Role r, VerticalLayout roleList) {
-                for (final User user : characterDAO.getUsersWithRole(r)) {
+                for (final User user : CharDB.getUsersWithRole(r)) {
                         if (user.isActive()) {
                                 NativeButton userBtn = new NativeButton(user.toString());
                                 userBtn.addStyleName(Button.STYLE_LINK);
@@ -98,7 +96,7 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
 
         @Override
         public void onCharacterInfoChange() {
-                characterDAO.clearCache();
+                CharDB.clearCache();
                 update();
         }
 

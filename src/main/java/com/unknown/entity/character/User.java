@@ -27,6 +27,7 @@ public class User implements SiteUser {
         private boolean active = true;
         private Armor armor;
         private int level = 0;
+        private double attendance;
         private String siteusername;
         private final List<CharacterItem> charItems = new ArrayList<CharacterItem>();
 
@@ -102,6 +103,14 @@ public class User implements SiteUser {
 
         public ImmutableList<CharacterItem> getCharItems() {
                 return ImmutableList.copyOf(charItems);
+        }
+
+        public double getAttendance() {
+                return attendance;
+        }
+
+        public void setAttendance(double attendance) {
+                this.attendance = attendance;
         }
 
         @Override

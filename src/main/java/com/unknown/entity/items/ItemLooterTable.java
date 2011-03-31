@@ -4,13 +4,10 @@
  */
 package com.unknown.entity.items;
 
-import com.unknown.entity.dao.CharacterDAO;
-import com.unknown.entity.dao.RaidDAO;
-import com.unknown.entity.database.CharacterDB;
+import com.unknown.entity.database.CharDB;
 import com.unknown.entity.database.RaidDB;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.List;
@@ -23,13 +20,9 @@ public class ItemLooterTable extends Table {
 
         IndexedContainer ic = new IndexedContainer();
         Items item;
-        CharacterDAO charDao;
-        RaidDAO raidDao;
 
         public ItemLooterTable(Items item) {
                 this.item = item;
-                this.charDao = new CharacterDB();
-                this.raidDao = new RaidDB();
                 printList();
         }
 
@@ -54,9 +47,9 @@ public class ItemLooterTable extends Table {
         }
 
         private void itemLooterAddRow(Item addItem, ItemLooter looter) throws ConversionException, ReadOnlyException {
-                boolean isheroic = raidDao.getLootedHeroic(looter.getName(), item.getId(), looter.getPrice());
+                boolean isheroic = RaidDB.getLootedHeroic(looter.getName(), item.getId(), looter.getPrice());
                 Label looterLabel = new Label(looter.getName());
-                looterLabel.addStyleName(charDao.getRoleForCharacter(looter.getName()).toLowerCase().replace(" ", ""));
+                looterLabel.addStyleName(CharDB.getRoleForCharacter(looter.getName()).toLowerCase().replace(" ", ""));
                 addItem.getItemProperty("Name").setValue(looterLabel);
                 addItem.getItemProperty("Price").setValue(looter.getPrice());
                 addItem.getItemProperty("Heroic").setValue(isheroic);
