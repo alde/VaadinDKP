@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import com.unknown.entity.Logg;
 import com.unknown.entity.character.SiteUser;
 import com.vaadin.Application;
+import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 import org.joda.time.DateTime;
 
 /**

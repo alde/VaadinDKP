@@ -11,6 +11,9 @@ import com.unknown.entity.panel.TablePanel;
 import com.vaadin.Application;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
+import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("serial")
 public class UnknownEntityDKP extends Application {
@@ -33,9 +36,26 @@ public class UnknownEntityDKP extends Application {
         private void doDrawings() {
                 dkpList = new DkpList(this);
                 dkpList.attach();
-                RaidDB.setApplication(this);
-                ItemDB.setApplication(this);
-                CharDB.setApplication(this);
+                try {
+                        Field rField = RaidDB.class.getDeclaredField("app");
+                        Field iField = ItemDB.class.getDeclaredField("app");
+                        Field cField = CharDB.class.getDeclaredField("app");
+                        rField.setAccessible(true);
+                        rField.set(null, this);
+                        iField.setAccessible(true);
+                        iField.set(null, this);
+                        cField.setAccessible(true);
+                        cField.set(null, this);
+                } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(UnknownEntityDKP.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                        Logger.getLogger(UnknownEntityDKP.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NoSuchFieldException ex) {
+                        Logger.getLogger(UnknownEntityDKP.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                        Logger.getLogger(UnknownEntityDKP.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
                 charList = new CharacterList(dkpList, this);
                 charList.attach();
                 dkpList.setCharacterList(charList);
@@ -53,7 +73,7 @@ public class UnknownEntityDKP extends Application {
                 raidList.setItemList(itemList);
 
                 TablePanel tp = new TablePanel(dkpList, itemList, raidList, this);
-                
+
                 final HorizontalLayout hzl = tp.HorizontalSegment();
 
                 window.addComponent(adminPanel);
@@ -67,7 +87,7 @@ public class UnknownEntityDKP extends Application {
                 adminPanel.addCharacterInfoListener(dkpList);
                 adminPanel.addItemInfoListener(itemList);
                 adminPanel.addRaidInfoListener(raidList);
-                
+
                 characterListOnCharacterClass();
                 window.addComponent(hzl);
 
