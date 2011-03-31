@@ -858,7 +858,7 @@ public class RaidDB {
 
         private static void addLog(String message) {
                 String name = "";
-                if (app == null) {
+                if (app == null || (SiteUser) app.getUser() == null) {
                         name = "<unknown>";
                 } else {
                         name = ((SiteUser) app.getUser()).getName();

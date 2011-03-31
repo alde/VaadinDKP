@@ -99,7 +99,7 @@ public class RaidRewardAddWindow extends Window {
         }
 
         private int updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
-                // RaidDB.setApplication(app);
+                 RaidDB.setApplication(app);
                 return RaidDB.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
