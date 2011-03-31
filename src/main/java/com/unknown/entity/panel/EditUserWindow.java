@@ -5,7 +5,6 @@
 package com.unknown.entity.panel;
 
 import com.unknown.entity.character.SiteUser;
-import com.unknown.entity.dao.CharacterDAO;
 import com.unknown.entity.dao.ILoginDao;
 import com.unknown.entity.dao.LoginDao;
 import com.unknown.entity.database.CharDB;

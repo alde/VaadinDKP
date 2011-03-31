@@ -37,12 +37,12 @@ public class DkpList extends Table implements CharacterInfoListener {
         public DkpList(Application app) {
                 this.ic = new IndexedContainer();
                 this.app = app;
-                dkpListSetColumnHeaders();
                 this.setSelectable(true);
                 this.setWidth("185px");
                 this.setHeight("650px");
                 this.setPageLength(0);
                 this.addListener(new dkpListClickListener());
+                dkpListSetColumnHeaders();
         }
 
         public void setLists(ItemList itemList, RaidList raidList) {
@@ -55,30 +55,8 @@ public class DkpList extends Table implements CharacterInfoListener {
                 ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Armor", Armor.class, "");
                 ic.addContainerProperty("DKP", Label.class, 0);
-                ic.addContainerProperty("Attendance", Double.class, 0.0);
-                ic.setItemSorter(new DefaultItemSorter(new Comparator<Object>() {
-
-                        @Override
-                        public int compare(Object o1, Object o2) {
-                                if (o1 instanceof Label && o2 instanceof Label) {
-                                        String one = ((Label) o1).getValue().toString();
-                                        String two = ((Label) o2).getValue().toString();
-                                        Double d1, d2;
-                                        try {
-                                                d1 = Double.parseDouble(one);
-                                                d2 = Double.parseDouble(two);
-                                                return d1 < d2 ? 1 : 0;
-                                        } catch(NumberFormatException nfe) {
-                                                nfe.printStackTrace();
-                                        }
-                                        return one.compareToIgnoreCase(two);
-                                } else if (o1 instanceof Double && o2 instanceof Double) {
-                                        return (Double) o1 < (Double) o2 ? 1 : 0;
-                                } else {
-                                        return 0;
-                                }
-                        }
-                }));
+                ic.addContainerProperty("Attendance", Label.class, 0);
+                ic.setItemSorter(new DefaultItemSorter(new DkpItemSorter()));
                 this.setContainerDataSource(ic);
         }
 
@@ -101,7 +79,6 @@ public class DkpList extends Table implements CharacterInfoListener {
         public void printList() {
                 clear();
                 List<User> users = CharDB.getUsersSortedByDKP();
-
                 for (final User user : users) {
                         if (user.isActive()) {
                                 Item addItem = addItem(user);
@@ -112,6 +89,16 @@ public class DkpList extends Table implements CharacterInfoListener {
                 this.setColumnCollapsed("Armor", true);
                 this.setColumnCollapsed("Attendance", true);
 
+        }
+
+        private boolean isAdmin() {
+                final SiteUser siteUser = (SiteUser) app.getUser();
+                return siteUser != null && siteUser.getLevel() == 1;
+        }
+
+        private boolean isSuperAdmin() {
+                final SiteUser siteUser = (SiteUser) app.getUser();
+                return siteUser != null && siteUser.getLevel() == 2;
         }
 
         private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException {
@@ -127,7 +114,22 @@ public class DkpList extends Table implements CharacterInfoListener {
                         dkp.addStyleName("negative");
                 }
                 addItem.getItemProperty("DKP").setValue(dkp);
-                addItem.getItemProperty("Attendance").setValue(user.getAttendance());
+                Label att = new Label(""+user.getAttendance());
+                Double attendance = user.getAttendance();
+                if (attendance >= 0 && attendance < 50) {
+                        att.setStyleName("negative");
+                } else if (attendance > 50 && attendance < 65) {
+                        att.setStyleName("uncommon");
+                } else if (attendance >= 65 && attendance < 75) {
+                        att.setStyleName("rare");
+                } else if (attendance >= 75 && attendance < 90) {
+                        att.setStyleName("epic");
+                } else if (attendance >= 90) {
+                        att.setStyleName("legendary");
+                }
+                addItem.getItemProperty("Attendance").setValue(att);
+
+
         }
 
         public void filter(Object value) {
@@ -159,6 +161,34 @@ public class DkpList extends Table implements CharacterInfoListener {
                         pop.setDkpList(dkpList);
                         pop.setCharacterList(charList);
                         pop.showProperCharWindow(user);
+                }
+        }
+
+        class DkpItemSorter implements Comparator<Object> {
+
+                public boolean isParsableToDouble(String i) {
+                        try {
+                                Double.parseDouble(i);
+                                return true;
+                        } catch (NumberFormatException nfe) {
+                                return false;
+                        }
+                }
+
+                @Override
+                public int compare(Object o1, Object o2) {
+                        if (o1 instanceof Label && o2 instanceof Label) {
+                                String s1 = ((Label) o1).getValue().toString();
+                                String s2 = ((Label) o2).getValue().toString();
+                                if (isParsableToDouble(s1) && isParsableToDouble(s2)) {
+                                        return Double.parseDouble(s1) < Double.parseDouble(s2) ? 1 : 0;
+                                }
+                                return s1.compareToIgnoreCase(s2);
+                        } else if (o1 instanceof Double && o2 instanceof Double) {
+                                return (Double) o1 < (Double) o2 ? 1 : 0;
+                        } else {
+                                return 0;
+                        }
                 }
         }
 }

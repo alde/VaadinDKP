@@ -4,7 +4,6 @@
  */
 package com.unknown.entity.items.windows;
 
-import com.unknown.entity.dao.ItemDAO;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.ItemPrices;
 import com.vaadin.Application;
