@@ -31,7 +31,6 @@ public class UnknownEntityDKP extends Application {
         }
 
         private void doDrawings() {
-                System.out.println(this.toString());
                 dkpList = new DkpList(this);
                 dkpList.attach();
                 RaidDB.setApplication(this);

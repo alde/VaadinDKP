@@ -91,16 +91,6 @@ public class DkpList extends Table implements CharacterInfoListener {
 
         }
 
-        private boolean isAdmin() {
-                final SiteUser siteUser = (SiteUser) app.getUser();
-                return siteUser != null && siteUser.getLevel() == 1;
-        }
-
-        private boolean isSuperAdmin() {
-                final SiteUser siteUser = (SiteUser) app.getUser();
-                return siteUser != null && siteUser.getLevel() == 2;
-        }
-
         private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException {
                 Label charname = new Label(user.getUsername());
                 charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
