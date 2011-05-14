@@ -15,7 +15,6 @@ import com.unknown.entity.DBConnection;
 import com.unknown.entity.Logg;
 import com.unknown.entity.Role;
 import com.unknown.entity.character.CharacterItem;
-import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.character.User;
 import com.vaadin.Application;
 import java.math.*;
@@ -38,10 +37,9 @@ import java.util.logging.Logger;
  * @author alde 
  */
 public class CharDB {
-        private static List<User> cachedUsers = new ArrayList<User>();
-        private static Application app;
 
-        
+        private static List<User> cachedUsers = new ArrayList<User>();
+
         public static List<User> getUsers() {
                 if (cachedUsers != null) {
                         if (!cachedUsers.isEmpty()) {
@@ -111,7 +109,6 @@ public class CharDB {
                 return users;
         }
 
-        
         public static void clearCache() {
                 cachedUsers.clear();
         }
@@ -150,7 +147,6 @@ public class CharDB {
                 return user;
         }
 
-        
         public static int getCharacterClassId(String charclass) {
                 DBConnection c = new DBConnection();
                 int classid = 0;
@@ -168,7 +164,6 @@ public class CharDB {
                 return classid;
         }
 
-        
         public static int getCharacterId(String charname) {
                 DBConnection c = new DBConnection();
                 int charid = 0;
@@ -210,7 +205,6 @@ public class CharDB {
                 return itemlist;
         }
 
-        
         public static String getRoleForCharacter(String name) {
                 DBConnection c = new DBConnection();
                 String foo = "";
@@ -228,12 +222,10 @@ public class CharDB {
                 return foo;
         }
 
-        
         public static Collection<User> getUsersWithRole(final Role role) {
                 return Collections2.filter(getUsers(), new HasRolePredicate(role));
         }
 
-        
         public static int addNewSiteUser(String username, String password, int rank) {
                 Connection c = null;
                 int success = 0;
@@ -253,7 +245,6 @@ public class CharDB {
                 return success;
         }
 
-        
         public static ImmutableList<String> getUserNames() {
                 Builder<String> userNameBuilder = ImmutableList.builder();
                 for (User user : getUsers()) {
@@ -263,7 +254,6 @@ public class CharDB {
 
         }
 
-        
         public static Double getAttendanceRaids(User user) {
                 Double foo = 0.0;
                 int amountofRaids = RaidDB.getTotalRaidsLastThirtyDays();
@@ -278,7 +268,6 @@ public class CharDB {
                 return foo;
         }
 
-        
         public static void removeLootFromCharacter(String itemname, User user) {
                 Connection c = null;
 
@@ -298,7 +287,6 @@ public class CharDB {
                 addLog("Removed Loot [" + itemname + " from " + user.getUsername() + "]");
         }
 
-        
         public static void updateLootForCharacter(String itemname, double price, boolean heroic, User user,
                 int lootid) {
                 Connection c = null;
@@ -331,7 +319,6 @@ public class CharDB {
                 }
         }
 
-        
         public static void deleteCharacter(User user) {
                 Connection c = null;
                 try {
@@ -347,7 +334,6 @@ public class CharDB {
                 addLog("Deleted Character [" + user.getUsername() + " | " + user.getRole().toString() + "]");
         }
 
-        
         public static List<String> getSiteUsers() {
                 DBConnection c = new DBConnection();
                 List<String> users = new ArrayList<String>();
@@ -381,7 +367,6 @@ public class CharDB {
                 return id;
         }
 
-        
         public static void updateSiteUser(String username, String password, int level) {
                 DBConnection c = new DBConnection();
                 try {
@@ -398,7 +383,6 @@ public class CharDB {
                 addLog("Updated Site User [" + username + " | Rank: " + level + "]");
         }
 
-        
         public static int getSiteUserLevel(String name) {
                 DBConnection c = new DBConnection();
                 int level = 1;
@@ -417,7 +401,6 @@ public class CharDB {
                 return level;
         }
 
-        
         public static int countActiveUsers() {
                 int i = 0;
                 for (User u : getUsers()) {
@@ -428,7 +411,6 @@ public class CharDB {
                 return i;
         }
 
-        
         public static User getUser(String username) {
                 for (User u : getUsers()) {
                         if (u.getUsername().equalsIgnoreCase(username)) {
@@ -455,7 +437,6 @@ public class CharDB {
                 return total;
         }
 
-        
         public static Integer getShares(int id) {
                 int adjustments = getTotalAdjustmentsForCharacter(id);
                 int shares = 0;
@@ -473,12 +454,7 @@ public class CharDB {
                 }
                 return shares - adjustments;
         }
-
         
-        public static void setApplication(Application app) {
-                CharDB.app = app;
-        }
-
         public static List<User> getUsersSortedByDKP() {
                 List<User> users = getUsers();
                 Collections.sort(users, new Comparator<User>() {
@@ -499,13 +475,11 @@ public class CharDB {
                         this.role = role;
                 }
 
-                
                 public boolean apply(User user) {
                         return user.getRole().equals(role);
                 }
         }
 
-        
         public static int addNewCharacter(String name, String role, Boolean isActive) {
                 Connection c = null;
                 int class_id = 0, update = 0;
@@ -542,7 +516,6 @@ public class CharDB {
                 }
         }
 
-        
         public static int updateCharacter(User user, String name, String charclass, boolean active) {
                 Connection c = null;
                 int success = 0;
@@ -575,13 +548,8 @@ public class CharDB {
         }
 
         private static void addLog(String message) {
-                String name = "";
-                if (app == null || (SiteUser) app.getUser() == null) {
-                        name = "<unknown>";
-                } else {
-                        name = ((SiteUser) app.getUser()).getName();
-                }
-                Logg.addLog(message, name, "char");
+                Logg logg = new Logg();
+                logg.addLog(message, "char");
         }
 
         public static List<User> getUsersSortedByAttendance() {
@@ -590,9 +558,8 @@ public class CharDB {
 
                         @Override
                         public int compare(User o1, User o2) {
-                                 return o1.getAttendance() < o2.getAttendance() ? 1 : 0;
+                                return o1.getAttendance() < o2.getAttendance() ? 1 : 0;
                         }
-
                 });
                 return users;
         }

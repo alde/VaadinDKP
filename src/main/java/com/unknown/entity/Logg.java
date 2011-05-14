@@ -4,6 +4,8 @@
  */
 package com.unknown.entity;
 
+import com.unknown.entity.character.SiteUser;
+import com.vaadin.Application;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +21,7 @@ import java.util.List;
  */
 public class Logg {
 
-        public static void addLog(String message, String username, String type) {
+        private void addLog(String message, String username, String type) {
                 DBConnection c = new DBConnection();
                 Date d = new Date();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -31,14 +33,14 @@ public class Logg {
                         p.setString(3, message);
                         p.setString(4, type);
                         p.executeUpdate();
-                      } catch (SQLException ex) {
+                } catch (SQLException ex) {
                         ex.printStackTrace();
                 } finally {
                         c.close();
                 }
         }
 
-        public static List<Log> readLog() {
+        public List<Log> readLog() {
                 DBConnection c = new DBConnection();
                 List<Log> log = new ArrayList<Log>();
                 try {
@@ -54,5 +56,20 @@ public class Logg {
                         c.close();
                 }
                 return log;
+        }
+
+        public Logg() {
+                
+        }
+
+        public void addLog(String message, String string) {
+                String name = "";
+                Application app = UnknownEntityDKP.getInstance();
+                if (app == null || (SiteUser) app.getUser() == null) {
+                        name = "<unknown>";
+                } else {
+                        name = ((SiteUser) app.getUser()).getName();
+                }
+                this.addLog(message, name, string);
         }
 }

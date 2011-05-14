@@ -20,7 +20,6 @@ import com.unknown.entity.items.windows.ItemAddWindow;
 import com.unknown.entity.raids.RaidInfoListener;
 import com.unknown.entity.raids.RaidList;
 import com.unknown.entity.raids.windows.RaidAddWindow;
-import com.vaadin.Application;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -60,13 +59,9 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private CharacterList characterList = null;
         private DkpList dkpList = null;
         private ItemList itemList = null;
-        private Application app = null;
-
-        public void addApplication(Application app) {
-                this.app = app;
-        }
 
         public AdminPanel() {
+                this.attach();
                 setListeners();
                 styleLoginLogoutRefresh();
                 this.setSpacing(true);
@@ -194,7 +189,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         ItemAddWindow addItem = new ItemAddWindow();
-                        addItem.addApplication(app);
                         addItem.printInfo();
                         addItem.addItemInfoListener(itemList);
                         getMainWindow().addWindow(addItem);
@@ -207,7 +201,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 public void buttonClick(ClickEvent event) {
                         RaidAddWindow addRaid = new RaidAddWindow();
                         addRaid.printInfo();
-                        addRaid.addApplication(app);
                         addRaid.addRaidInfoListener(raidList);
                         getMainWindow().addWindow(addRaid);
                 }
@@ -219,7 +212,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 public void buttonClick(ClickEvent event) {
                         CharacterAddWindow addChar = new CharacterAddWindow();
                         addChar.printInfo();
-                        addChar.addApplication(app);
                         addChar.addCharacterInfoListener(characterList);
                         addChar.addCharacterInfoListener(dkpList);
                         getMainWindow().addWindow(addChar);
@@ -236,7 +228,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                                 getMainWindow().addWindow(loginWindow);
                                 loginWindow.addCharacterInfoListener(characterList);
                                 loginWindow.addCharacterInfoListener(dkpList);
-                                loginWindow.addApplication(app);
                                 loginWindow.attach();
 
                         } else {
@@ -263,7 +254,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 public void buttonClick(ClickEvent event) {
                         try {
                                 EditDefaultPricesWindow editDefaults = new EditDefaultPricesWindow();
-                                editDefaults.addApplication(app);
                                 editDefaults.printInfo();
                                 getMainWindow().addWindow(editDefaults);
                         } catch (SQLException ex) {
@@ -277,7 +267,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         AddNewUserWindow newUser = new AddNewUserWindow();
-                        newUser.addApplication(app);
                         newUser.printInfo();
                         getMainWindow().addWindow(newUser);
                 }
@@ -290,7 +279,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
                         EditZonesWindow editZones = new EditZonesWindow();
                         editZones.addRaidInfoListener(raidList);
-                        editZones.addApplication(app);
                         editZones.printInfo();
 
                         getMainWindow().addWindow(editZones);
@@ -302,7 +290,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         EditMultiplierWindow editMP = new EditMultiplierWindow();
-                        editMP.addApplication(app);
                         editMP.addItemInfoListener(itemList);
                         editMP.addCharacterInfoListener(dkpList);
                         editMP.addCharacterInfoListener(characterList);
@@ -316,7 +303,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 @Override
                 public void buttonClick(ClickEvent event) {
                         EditUserWindow editUser = new EditUserWindow(getApplication());
-                        editUser.addApplication(app);
                         editUser.printInfo();
                         getMainWindow().addWindow(editUser);
                 }

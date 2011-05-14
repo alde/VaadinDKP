@@ -91,7 +91,6 @@ public class AddNewUserWindow extends Window {
                         }
 
                         String hashedpassword = hashPassword(password.getValue().toString());
-                        CharDB.setApplication(app);
                         CharDB.addNewSiteUser(username.getValue().toString(), hashedpassword, userlevel);
                 } else {
                         Label err = new Label("Passwords must match!");

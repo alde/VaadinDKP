@@ -197,11 +197,6 @@ class EditUserWindow extends Window {
                 }
         }
 
-        void addApplication(Application app) {
-                this.app = app;
-                CharDB.setApplication(app);
-        }
-
         private class CloseBtnListener implements ClickListener {
 
                 @Override

@@ -105,7 +105,6 @@ public class CharacterAddWindow extends Window {
         }
 
         private void addChar(String name, String role, boolean isActive) throws SQLException {
-                CharDB.setApplication(app);
                 CharDB.addNewCharacter(name, role, isActive);
                 
         }

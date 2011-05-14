@@ -22,9 +22,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.unknown.entity.Logg;
-import com.unknown.entity.character.SiteUser;
 import com.vaadin.Application;
-import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 import org.joda.time.DateTime;
 
 /**
@@ -34,9 +32,7 @@ import org.joda.time.DateTime;
 public class RaidDB {
 
         private static List<Raid> raidCache = new ArrayList<Raid>();
-        private static Application app;
 
-        
         public static List<Raid> getRaids() {
                 if (raidCache != null) {
                         if (!raidCache.isEmpty()) {
@@ -62,7 +58,6 @@ public class RaidDB {
                 return raids;
         }
 
-        
         public static void clearCache() {
                 raidCache.clear();
         }
@@ -91,7 +86,6 @@ public class RaidDB {
                 return raidChars;
         }
 
-        
         public static List<String> getRaidZoneList() {
                 List<String> zones = new ArrayList<String>();
                 Connection c = null;
@@ -110,7 +104,6 @@ public class RaidDB {
                 return zones;
         }
 
-        
         public static int addNewRaid(String zone, String comment, String date) {
                 Connection c = null;
                 int result = 0;
@@ -152,7 +145,6 @@ public class RaidDB {
                 }
         }
 
-        
         public static Collection<RaidReward> getRewardsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
@@ -177,7 +169,6 @@ public class RaidDB {
                 return raidRewards;
         }
 
-        
         public static Collection<RaidItem> getItemsForRaid(int raidId) {
                 Connection c = null;
                 List<RaidItem> raidItems = new ArrayList<RaidItem>();
@@ -205,7 +196,6 @@ public class RaidDB {
                 return raidItems;
         }
 
-        
         public static Collection<RaidChar> getCharsForReward(int id) {
                 Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
@@ -232,7 +222,6 @@ public class RaidDB {
                 return raidChars;
         }
 
-        
         public static int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) {
                 int success = 0;
                 Connection c = null;
@@ -266,7 +255,6 @@ public class RaidDB {
                 return success;
         }
 
-        
         public static int getZoneIdByName(String raidzoneName) {
                 DBConnection c = new DBConnection();
                 int zoneid = 1;
@@ -284,7 +272,6 @@ public class RaidDB {
                 return zoneid;
         }
 
-        
         public static String getZoneNameById(int raidzoneid) {
                 DBConnection c = new DBConnection();
                 String zonename = "";
@@ -302,7 +289,6 @@ public class RaidDB {
                 return zonename;
         }
 
-        
         public static int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
                 Connection c = null;
                 int success = 0;
@@ -374,7 +360,6 @@ public class RaidDB {
                 return clean;
         }
 
-        
         public static void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) {
                 Connection c = null;
                 try {
@@ -396,7 +381,6 @@ public class RaidDB {
                 addLog("Added Loot [" + name + " looted " + loot + " in " + raid.getComment() + "]");
         }
 
-        
         public static int removeReward(RaidReward reward) {
                 Connection c = null;
                 int success = 0;
@@ -417,7 +401,6 @@ public class RaidDB {
                 return success;
         }
 
-        
         public static int addReward(RaidReward reward) {
                 reward = doAddReward(reward);
                 doAddCharacterReward(reward);
@@ -461,7 +444,6 @@ public class RaidDB {
                 }
         }
 
-        
         public static int removeLootFromRaid(RaidItem item) {
                 Connection c = null;
                 int success = 0;
@@ -482,14 +464,12 @@ public class RaidDB {
                 return success;
         }
 
-        
         public static List<String> findInvalidCharacters(List<String> attendantlist) {
                 List<String> invalid = new ArrayList<String>(attendantlist);
                 invalid.removeAll(CharDB.getUserNames());
                 return ImmutableList.copyOf(invalid);
         }
 
-        
         public static Collection<RaidChar> getRaidCharsForRaid(List<String> attendantlist, int raidId) {
                 Set<RaidChar> chars = new HashSet<RaidChar>();
                 for (String string : attendantlist) {
@@ -521,7 +501,6 @@ public class RaidDB {
                 return rchar;
         }
 
-        
         public static List<Raid> getRaidsForCharacter(int charid) {
                 List<Raid> raids = new ArrayList<Raid>();
                 DBConnection c = new DBConnection();
@@ -540,7 +519,6 @@ public class RaidDB {
                 return raids;
         }
 
-        
         public static int getTotalRaidsLastThirtyDays() {
                 int total_raids = 0;
                 DateTime dt = new DateTime();
@@ -563,7 +541,6 @@ public class RaidDB {
                 return total_raids;
         }
 
-        
         public static int getAttendedRaidsLastThirtyDays(User user) {
                 int i = 0;
                 DateTime dt = new DateTime();
@@ -587,7 +564,6 @@ public class RaidDB {
                 return i;
         }
 
-        
         public static boolean getLootedHeroic(String charname, int itemid, double price) {
                 DBConnection c = new DBConnection();
                 boolean isheroic = false;
@@ -609,7 +585,6 @@ public class RaidDB {
                 return isheroic;
         }
 
-        
         public static int doUpdateLoot(int lootid, String looter, String itemname, double price, boolean heroic, int raidid) {
                 int itemid = ItemDB.getItemId(itemname);
                 int charid = CharDB.getCharacterId(looter);
@@ -641,7 +616,6 @@ public class RaidDB {
                 }
         }
 
-        
         public static void removeZone(String zone) {
                 fixExistingZonesToDefaultWhenRemovingThatZone(zone);
                 DBConnection c = new DBConnection();
@@ -656,7 +630,6 @@ public class RaidDB {
                 addLog("Removed Zone [" + zone + "]");
         }
 
-        
         public static void addZone(String zone) {
                 DBConnection c = new DBConnection();
                 try {
@@ -685,7 +658,6 @@ public class RaidDB {
                 }
         }
 
-        
         public static void updateZoneName(String oldZone, String newZone) {
                 DBConnection c = new DBConnection();
                 int zoneid = 0;
@@ -719,7 +691,6 @@ public class RaidDB {
                 return zoneid;
         }
 
-        
         public static boolean isValidZone(String oldzone) {
                 int id = 0;
                 id = getValidZoneByName(oldzone);
@@ -730,7 +701,6 @@ public class RaidDB {
                 }
         }
 
-        
         public static void safelyRemoveRaid(Raid raid) {
                 deleteRewardsForRaid(raid);
                 deleteLootsForRaid(raid);
@@ -774,7 +744,6 @@ public class RaidDB {
                 addLog("Removed Raid [" + raid.getDate() + " | " + raid.getComment() + " | " + raid.getRaidname() + "]");
         }
 
-        
         public static Raid getRaid(String raidcomment, String raiddate) {
                 for (Raid r : getRaids()) {
                         if (r.getComment().equalsIgnoreCase(raidcomment) && r.getDate().equalsIgnoreCase(raiddate)) {
@@ -784,7 +753,6 @@ public class RaidDB {
                 return null;
         }
 
-        
         public static List<Adjustment> getAdjustmentsForCharacter(int charid) {
                 List<Adjustment> pun = new ArrayList<Adjustment>();
                 DBConnection c = new DBConnection();
@@ -808,7 +776,6 @@ public class RaidDB {
                 return pun;
         }
 
-        
         public static int addAdjustment(Adjustment p) {
                 p = doAddAdjustment(p);
                 return p.getId();
@@ -836,7 +803,6 @@ public class RaidDB {
                 return p;
         }
 
-        
         public static void removeAdjustment(Adjustment p) {
                 DBConnection c = new DBConnection();
                 try {
@@ -851,20 +817,10 @@ public class RaidDB {
                 addLog("Removed adjustment [" + p.getDate() + " | " + p.getComment() + " (" + p.getShares() + " shares)] from " + getCharacter(p.getCharId()));
 
         }
-
         
-        public static void setApplication(Application app) {
-                RaidDB.app = app;
-        }
-
         private static void addLog(String message) {
-                String name = "";
-                if (app == null || (SiteUser) app.getUser() == null) {
-                        name = "<unknown>";
-                } else {
-                        name = ((SiteUser) app.getUser()).getName();
-                }
-                Logg.addLog(message, name, "raid");
+                Logg logg = new Logg();
+                logg.addLog(message, "raid");
         }
 
         private static String getCharacter(int id) {

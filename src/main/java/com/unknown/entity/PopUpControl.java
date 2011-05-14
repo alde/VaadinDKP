@@ -108,7 +108,6 @@ public class PopUpControl extends Window {
         private void showItemEditWindow(Items item) throws NullPointerException, IllegalArgumentException {
                 ItemEditWindow info = new ItemEditWindow(item);
                 info.printInfo();
-                info.addApplication(app);
                 info.addItemInfoListener(itemList);
                 info.addCharacterInfoListener(charList);
                 info.addCharacterInfoListener(dkpList);

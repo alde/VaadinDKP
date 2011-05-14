@@ -10,7 +10,6 @@ import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.items.MultiplierList;
-import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -34,7 +33,6 @@ public class EditMultiplierWindow extends Window {
         MultiplierList multiplierTable;
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();
         private List<CharacterInfoListener> charlisteners = new ArrayList<CharacterInfoListener>();
-        private Application app;
 
         public EditMultiplierWindow() {
                 this.setCaption("Edit multipliers");
@@ -104,11 +102,6 @@ public class EditMultiplierWindow extends Window {
                 for (CharacterInfoListener charInfoListener : charlisteners) {
                         charInfoListener.onCharacterInfoChange();
                 }
-        }
-
-        public void addApplication(Application app) {
-                this.app = app;
-                ItemDB.setApplication(app);
         }
 
         private class AddButtonListener implements ClickListener {

@@ -24,7 +24,8 @@ class LogTable extends Table {
                 this.setWidth("860px");
                 this.addStyleName("striped");
                 setTableHeaders();
-                for (Log l : Logg.readLog()) {
+                Logg logs = new Logg();
+                for (Log l : logs.readLog()) {
                         Item addItem = ic.addItem(l);
                         addTableRow(addItem, l);
                 }

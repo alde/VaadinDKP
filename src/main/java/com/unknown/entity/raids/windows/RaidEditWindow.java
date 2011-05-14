@@ -180,7 +180,6 @@ public class RaidEditWindow extends Window {
                         RaidLootAddWindow rlootadd = new RaidLootAddWindow(raid);
                         rlootadd.addCharacterInfoListener(dkplist);
                         rlootadd.addCharacterInfoListener(clist);
-                        rlootadd.addApplication(app);
                         rlootadd.addRaidInfoListener(rlList);
                         rlootadd.addItemInfoListener(itemList);
                         rlootadd.printInfo();

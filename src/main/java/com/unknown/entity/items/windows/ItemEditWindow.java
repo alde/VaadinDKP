@@ -8,7 +8,6 @@ import com.unknown.entity.database.*;
 import com.unknown.entity.*;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.items.*;
-import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.terminal.ExternalResource;
@@ -55,7 +54,6 @@ public class ItemEditWindow extends Window {
         private VerticalLayout lout;
         private TextField ilvl;
         private TextField quality;
-        private Application app;
 
         public ItemEditWindow(Items item) {
                 this.item = item;
@@ -231,7 +229,6 @@ public class ItemEditWindow extends Window {
         private void updateItem() {
                 String temp = type.getValue().toString();
                 Type tempType = typeFromString(temp);
-                ItemDB.setApplication(app);
                 ItemDB.updateItem(item, name.getValue().toString(), Slots.valueOf(slot.getValue().toString()), tempType, Integer.parseInt(wowIdField.getValue().toString()), Integer.parseInt(wowIdFieldhc.getValue().toString()), Double.parseDouble(price.getValue().toString()), Double.parseDouble(pricehc.getValue().toString()), Integer.parseInt(ilvl.getValue().toString()), quality.getValue().toString());
                 notifyListeners();
                 update();
@@ -253,7 +250,6 @@ public class ItemEditWindow extends Window {
 
         private void applyPrices() {
                 updateItem();
-                ItemDB.setApplication(app);
                 ItemDB.updateLoots(item, price.getValue().toString(), pricehc.getValue().toString());
                 lout.removeComponent(ilt);
                 ilt = new ItemLooterTable(ItemDB.getSingleItem(name.getValue().toString()));
@@ -262,7 +258,6 @@ public class ItemEditWindow extends Window {
         }
 
         private void deleteItem(Items item) throws SQLException {
-                ItemDB.setApplication(app);
                 ItemDB.deleteItem(item.getId());
         }
 
@@ -322,10 +317,6 @@ public class ItemEditWindow extends Window {
                 ilvl.setValue("");
                 quality.setValue("");
                 lout.removeAllComponents();
-        }
-
-        public void addApplication(Application app) {
-                this.app = app;
         }
 
         private class UpdateButtonClickListener implements ClickListener {

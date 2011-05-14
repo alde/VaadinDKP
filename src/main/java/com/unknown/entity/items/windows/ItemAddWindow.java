@@ -9,7 +9,6 @@ import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.XmlParser;
 import com.unknown.entity.items.*;
-import com.vaadin.Application;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -48,7 +47,6 @@ public class ItemAddWindow extends Window {
         private TextField itemlevel;
         private TextField quality;
         private List<ItemPrices> prices;
-        private Application app;
 
         public ItemAddWindow() {
                 this.setCaption("Add Item");
@@ -159,7 +157,6 @@ public class ItemAddWindow extends Window {
         }
 
         private int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String qual) {
-                ItemDB.setApplication(app);
                 return ItemDB.addItem(name, wowid, wowid_hc, price, price_hc, slot, type, ilvl, qual);
         }
 
@@ -171,10 +168,6 @@ public class ItemAddWindow extends Window {
                 for (ItemInfoListener itemInfoListener : listeners) {
                         itemInfoListener.onItemInfoChange();
                 }
-        }
-
-        public void addApplication(Application app) {
-                this.app = app;
         }
 
         private class SlotComboBoxValueChangeListener implements ValueChangeListener {

@@ -10,20 +10,29 @@ import com.unknown.entity.character.User;
 import com.unknown.entity.database.*;
 import com.unknown.entity.items.*;
 import com.unknown.entity.raids.Raid;
+import com.unknown.entity.raids.RaidItem;
 import com.unknown.entity.raids.RaidLootListener;
-import com.vaadin.Application;
+import com.vaadin.data.Property.ConversionException;
+import com.vaadin.data.Property.ReadOnlyException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.data.Item;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -36,10 +45,13 @@ import java.util.logging.Logger;
  */
 public class RaidLootAddWindow extends Window {
 
+        private HashSet<User> charlist;
+        private HashSet<Items> lootlist;
         private Raid raid;
         private List<RaidLootListener> listeners = new ArrayList<RaidLootListener>();
         private List<CharacterInfoListener> charinfolisteners = new ArrayList<CharacterInfoListener>();
         private List<ItemInfoListener> iteminfolisteners = new ArrayList<ItemInfoListener>();
+        private Table table;
         private Label notice;
         private ComboBox loots;
         private CheckBox heroic;
@@ -48,9 +60,11 @@ public class RaidLootAddWindow extends Window {
         private TextField price;
         private ComboBox name;
         private Button addButton;
-        private Application app;
+        private Button addAllButton;
+        private IndexedContainer ic;
 
         RaidLootAddWindow(Raid raid) {
+
                 this.raid = raid;
                 this.setCaption(raid.getComment().toString());
                 this.getContent().setSizeUndefined();
@@ -58,29 +72,56 @@ public class RaidLootAddWindow extends Window {
                 this.setPositionX(600);
                 this.setPositionY(300);
                 this.setSizeUndefined();
+                this.charlist = new HashSet<User>();
+                this.charlist.addAll(CharDB.getUsers());
+                this.lootlist = new HashSet<Items>();
+                this.lootlist.addAll(ItemDB.getItems());
         }
 
         public void printInfo() {
-                HashSet<Items> lootlist = getLootList();
+                
                 this.loots = lootListComboBox(lootlist);
                 this.heroic = new CheckBox("Heroic");
                 this.upgrade = new CheckBox("Upgrade (normal > heroic)");
                 this.sidegrade = new CheckBox("Sidegrade (Free)");
-                this.price = new TextField("Price");
+                this.price = new TextField();
+                this.price.setWidth("200px");
                 this.name = nameComboList();
                 this.notice = new Label();
                 this.notice.setContentMode(Label.CONTENT_PREFORMATTED);
                 this.addButton = new Button("Add");
-
-                addComponent(loots);
-                addComponent(heroic);
-                addComponent(upgrade);
-                addComponent(sidegrade);
-                addComponent(price);
-                addComponent(name);
+                this.addAllButton = new Button("Add All");
+                this.table = new Table("Loots");
+                this.ic = new IndexedContainer();
+                this.table.setWidth("500px");
+                this.table.setHeight("300px");
+                
+                setHeaders();
+                HorizontalLayout hzl = new HorizontalLayout();
+                hzl.setSpacing(true);
+                hzl.addComponent(loots);
+                hzl.addComponent(name);
+                addComponent(hzl);
+                
+                HorizontalLayout horiz = new HorizontalLayout();
+                horiz.setSpacing(true);
+                horiz.addComponent(heroic);
+                horiz.addComponent(upgrade);
+                horiz.addComponent(sidegrade);
+                addComponent(horiz);
+                
+                addComponent(new Label("Price: "));
+                HorizontalLayout horizontal = new HorizontalLayout();
+                horizontal.setSpacing(true);
+                horizontal.addComponent(price);
+                horizontal.addComponent(addButton);
+                addComponent(horizontal);
+                
+//                addComponent(price);
                 addComponent(notice);
-                addComponent(addButton);
-
+//                addComponent(addButton);
+                addComponent(table);
+                addComponent(addAllButton);
                 setImmediates();
                 setListeners();
 
@@ -91,8 +132,19 @@ public class RaidLootAddWindow extends Window {
                 heroic.addListener(new HeroicChangeListener());
                 upgrade.addListener(new UpgradeChangeListener());
                 sidegrade.addListener(new SidegradeChangeListener());
-                addButton.addListener(new AddRaidListener());
+                addButton.addListener(new AddLootsListener());
                 name.addListener(new NameChangeListener());
+                addAllButton.addListener(new AddAllListener());
+                table.addListener(new ItemClickListener() {
+
+                        @Override
+                        public void itemClick(ItemClickEvent event) {
+                                if (event.isCtrlKey()) {
+                                        RaidItem item = (RaidItem) event.getItemId();
+                                        ic.removeItem(item);
+                                }
+                        }
+                });
         }
 
         private void setImmediates() {
@@ -111,17 +163,15 @@ public class RaidLootAddWindow extends Window {
 
         private ComboBox nameComboList() throws UnsupportedOperationException {
                 final ComboBox cname = new ComboBox("Name");
-                cname.setWidth("300px");
-                HashSet<User> charlist = new HashSet<User>();
+                cname.setWidth("150px");
                 TreeSet<String> sortedlist = new TreeSet<String>();
-                charlist.addAll(CharDB.getUsers());
-                for (User eachname : charlist) {
+                for (User eachname : this.charlist) {
                         sortedlist.add(eachname.getUsername());
                 }
                 for (String s : sortedlist) {
                         cname.addItem(s);
                 }
-                cname.setNullSelectionAllowed(false);
+                cname.setNullSelectionAllowed(true);
 
                 return cname;
         }
@@ -141,22 +191,16 @@ public class RaidLootAddWindow extends Window {
 
         private ComboBox lootListComboBox(HashSet<Items> lootlist) throws UnsupportedOperationException {
                 ComboBox cloot = new ComboBox("Item");
-                cloot.setWidth("300px");
+                cloot.setWidth("340px");
                 for (Items eachitem : lootlist) {
                         cloot.addItem(eachitem.getName());
                 }
-                cloot.setNullSelectionAllowed(false);
+                cloot.setNullSelectionAllowed(true);
                 return cloot;
         }
 
         private Double getDefaultPrice(String itemname, boolean isheroic) throws SQLException {
                 return (Double) ItemDB.getItemPrice(itemname, isheroic);
-        }
-
-        private HashSet<Items> getLootList() {
-                HashSet<Items> lootlist = new HashSet<Items>();
-                lootlist.addAll(ItemDB.getItems());
-                return lootlist;
         }
 
         public void addRaidInfoListener(RaidLootListener listener) {
@@ -183,9 +227,9 @@ public class RaidLootAddWindow extends Window {
                 iteminfolisteners.add(listener);
         }
 
-        private void UpdateNotice() {
+        private void updateNotice() {
                 notice.setValue("");
-                if (name.getValue() != null && !name.getValue().toString().isEmpty()) {
+                if (name.getValue() != null && !name.getValue().toString().isEmpty() && loots.getValue() != null && !loots.getValue().toString().isEmpty()) {
                         String slot = ItemDB.getItemById(ItemDB.getItemId(loots.getValue().toString())).getSlot();
                         List<CharacterItem> prev = new ArrayList<CharacterItem>();
                         List<CharacterItem> items = ItemDB.getLootForCharacter(name.getValue().toString());
@@ -198,7 +242,7 @@ public class RaidLootAddWindow extends Window {
                         if (!prev.isEmpty()) {
                                 String temp = name.getValue().toString() + " has already looted: \n";
                                 for (CharacterItem s : prev) {
-                                        temp += "  " +s.getName();
+                                        temp += "  " + s.getName();
                                         if (s.getHeroic()) {
                                                 temp += " [H] (" + s.getPrice() + " dkp)\n";
                                         } else {
@@ -213,16 +257,53 @@ public class RaidLootAddWindow extends Window {
                 }
         }
 
-        void addApplication(Application app) {
-                this.app = app;
+        private void clear() {
+                name.setValue(null);
+                loots.setValue(null);
+                heroic.setValue(false);
+                sidegrade.setValue(false);
+                upgrade.setValue(false);
+                price.setValue("");
+        }
+        
+        private void setHeaders() throws UnsupportedOperationException {
+                ic.addContainerProperty("Name", Label.class, "");
+                ic.addContainerProperty("Item", Label.class, "");
+                ic.addContainerProperty("Price", Double.class, 0);
+                ic.addContainerProperty("Heroic", String.class, "");
+                this.table.setContainerDataSource(ic);
+                this.table.setColumnWidth("Name", 100);
+                this.table.setColumnWidth("Price", 40);
+                this.table.setColumnWidth("Heroic", 50);
+        }
+
+        private void setNewRow(Item addItem, RaidItem ri) throws ReadOnlyException, ConversionException {
+                Label nameLabel = new Label(ri.getLooter());
+                String charclass = CharDB.getRoleForCharacter(ri.getLooter()).replace(" ", "").toLowerCase();
+                nameLabel.addStyleName(charclass);
+                Label itemLabel = new Label(ri.getName());
+                itemLabel.addStyleName(ri.getQuality().toLowerCase());
+                addItem.getItemProperty("Name").setValue(nameLabel);
+                addItem.getItemProperty("Item").setValue(itemLabel);
+                addItem.getItemProperty("Price").setValue(ri.getPrice());
+                addItem.getItemProperty("Heroic").setValue(ri.isHeroic() ? "Yes" : "No");
+        }
+
+        private void addRow() {
+                Items i = ItemDB.getSingleItem(loots.getValue().toString());
+                RaidItem ri = new RaidItem(i.getName(), name.getValue().toString(), i.getId(), Double.parseDouble(price.getValue().toString()), heroic.booleanValue(), i.getQuality());
+                Item addItem = ic.addItem(ri);
+                setNewRow(addItem, ri);
         }
 
         private class LootChangeListener implements ValueChangeListener {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
-                        price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
-                        UpdateNotice();
+                        if (loots.getValue() != null) {
+                                price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
+                                updateNotice();
+                        }
                 }
         }
 
@@ -230,17 +311,18 @@ public class RaidLootAddWindow extends Window {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
-                        price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
+                        if (loots.getValue() != null) {
+                                price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
+                        }
                 }
         }
 
-        private class AddRaidListener implements ClickListener {
+        private class AddLootsListener implements ClickListener {
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        addRaidLoot(name.getValue().toString(), loots.getValue().toString(), Boolean.parseBoolean(heroic.getValue().toString()), Double.parseDouble(price.getValue().toString()));
-                        notifyListeners();
-                        close();
+                        addRow();
+                        clear();
                 }
         }
 
@@ -248,9 +330,11 @@ public class RaidLootAddWindow extends Window {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
-                        heroic.setValue(!heroic.booleanValue());
-                        Double upgradePrice = calcUpgradePrice();
-                        price.setValue(upgradePrice);
+                        if (loots.getValue() != null) {
+                                heroic.setValue(!heroic.booleanValue());
+                                Double upgradePrice = calcUpgradePrice();
+                                price.setValue(upgradePrice);
+                        }
                 }
 
                 private double calcUpgradePrice() {
@@ -266,7 +350,7 @@ public class RaidLootAddWindow extends Window {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
-                        UpdateNotice();
+                        updateNotice();
                 }
         }
 
@@ -279,6 +363,19 @@ public class RaidLootAddWindow extends Window {
                         } else {
                                 price.setValue(getItemPrice(loots.getValue().toString(), heroic.booleanValue()));
                         }
+                }
+        }
+
+        private class AddAllListener implements ClickListener {
+
+                @Override
+                public void buttonClick(ClickEvent event) {
+                        Collection<RaidItem> list = (Collection<RaidItem>) ic.getItemIds();
+                        for (RaidItem rl : list) {
+                                addRaidLoot(rl.getLooter(), rl.getName(), rl.isHeroic(), rl.getPrice());
+                        }
+                        notifyListeners();
+                        close();
                 }
         }
 }

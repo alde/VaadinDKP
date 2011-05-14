@@ -9,13 +9,11 @@ import com.unknown.entity.Logg;
 import com.unknown.entity.Slots;
 import com.unknown.entity.Type;
 import com.unknown.entity.character.CharacterItem;
-import com.unknown.entity.character.SiteUser;
 import com.unknown.entity.items.ItemLooter;
 import com.unknown.entity.items.ItemPrices;
 import com.unknown.entity.items.Items;
 import com.unknown.entity.items.Multiplier;
 import com.unknown.entity.raids.RaidItem;
-import com.vaadin.Application;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,7 +32,6 @@ import java.util.logging.Logger;
 public class ItemDB {
 
         private static List<Items> itemCache = new ArrayList<Items>();
-        private static Application app;
 
         public static List<Items> getItems() {
                 if (itemCache != null) {
@@ -63,7 +60,6 @@ public class ItemDB {
                 return items;
         }
 
-        
         public static void clearCache() {
                 itemCache.clear();
         }
@@ -93,7 +89,6 @@ public class ItemDB {
                 return looters;
         }
 
-        
         public static List<ItemPrices> getDefaultPrices() {
                 DBConnection c = new DBConnection();
                 List<ItemPrices> prices = new ArrayList<ItemPrices>();
@@ -111,7 +106,6 @@ public class ItemDB {
                 return prices;
         }
 
-        
         public static List<Multiplier> getMultipliers() {
                 DBConnection c = new DBConnection();
                 List<Multiplier> multi = new ArrayList<Multiplier>();
@@ -128,7 +122,6 @@ public class ItemDB {
                 return multi;
         }
 
-        
         public static void addMultiplier(int ilvl, double multiplier) {
                 DBConnection c = new DBConnection();
                 try {
@@ -143,7 +136,6 @@ public class ItemDB {
                 addLog("Added Multiplier [ilvl: " + ilvl + " | " + "multiplier: " + multiplier + "]");
         }
 
-        
         public static Multiplier getMultiplierForItemlevel(int ilvl) {
                 DBConnection c = new DBConnection();
                 Multiplier mp = null;
@@ -164,7 +156,6 @@ public class ItemDB {
                 return mp;
         }
 
-        
         public static int updateItem(Items item, String newname, Slots newslot, Type newtype, int newwowid, int newwowidhc, double newprice, double newpricehc, int ilvl, String quality) {
                 Connection c = null;
                 int success = 0;
@@ -212,7 +203,6 @@ public class ItemDB {
                 return success;
         }
 
-        
         public static int addItem(String name, int wowid, int wowid_hc, double price, double price_hc, String slot, String type, int ilvl, String quality) {
                 Connection c = null;
                 int result = 0;
@@ -242,7 +232,6 @@ public class ItemDB {
                 return result;
         }
 
-        
         public static Object getItemPrice(String itemname, boolean heroic) {
                 Double price = 0.0;
                 Connection c = null;
@@ -266,7 +255,6 @@ public class ItemDB {
                 return price;
         }
 
-        
         public static int getItemId(String loot) {
                 DBConnection c = new DBConnection();
                 int itemid = 0;
@@ -284,7 +272,6 @@ public class ItemDB {
                 return itemid;
         }
 
-        
         public static int getLootId(int itemid, int charid, double price, Boolean heroic, int raidid) {
                 DBConnection c = new DBConnection();
                 int i = 0;
@@ -311,7 +298,6 @@ public class ItemDB {
                 return i;
         }
 
-        
         public static Items getSingleItem(String name) {
                 Connection c = null;
                 Items item = null;
@@ -334,7 +320,6 @@ public class ItemDB {
                 return item;
         }
 
-        
         public static void updateDefaultPrice(String slot, double normalprice) {
                 Connection c = null;
                 try {
@@ -351,7 +336,6 @@ public class ItemDB {
                 addLog("Updated Default Price [" + slot + " | " + normalprice + "]");
         }
 
-        
         public static int deleteItem(int id) {
                 DBConnection c = new DBConnection();
                 int success = 0;
@@ -372,7 +356,6 @@ public class ItemDB {
                 return success;
         }
 
-        
         public static ArrayList<RaidItem> getItemsForRaid(int id) {
                 DBConnection c = new DBConnection();
                 ArrayList<RaidItem> items = new ArrayList<RaidItem>();
@@ -399,7 +382,6 @@ public class ItemDB {
                 }
         }
 
-        
         public static Items getItemById(int id) {
                 DBConnection c = new DBConnection();
                 Items tmp = null;
@@ -443,7 +425,6 @@ public class ItemDB {
                 }
         }
 
-        
         public static void updateLoots(Items item, String price, String pricehc) {
                 updateHeroic(item, pricehc);
                 updateNormal(item, price);
@@ -464,7 +445,6 @@ public class ItemDB {
                 }
         }
 
-        
         public static void updateItemLevels(int id, int ilvl, double multiplier) {
                 DBConnection c = new DBConnection();
                 try {
@@ -480,7 +460,6 @@ public class ItemDB {
                 addLog("Updated Multiplier [ilvl: " + ilvl + " | multiplier: " + multiplier + "]");
         }
 
-        
         public static void deleteItemLevelsMultiplier(int id) {
                 DBConnection c = new DBConnection();
                 try {
@@ -494,7 +473,6 @@ public class ItemDB {
                 addLog("Deleted Multiplier [id: " + id + "]");
         }
 
-        
         public static double getDefaultPrice(Items item) {
                 DBConnection c = new DBConnection();
                 double d = 0.0;
@@ -526,7 +504,6 @@ public class ItemDB {
                 }
         }
 
-        
         public static void updateItemPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
                 DBConnection c = new DBConnection();
                 try {
@@ -543,7 +520,6 @@ public class ItemDB {
                 }
         }
 
-        
         public static void updateLootedPrices(int id, BigDecimal formattedprice, BigDecimal formattedpricehc) {
                 DBConnection c = new DBConnection();
                 try {
@@ -564,7 +540,6 @@ public class ItemDB {
                 }
         }
 
-        
         public static List<CharacterItem> getLootForCharacter(String name) {
                 List<CharacterItem> foo = new ArrayList<CharacterItem>();
                 DBConnection c = new DBConnection();
@@ -589,23 +564,12 @@ public class ItemDB {
                 return foo;
         }
 
-        
         public static String getSlotForItemByName(String name) {
                 return getItemById(getItemId(name)).getSlot();
         }
-
         
-        public static void setApplication(Application app) {
-                ItemDB.app = app;
-        }
-
         private static void addLog(String message) {
-                String name = "";
-                if (app == null || (SiteUser) app.getUser() == null) {
-                        name = "<unknown>";
-                } else {
-                        name = ((SiteUser) app.getUser()).getName();
-                }
-                Logg.addLog(message, name, "item");
+                Logg logg = new Logg();
+                logg.addLog(message, "item");
         }
 }

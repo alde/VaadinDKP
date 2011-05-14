@@ -204,7 +204,6 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void updateCharacter(String name, String charclass, boolean active) {
-                CharDB.setApplication(app);
                 CharDB.updateCharacter(user, name, charclass, active);
         }
 
@@ -289,12 +288,10 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void removeLootFromCharacter(Item item) {
-                CharDB.setApplication(app);
                 CharDB.removeLootFromCharacter(item.getItemProperty("Name").toString(), user);
         }
 
         private void updateLootForCharacter(Item item, int lootid) {
-                CharDB.setApplication(app);
                 CharDB.updateLootForCharacter(item.getItemProperty("Name").toString(), Double.parseDouble(item.getItemProperty("Price").toString()), Boolean.parseBoolean(item.getItemProperty("Heroic").toString()), user, lootid);
         }
 
@@ -343,7 +340,6 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
 
                 @Override
                 public void buttonClick(ClickEvent event) {
-                        CharDB.setApplication(app);
                         CharDB.deleteCharacter(user);
                         notifyListeners();
                         close();
