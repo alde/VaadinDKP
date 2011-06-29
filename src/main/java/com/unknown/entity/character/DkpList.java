@@ -43,7 +43,6 @@ public class DkpList extends Table implements CharacterInfoListener {
                 ic.addContainerProperty("Name", Label.class, "");
                 ic.addContainerProperty("Armor", Armor.class, "");
                 ic.addContainerProperty("DKP", Label.class, 0);
-                ic.addContainerProperty("Attendance", Label.class, 0);
                 ic.setItemSorter(new DefaultItemSorter(new DkpItemSorter()));
                 this.setContainerDataSource(ic);
         }
@@ -92,22 +91,6 @@ public class DkpList extends Table implements CharacterInfoListener {
                         dkp.addStyleName("negative");
                 }
                 addItem.getItemProperty("DKP").setValue(dkp);
-                Label att = new Label(""+user.getAttendance());
-                Double attendance = user.getAttendance();
-                if (attendance >= 0 && attendance < 50) {
-                        att.setStyleName("negative");
-                } else if (attendance > 50 && attendance < 65) {
-                        att.setStyleName("uncommon");
-                } else if (attendance >= 65 && attendance < 75) {
-                        att.setStyleName("rare");
-                } else if (attendance >= 75 && attendance < 90) {
-                        att.setStyleName("epic");
-                } else if (attendance >= 90) {
-                        att.setStyleName("legendary");
-                }
-                addItem.getItemProperty("Attendance").setValue(att);
-
-
         }
 
         public void filter(Object value) {

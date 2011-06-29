@@ -238,21 +238,37 @@ public class CharacterInfoWindow extends Window {
         }
 
         private void raidsAttended() {
-                Double attendance = user.getAttendance();
-                Label attended = new Label();
-                attended.setValue("Attended " + attendance + "% of raids the last 60 days.");
-                if (attendance >= 0 && attendance < 50) {
-                        attended.setStyleName("negative");
-                } else if (attendance > 50 && attendance < 65) {
-                        attended.setStyleName("uncommon");
-                } else if (attendance >= 65 && attendance < 75) {
-                        attended.setStyleName("rare");
-                } else if (attendance >= 75 && attendance < 90) {
-                        attended.setStyleName("epic");
-                } else if (attendance >= 90) {
-                        attended.setStyleName("legendary");
+                Double att30 = CharDB.getAttendance(30, user);
+                Double att60 = CharDB.getAttendance(60, user);
+                
+                Label attended30 = new Label();
+                Label attended60 = new Label();
+                attended30.setValue("Attended " + att30 + "% of raids the last 30 days, ");
+                attended60.setValue("and " + att60 + "% of raids the last 60 days.");
+                if (att30 >= 0 && att30 < 50) {
+                        attended30.setStyleName("negative");
+                } else if (att30 > 50 && att30 < 65) {
+                        attended30.setStyleName("uncommon");
+                } else if (att30 >= 65 && att30 < 75) {
+                        attended30.setStyleName("rare");
+                } else if (att30 >= 75 && att30 < 90) {
+                        attended30.setStyleName("epic");
+                } else if (att30 >= 90) {
+                        attended30.setStyleName("legendary");
                 }
-                addComponent(attended);
+                if (att60 >= 0 && att60 < 50) {
+                        attended60.setStyleName("negative");
+                } else if (att60 > 50 && att60 < 65) {
+                        attended60.setStyleName("uncommon");
+                } else if (att60 >= 65 && att60 < 75) {
+                        attended60.setStyleName("rare");
+                } else if (att60 >= 75 && att60 < 90) {
+                        attended60.setStyleName("epic");
+                } else if (att60 >= 90) {
+                        attended60.setStyleName("legendary");
+                }
+                addComponent(attended30);
+                addComponent(attended60);
         }
 
         private class LootListClickListener implements ItemClickListener {

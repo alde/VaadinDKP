@@ -129,7 +129,6 @@ public class CharDB {
                 Role userrole = Role.valueOf(charroles.get(userid));
                 User user = new User(userid, username, userrole, active, shares, formatted_dkp_earned.doubleValue(), formatted_dkp_spent.doubleValue(), formatted_dkp.doubleValue());
                 user.addCharItems(getItemsForCharacter(userid));
-                user.setAttendance(getAttendanceRaids(user));
                 return user;
         }
 
@@ -233,10 +232,10 @@ public class CharDB {
 
         }
 
-        public static Double getAttendanceRaids(User user) {
+        public static Double getAttendanceRaids(int n, User user) {
                 Double foo = 0.0;
-                int amountofRaids = RaidDB.getTotalRaidsLastSixtyDays();
-                int attendedRaids = RaidDB.getAttendedRaidsLastSixtyDays(user);
+                int amountofRaids = RaidDB.getTotalRaidsLastNDays(n);
+                int attendedRaids = RaidDB.getAttendedRaidsLastNDays(n, user);
                 double temp = 0;
                 if (amountofRaids == 0) {
                         temp = 0;
@@ -428,6 +427,10 @@ public class CharDB {
                 return users;
         }
 
+        public static Double getAttendance(int i, User user) {
+                return getAttendanceRaids(i, user);
+        }
+
         private static class HasRolePredicate implements Predicate<User> {
 
                 private final Role role;
@@ -507,17 +510,5 @@ public class CharDB {
         private static void addLog(String message) {
                 Logg logg = new Logg();
                 logg.addLog(message, "char");
-        }
-
-        public static List<User> getUsersSortedByAttendance() {
-                List<User> users = getUsers();
-                Collections.sort(users, new Comparator<User>() {
-
-                        @Override
-                        public int compare(User o1, User o2) {
-                                return o1.getAttendance() < o2.getAttendance() ? 1 : 0;
-                        }
-                });
-                return users;
         }
 }

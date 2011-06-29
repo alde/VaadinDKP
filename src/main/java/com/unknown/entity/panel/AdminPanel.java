@@ -55,6 +55,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private CharacterList characterList = null;
         private DkpList dkpList = null;
         private ItemList itemList = null;
+        private String fname;
 
         public AdminPanel() {
                 this.attach();
@@ -191,19 +192,25 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 if (isSuperAdmin()) {
                         databaseBox.addItem("Devel");
                 }
-                databaseBox.setNullSelectionAllowed(false);
                 databaseBox.setImmediate(true);
                 databaseBox.setNewItemsAllowed(false);
-                databaseBox.setValue(UnknownEntityDKP.getInstance().fileName);
                 triggerDatabaseChange();
         }
 
         private void triggerDatabaseChange() {
+                if (this.fname == null) {
+                        this.fname = UnknownEntityDKP.getInstance().fileName;
+                }
                 UnknownEntityDKP.getInstance().closeDatabase();
-                UnknownEntityDKP.getInstance().setDatabase(databaseBox.getValue().toString());
+                UnknownEntityDKP.getInstance().setDatabase(this.fname);
                 notifyListeners();
         }
 
+        
+                private void setDatabase(String selected) {
+                        this.fname = selected;
+                }
+        
         private class AddItemListener implements ClickListener {
 
                 @Override
@@ -350,6 +357,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
                 @Override
                 public void valueChange(ValueChangeEvent event) {
+                        setDatabase(event.getProperty().getValue().toString());
                         triggerDatabaseChange();
                 }
         }

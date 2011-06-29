@@ -438,10 +438,10 @@ public class RaidDB {
                 return raids;
         }
 
-        public static int getTotalRaidsLastSixtyDays() {
+        public static int getTotalRaidsLastNDays(int n) {
                 int total_raids = 0;
                 DateTime dt = new DateTime();
-                String startdate = dt.toYearMonthDay().minusDays(60).toString();
+                String startdate = dt.toYearMonthDay().minusDays(n).toString();
                 String enddate = dt.toYearMonthDay().toString();
                 try {
 
@@ -457,10 +457,10 @@ public class RaidDB {
                 return total_raids;
         }
 
-        public static int getAttendedRaidsLastSixtyDays(User user) {
+        public static int getAttendedRaidsLastNDays(int n, User user) {
                 int i = 0;
                 DateTime dt = new DateTime();
-                String startdate = dt.toYearMonthDay().minusDays(60).toString();
+                String startdate = dt.toYearMonthDay().minusDays(n).toString();
                 String enddate = dt.toYearMonthDay().toString();
                 try {
                         PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT DISTINCT raid_id FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");

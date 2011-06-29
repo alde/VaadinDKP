@@ -68,5 +68,5 @@ public class GetRaidsJSON extends HttpServlet {
         @Override
         public String getServletInfo() {
                 return "Short description";
-        }// </editor-fold>
+        }
 }

@@ -22,11 +22,6 @@ public final class DBConnection {
                 }
         }
 
-//        public Connection Connect() {
-//                UnknownEntityDKP.getInstance().fileName = database;
-//                return this.connect();
-//        }
-
         public Connection connect() {
                 properties = getProperties();
                 try {
@@ -48,23 +43,6 @@ public final class DBConnection {
                         throw new SQLRuntimeException(ex);
                 }
                 return ps;
-        }
-
-        public void closeStatement() {
-                if (ps != null) {
-                        try {
-                                if (ps.getResultSet() != null) {
-                                        ps.getResultSet().close();
-                                }
-                        } catch (SQLException ex) {
-                                //Ignore
-                        }
-                        try {
-                                ps.close();
-                        } catch (SQLException ex) {
-                                //Ignore
-                        }
-                }
         }
 
         private Properties getProperties() {
