@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.panel;
 
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -9,10 +6,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Window;
 
-/**
- *
- * @author alde
- */
+
 class ViewLogWindow extends Window {
 
         private LogTable logs;

@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity;
 
 import com.unknown.entity.character.*;
@@ -16,10 +13,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alde
- */
+
 public class PopUpControl extends Window {
 
         private ItemList itemList;

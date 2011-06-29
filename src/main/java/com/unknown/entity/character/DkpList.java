@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity.character;
 
 import com.unknown.entity.Armor;
@@ -9,11 +5,9 @@ import com.unknown.entity.PopUpControl;
 import com.unknown.entity.database.CharDB;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.RaidList;
-import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ItemSorter;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Label;
@@ -21,10 +15,6 @@ import com.vaadin.ui.Table;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- *
- * @author bobo
- */
 public class DkpList extends Table implements CharacterInfoListener {
 
         private IndexedContainer ic;
@@ -32,11 +22,9 @@ public class DkpList extends Table implements CharacterInfoListener {
         private CharacterList charList;
         private ItemList itemList;
         private RaidList raidList;
-        private Application app;
 
-        public DkpList(Application app) {
+        public DkpList() {
                 this.ic = new IndexedContainer();
-                this.app = app;
                 this.setSelectable(true);
                 this.setWidth("185px");
                 this.setHeight("650px");

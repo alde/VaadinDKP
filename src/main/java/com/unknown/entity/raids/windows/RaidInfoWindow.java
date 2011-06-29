@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.character.CharacterList;
@@ -14,10 +11,7 @@ import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidInfoWindow extends Window {
 
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();

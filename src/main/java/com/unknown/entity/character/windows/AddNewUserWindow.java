@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.character.windows;
 
 import com.unknown.entity.database.CharDB;
@@ -18,10 +15,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- *
- * @author alde
- */
+
 public class AddNewUserWindow extends Window {
 
         final TextField username;

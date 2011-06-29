@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.items.windows;
 
 import com.unknown.entity.database.*;
@@ -34,10 +31,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alde
- */
+
 public class ItemEditWindow extends Window {
 
         private Items item;

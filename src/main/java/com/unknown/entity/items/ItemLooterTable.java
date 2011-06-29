@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.items;
 
 import com.unknown.entity.database.CharDB;
@@ -12,10 +9,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class ItemLooterTable extends Table {
 
         IndexedContainer ic = new IndexedContainer();

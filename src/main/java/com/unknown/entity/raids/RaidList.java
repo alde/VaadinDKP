@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
@@ -18,10 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidList extends Table implements RaidInfoListener {
         IndexedContainer ic;
         private final RaidList raidList = this;

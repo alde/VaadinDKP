@@ -1,8 +1,4 @@
-/*
- *
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.database;
 
 import com.google.common.base.Predicate;
@@ -11,14 +7,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import com.unknown.entity.DBConnection;
 import com.unknown.entity.Logg;
 import com.unknown.entity.Role;
+import com.unknown.entity.UnknownEntityDKP;
 import com.unknown.entity.character.CharacterItem;
 import com.unknown.entity.character.User;
-import com.vaadin.Application;
 import java.math.*;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,39 +23,32 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- *
- * @author alde 
- */
+
 public class CharDB {
-
+        
         private static List<User> cachedUsers = new ArrayList<User>();
-
+       
         public static List<User> getUsers() {
                 if (cachedUsers != null) {
                         if (!cachedUsers.isEmpty()) {
                                 return new ArrayList(cachedUsers);
                         }
                 }
-                Connection c = null;
                 List<User> users = new ArrayList<User>();
                 try {
-                        c = new DBConnection().getConnection();
                         int totalshares = 0;
                         int totaladjustments = 0;
                         double loot_value = 0.0;
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id");
                         ResultSet rs = p.executeQuery();
-                        PreparedStatement ploot = c.prepareStatement("SELECT * FROM loots JOIN characters where loots.character_id=characters.id");
+                        PreparedStatement ploot = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM loots JOIN characters where loots.character_id=characters.id");
                         ResultSet rsloot = ploot.executeQuery();
-                        PreparedStatement ps = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON character_rewards.reward_id=rewards.id AND characters.id=character_rewards.character_id");
+                        PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON character_rewards.reward_id=rewards.id AND characters.id=character_rewards.character_id");
                         ResultSet rss = ps.executeQuery();
-                        PreparedStatement totalShares = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
+                        PreparedStatement totalShares = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
                         ResultSet rsTotalShares = totalShares.executeQuery();
-                        PreparedStatement pAdjust = c.prepareStatement("SELECT SUM(shares) AS pun FROM adjustments");
+                        PreparedStatement pAdjust = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT SUM(shares) AS pun FROM adjustments");
                         ResultSet rsAdjust = pAdjust.executeQuery();
                         while (rsAdjust.next()) {
                                 totaladjustments = rsAdjust.getInt("pun");
@@ -102,8 +89,7 @@ public class CharDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
+                
                 }
                 cachedUsers = users;
                 return users;
@@ -148,45 +134,42 @@ public class CharDB {
         }
 
         public static int getCharacterClassId(String charclass) {
-                DBConnection c = new DBConnection();
                 int classid = 0;
                 try {
-                        PreparedStatement pclass = c.prepareStatement("SELECT id FROM character_classes WHERE name=?");
+                        PreparedStatement pclass = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT id FROM character_classes WHERE name=?");
                         pclass.setString(1, fixRole(charclass));
                         ResultSet rclass = pclass.executeQuery();
                         while (rclass.next()) {
                                 classid = rclass.getInt("id");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return classid;
         }
 
         public static int getCharacterId(String charname) {
-                DBConnection c = new DBConnection();
+               
                 int charid = 0;
                 try {
-                        PreparedStatement pclass = c.prepareStatement("SELECT id FROM characters WHERE name=?");
+                        PreparedStatement pclass = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT id FROM characters WHERE name=?");
                         pclass.setString(1, charname);
                         ResultSet rclass = pclass.executeQuery();
                         while (rclass.next()) {
                                 charid = rclass.getInt("id");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
+                
+                        
                 }
                 return charid;
         }
 
         private static List<CharacterItem> getItemsForCharacter(int charId) {
-                Connection c = null;
+               
                 List<CharacterItem> itemlist = new ArrayList<CharacterItem>();
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM loots JOIN items WHERE loots.character_id=? AND loots.item_id=items.id");
+                      
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM loots JOIN items WHERE loots.character_id=? AND loots.item_id=items.id");
                         p.setInt(1, charId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -199,25 +182,23 @@ public class CharDB {
                                 itemlist.add(charitem);
                         }
                 } catch (SQLException e) {
-                } finally {
-                        closeConnection(c);
                 }
                 return itemlist;
         }
 
         public static String getRoleForCharacter(String name) {
-                DBConnection c = new DBConnection();
+               
                 String foo = "";
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id WHERE characters.name=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM characters JOIN character_classes ON characters.character_class_id=character_classes.id WHERE characters.name=?");
                         p.setString(1, name);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 foo = rs.getString("character_classes.name");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
+                
+                        
                 }
                 return foo;
         }
@@ -227,19 +208,17 @@ public class CharDB {
         }
 
         public static int addNewSiteUser(String username, String password, int rank) {
-                Connection c = null;
+               
                 int success = 0;
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("INSERT INTO users (name, password, rank) VALUES(?,?,?)");
+                      
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO users (name, password, rank) VALUES(?,?,?)");
                         p.setString(1, username);
                         p.setString(2, password);
                         p.setInt(3, rank);
                         success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Added Site User [" + username + "] with Rank: " + rank);
                 return success;
@@ -256,8 +235,8 @@ public class CharDB {
 
         public static Double getAttendanceRaids(User user) {
                 Double foo = 0.0;
-                int amountofRaids = RaidDB.getTotalRaidsLastThirtyDays();
-                int attendedRaids = RaidDB.getAttendedRaidsLastThirtyDays(user);
+                int amountofRaids = RaidDB.getTotalRaidsLastSixtyDays();
+                int attendedRaids = RaidDB.getAttendedRaidsLastSixtyDays(user);
                 double temp = 0;
                 if (amountofRaids == 0) {
                         temp = 0;
@@ -269,34 +248,32 @@ public class CharDB {
         }
 
         public static void removeLootFromCharacter(String itemname, User user) {
-                Connection c = null;
+               
 
                 try {
-                        c = new DBConnection().getConnection();
+                       
                         int charid = getCharacterId(user.getUsername());
                         int itemid = ItemDB.getItemId(itemname);
-                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
                         p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Removed Loot [" + itemname + " from " + user.getUsername() + "]");
         }
 
         public static void updateLootForCharacter(String itemname, double price, boolean heroic, User user,
                 int lootid) {
-                Connection c = null;
+               
 
                 try {
-                        c = new DBConnection().getConnection();
+                       
                         int charid = getCharacterId(user.getUsername());
                         int itemid = ItemDB.getItemId(itemname);
 
-                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE loots SET item_id=? , character_id=?, price=?, heroic=? WHERE id=?");
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
                         p.setDouble(3, price);
@@ -305,89 +282,73 @@ public class CharDB {
                         int success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Updated Loot for " + user.getUsername() + " [" + itemname + " | " + price + "dkp]");
         }
-
-        private static void closeConnection(Connection c) {
-                try {
-                        c.close();
-                } catch (SQLException ex) {
-                        Logger.getLogger(CharDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
-        }
-
         public static void deleteCharacter(User user) {
-                Connection c = null;
+               
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("DELETE FROM characters WHERE id=?");
+                       
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM characters WHERE id=?");
                         p.setInt(1, user.getId());
                         p.executeUpdate();
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Deleted Character [" + user.getUsername() + " | " + user.getRole().toString() + "]");
         }
 
         public static List<String> getSiteUsers() {
-                DBConnection c = new DBConnection();
                 List<String> users = new ArrayList<String>();
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM users");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM users");
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 users.add(rs.getString("name"));
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return users;
         }
 
         public static int getSiteUserId(String username) {
-                DBConnection c = new DBConnection();
+               
                 int id = 0;
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM users WHERE name=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM users WHERE name=?");
                         p.setString(1, username);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 id = rs.getInt("id");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
+                
+                        
                 }
                 return id;
         }
 
         public static void updateSiteUser(String username, String password, int level) {
-                DBConnection c = new DBConnection();
+               
                 try {
-                        PreparedStatement p = c.prepareStatement("UPDATE users SET name=? , password = ? , rank = ? WHERE id = ?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE users SET name=? , password = ? , rank = ? WHERE id = ?");
                         p.setString(1, username);
                         p.setString(2, password);
                         p.setInt(3, level);
                         p.setInt(4, getSiteUserId(username));
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
+                
+                        
                 }
                 addLog("Updated Site User [" + username + " | Rank: " + level + "]");
         }
 
         public static int getSiteUserLevel(String name) {
-                DBConnection c = new DBConnection();
+               
                 int level = 1;
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM users WHERE name=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM users WHERE name=?");
                         p.setString(1, name);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -395,8 +356,8 @@ public class CharDB {
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
+                
+                        
                 }
                 return level;
         }
@@ -421,18 +382,18 @@ public class CharDB {
         }
 
         private static int getTotalAdjustmentsForCharacter(int userid) {
-                DBConnection c = new DBConnection();
+               
                 int total = 0;
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT SUM(shares) AS pun FROM adjustments WHERE character_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT SUM(shares) AS pun FROM adjustments WHERE character_id=?");
                         p.setInt(1, userid);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 total = rs.getInt("pun");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
+                
+                        
                 }
                 return total;
         }
@@ -440,17 +401,17 @@ public class CharDB {
         public static Integer getShares(int id) {
                 int adjustments = getTotalAdjustmentsForCharacter(id);
                 int shares = 0;
-                DBConnection c = new DBConnection();
+               
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT SUM(number_of_shares) AS shares FROM rewards JOIN character_rewards WHERE rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT SUM(number_of_shares) AS shares FROM rewards JOIN character_rewards WHERE rewards.id=character_rewards.reward_id AND character_rewards.character_id=?");
                         p.setInt(1, id);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 shares = rs.getInt("shares");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
+                
+                        
                 }
                 return shares - adjustments;
         }
@@ -481,13 +442,13 @@ public class CharDB {
         }
 
         public static int addNewCharacter(String name, String role, Boolean isActive) {
-                Connection c = null;
+               
                 int class_id = 0, update = 0;
 
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO characters (name, character_class_id, active, user_id) VALUES(?,?,?,NULL)");
-                        PreparedStatement pclass = c.prepareStatement("SELECT * FROM character_classes WHERE name=?");
+                       
+                        PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO characters (name, character_class_id, active, user_id) VALUES(?,?,?,NULL)");
+                        PreparedStatement pclass = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM character_classes WHERE name=?");
                         pclass.setString(1, fixRole(role));
                         ResultSet rsclass = pclass.executeQuery();
 
@@ -501,8 +462,6 @@ public class CharDB {
 
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Added character [" + name + " | " + role.toString() + "]");
                 return update;
@@ -517,12 +476,12 @@ public class CharDB {
         }
 
         public static int updateCharacter(User user, String name, String charclass, boolean active) {
-                Connection c = null;
+               
                 int success = 0;
                 try {
-                        c = new DBConnection().getConnection();
+                       
                         int classid = getCharacterClassId(charclass);
-                        PreparedStatement p = c.prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE characters SET name=? , character_class_id=? , active=? , user_id=NULL WHERE id=?");
                         p.setString(1, name);
                         p.setInt(2, classid);
                         p.setBoolean(3, active);
@@ -530,8 +489,6 @@ public class CharDB {
                         success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 String foo = "";
                 if (user.getUsername().equalsIgnoreCase(name)) {

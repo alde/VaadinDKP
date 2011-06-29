@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.character.windows;
 
 import com.unknown.entity.PopUpControl;
@@ -39,10 +36,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class CharacterEditWindow extends Window implements CharacterInfoListener {
 
         private User user;
@@ -350,7 +344,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 Double attendance = user.getAttendance();
                 
                 Label attended = new Label();
-                attended.setValue("Attended " + attendance + "% of raids the last 30 days.");
+                attended.setValue("Attended " + attendance + "% of raids the last 60 days.");
                 if (attendance >= 0 && attendance < 50) {
                         attended.setStyleName("negative");
                 } else if (attendance > 50 && attendance < 65) {
@@ -440,7 +434,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 public void itemClick(ItemClickEvent event) {
                         if (event.isCtrlKey() && event.isShiftKey()) {
                                 Adjustment p = (Adjustment) event.getItemId();
-                                // RaidDB.setApplication(app);
+                               
                                 RaidDB.removeAdjustment(p);
                                 notifyListeners();
                                 update();

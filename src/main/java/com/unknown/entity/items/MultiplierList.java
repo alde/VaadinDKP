@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.items;
 
 import com.unknown.entity.database.ItemDB;
@@ -13,10 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class MultiplierList extends Table {
 
         IndexedContainer ic;

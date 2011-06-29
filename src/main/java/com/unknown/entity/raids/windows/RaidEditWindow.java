@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
@@ -21,10 +18,7 @@ import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidEditWindow extends Window {
 
         private final Raid raid;
@@ -119,14 +113,14 @@ public class RaidEditWindow extends Window {
         }
 
         private void deleteRaid() {
-                // RaidDB.setApplication(app);
+               
                 RaidDB.safelyRemoveRaid(raid);
                 notifyListeners();
                 close();
         }
 
         private void updateRaid(String raidzoneName, String raidcomment, String raiddate) {
-                // RaidDB.setApplication(app);
+               
                 RaidDB.doRaidUpdate(raid, raidzoneName, raidcomment, raiddate);
         }
 

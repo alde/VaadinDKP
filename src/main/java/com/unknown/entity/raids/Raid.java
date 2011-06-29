@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids;
 
 import com.google.common.collect.ImmutableList;
@@ -9,10 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class Raid {
 
 	private String raidname;

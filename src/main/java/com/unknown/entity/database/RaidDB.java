@@ -1,15 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity.database;
 
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.character.Adjustment;
-import com.unknown.entity.DBConnection;
 import com.unknown.entity.character.User;
 import com.unknown.entity.raids.*;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,16 +13,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.unknown.entity.Logg;
-import com.vaadin.Application;
+import com.unknown.entity.UnknownEntityDKP;
 import org.joda.time.DateTime;
 
-/**
- *
- * @author alde
- */
 public class RaidDB {
 
         private static List<Raid> raidCache = new ArrayList<Raid>();
@@ -39,11 +27,9 @@ public class RaidDB {
                                 return new ArrayList(raidCache);
                         }
                 }
-                Connection c = null;
                 List<Raid> raids = new ArrayList<Raid>();
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM raids JOIN zones ON raids.zone_id=zones.id");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM raids JOIN zones ON raids.zone_id=zones.id");
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
                                 final Raid raid = new Raid(rs.getString("zones.name"), rs.getString("raids.comment"), rs.getString("raids.date"), rs.getInt("raids.id"));
@@ -51,8 +37,6 @@ public class RaidDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 raidCache = raids;
                 return raids;
@@ -63,11 +47,9 @@ public class RaidDB {
         }
 
         public static List<RaidChar> getCharsForRaid(int raidId) {
-                Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=characters.id");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM rewards JOIN character_rewards JOIN characters ON rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=characters.id");
                         p.setInt(1, raidId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -80,38 +62,30 @@ public class RaidDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 return raidChars;
         }
 
         public static List<String> getRaidZoneList() {
                 List<String> zones = new ArrayList<String>();
-                Connection c = null;
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones");
+                        PreparedStatement pzone = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM zones");
                         ResultSet rzone = pzone.executeQuery();
                         while (rzone.next()) {
                                 zones.add(rzone.getString("name"));
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 return zones;
         }
 
         public static int addNewRaid(String zone, String comment, String date) {
-                Connection c = null;
                 int result = 0;
                 int zoneId = 0;
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO raids (zone_id, date, comment) VALUES(?,?,?)");
-                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
+                        PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO raids (zone_id, date, comment) VALUES(?,?,?)");
+                        PreparedStatement pzone = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM zones WHERE name=?");
                         pzone.setString(1, zone);
                         ResultSet rzone = pzone.executeQuery();
                         while (rzone.next()) {
@@ -123,34 +97,29 @@ public class RaidDB {
                         result = ps.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Added Raid [" + zone + " | " + comment + "]");
                 return result;
         }
 
-        private static void addCharsToReward(List<Integer> newcharid, RaidReward reward) throws SQLException {
-                DBConnection connection = new DBConnection();
+        private static void addCharsToReward(List<Integer> newcharid, RaidReward reward) {
                 try {
-                        PreparedStatement p = connection.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) VALUES (?,?)");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO character_rewards (reward_id, character_id) VALUES (?,?)");
                         for (Integer i : newcharid) {
                                 p.setInt(1, reward.getId());
                                 p.setInt(2, i);
                                 p.addBatch();
                         }
                         p.executeBatch();
-                } finally {
-                        connection.close();
+                } catch(SQLException e) {
+                        e.printStackTrace();
                 }
         }
 
         public static Collection<RaidReward> getRewardsForRaid(int raidId) {
-                Connection c = null;
                 List<RaidReward> raidRewards = new ArrayList<RaidReward>();
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM rewards WHERE rewards.raid_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM rewards WHERE rewards.raid_id=?");
                         p.setInt(1, raidId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -163,18 +132,14 @@ public class RaidDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 return raidRewards;
         }
 
         public static Collection<RaidItem> getItemsForRaid(int raidId) {
-                Connection c = null;
                 List<RaidItem> raidItems = new ArrayList<RaidItem>();
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("SELECT characters.name,items.id,items.name,loots.price,items.quality,loots.heroic FROM loots JOIN items JOIN characters WHERE loots.item_id=items.id AND loots.character_id=characters.id AND loots.raid_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT characters.name,items.id,items.name,loots.price,items.quality,loots.heroic FROM loots JOIN items JOIN characters WHERE loots.item_id=items.id AND loots.character_id=characters.id AND loots.raid_id=?");
                         p.setInt(1, raidId);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -190,18 +155,14 @@ public class RaidDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 return raidItems;
         }
 
         public static Collection<RaidChar> getCharsForReward(int id) {
-                Connection c = null;
                 List<RaidChar> raidChars = new ArrayList<RaidChar>();
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement(" SELECT * FROM character_rewards JOIN rewards JOIN characters WHERE character_rewards.reward_id=? AND rewards.id=? AND characters.id=character_rewards.character_id");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement(" SELECT * FROM character_rewards JOIN rewards JOIN characters WHERE character_rewards.reward_id=? AND rewards.id=? AND characters.id=character_rewards.character_id");
                         p.setInt(1, id);
                         p.setInt(2, id);
                         ResultSet rs = p.executeQuery();
@@ -216,19 +177,15 @@ public class RaidDB {
                 } catch (SQLException e) {
                         e.printStackTrace();
 
-                } finally {
-                        closeConnection(c);
                 }
                 return raidChars;
         }
 
         public static int doRaidUpdate(Raid raid, String raidzoneName, String raidcomment, String raiddate) {
                 int success = 0;
-                Connection c = null;
                 int zoneid = getZoneIdByName(raidzoneName);
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("UPDATE raids SET zone_id=? , date=? , comment=? WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE raids SET zone_id=? , date=? , comment=? WHERE id=?");
                         p.setInt(1, zoneid);
                         p.setString(2, raiddate);
                         p.setString(3, raidcomment);
@@ -236,8 +193,6 @@ public class RaidDB {
                         success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 String foo = "";
                 if (raid.getComment().equalsIgnoreCase(raidcomment)) {
@@ -256,50 +211,40 @@ public class RaidDB {
         }
 
         public static int getZoneIdByName(String raidzoneName) {
-                DBConnection c = new DBConnection();
                 int zoneid = 1;
                 try {
-                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
+                        PreparedStatement pzone = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM zones WHERE name=?");
                         pzone.setString(1, raidzoneName);
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
                                 zoneid = rs.getInt("id");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return zoneid;
         }
 
         public static String getZoneNameById(int raidzoneid) {
-                DBConnection c = new DBConnection();
                 String zonename = "";
                 try {
-                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE id=?");
+                        PreparedStatement pzone = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM zones WHERE id=?");
                         pzone.setInt(1, raidzoneid);
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
                                 zonename = rs.getString("name");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return zonename;
         }
 
         public static int doUpdateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
-                Connection c = null;
                 int success = 0;
                 try {
-                        c = new DBConnection().getConnection();
-                        doUpdateCharacters(c, reward, newAttendants);
-                        success += doUpdateSharesAndComment(c, reward, newShares, newComment);
+                        doUpdateCharacters(reward, newAttendants);
+                        success += doUpdateSharesAndComment(reward, newShares, newComment);
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 String foo = "";
                 if (reward.getComment().equalsIgnoreCase(newComment)) {
@@ -322,31 +267,30 @@ public class RaidDB {
                 return success;
         }
 
-        private static void doUpdateCharacters(Connection c, RaidReward reward, List<String> newAttendants) throws SQLException {
+        private static void doUpdateCharacters(RaidReward reward, List<String> newAttendants) throws SQLException {
                 List<Integer> newcharid = new ArrayList<Integer>();
                 newAttendants = removeDuplicates(newAttendants);
                 for (String s : newAttendants) {
                         newcharid.add(CharDB.getCharacterId(s));
                 }
-                removeAllExistingCharactersFromReward(reward, newAttendants, newcharid);
+                removeAllExistingCharactersFromReward(reward);
                 addCharsToReward(newcharid, reward);
 
         }
 
-        private static void removeAllExistingCharactersFromReward(RaidReward reward, List<String> newAttendants, List<Integer> newcharclassid) throws SQLException {
-                DBConnection c = new DBConnection();
+        private static void removeAllExistingCharactersFromReward(RaidReward reward) {
                 try {
 
-                        PreparedStatement p = c.prepareStatement("DELETE FROM character_rewards WHERE reward_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM character_rewards WHERE reward_id=?");
                         p.setInt(1, reward.getId());
                         p.executeUpdate();
-                } finally {
-                        c.close();
+                } catch(SQLException e) {
+                        e.printStackTrace();
                 }
         }
 
-        private static int doUpdateSharesAndComment(Connection c, RaidReward reward, int newShares, String newComment) throws SQLException {
-                PreparedStatement p = c.prepareStatement("UPDATE rewards SET number_of_shares=? , comment=? WHERE id=?");
+        private static int doUpdateSharesAndComment(RaidReward reward, int newShares, String newComment) throws SQLException {
+                PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE rewards SET number_of_shares=? , comment=? WHERE id=?");
                 p.setInt(1, newShares);
                 p.setString(2, newComment);
                 p.setInt(3, reward.getId());
@@ -361,12 +305,10 @@ public class RaidDB {
         }
 
         public static void addLootToRaid(Raid raid, String name, String loot, boolean heroic, double price) {
-                Connection c = null;
                 try {
-                        c = new DBConnection().getConnection();
                         int itemid = ItemDB.getItemId(loot);
                         int charid = CharDB.getCharacterId(name);
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO loots (item_id, raid_id, character_id, price, heroic) VALUES(?,?,?,?,?)");
+                        PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO loots (item_id, raid_id, character_id, price, heroic) VALUES(?,?,?,?,?)");
                         ps.setInt(1, itemid);
                         ps.setInt(2, raid.getId());
                         ps.setInt(3, charid);
@@ -375,27 +317,21 @@ public class RaidDB {
                         ps.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Added Loot [" + name + " looted " + loot + " in " + raid.getComment() + "]");
         }
 
         public static int removeReward(RaidReward reward) {
-                Connection c = null;
                 int success = 0;
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("DELETE FROM rewards WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM rewards WHERE id=?");
                         p.setInt(1, reward.getId());
                         success += p.executeUpdate();
-                        p = c.prepareStatement("DELETE FROM character_rewards WHERE reward_id=?");
+                        p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM character_rewards WHERE reward_id=?");
                         p.setInt(1, reward.getId());
                         success += p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Removed Reward [" + reward.getComment() + "]");
                 return success;
@@ -408,9 +344,8 @@ public class RaidDB {
         }
 
         private static RaidReward doAddReward(RaidReward reward) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
                         p.setInt(1, reward.getShares());
                         p.setString(2, reward.getComment());
                         p.setInt(3, reward.getRaidId());
@@ -421,17 +356,14 @@ public class RaidDB {
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 addLog("Added Reward [" + reward.getComment() + " | " + reward.getShares() + " shares]");
                 return reward;
         }
 
         private static void doAddCharacterReward(RaidReward reward) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO character_rewards (reward_id, character_id) values(?,?)");
                         for (RaidChar eachid : reward.getRewardChars()) {
                                 p.setInt(1, reward.getId());
                                 p.setInt(2, eachid.getId());
@@ -439,26 +371,19 @@ public class RaidDB {
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
         }
 
         public static int removeLootFromRaid(RaidItem item) {
-                Connection c = null;
                 int success = 0;
                 int charid = CharDB.getCharacterId(item.getLooter());
                 try {
-                        c = new DBConnection().getConnection();
-                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM loots WHERE item_id=? AND character_id=?");
                         p.setInt(1, item.getId());
                         p.setInt(2, charid);
-                        System.out.println(p.toString());
                         success = p.executeUpdate();
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        closeConnection(c);
                 }
                 addLog("Removed Loot [" + item.getName() + " from " + item.getLooter() + "]");
                 return success;
@@ -480,10 +405,9 @@ public class RaidDB {
         }
 
         public static RaidChar getRaidChar(int charId, int raidId) {
-                DBConnection c = new DBConnection();
                 RaidChar rchar = new RaidChar();
                 try {
-                        PreparedStatement p = c.prepareStatement(" SELECT DISTINCT * FROM rewards JOIN character_rewards JOIN characters WHERE rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=? AND character_rewards.character_id=characters.id");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement(" SELECT DISTINCT * FROM rewards JOIN character_rewards JOIN characters WHERE rewards.raid_id=? AND rewards.id=character_rewards.reward_id AND character_rewards.character_id=? AND character_rewards.character_id=characters.id");
                         p.setInt(1, raidId);
                         p.setInt(2, charId);
                         ResultSet rs = p.executeQuery();
@@ -495,17 +419,14 @@ public class RaidDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 return rchar;
         }
 
         public static List<Raid> getRaidsForCharacter(int charid) {
                 List<Raid> raids = new ArrayList<Raid>();
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT DISTINCT raids.* FROM raids JOIN rewards JOIN characters JOIN character_rewards WHERE characters.id=? AND rewards.raid_id=raids.id AND character_rewards.character_id=characters.id AND character_rewards.reward_id=rewards.id");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT DISTINCT raids.* FROM raids JOIN rewards JOIN characters JOIN character_rewards WHERE characters.id=? AND rewards.raid_id=raids.id AND character_rewards.character_id=characters.id AND character_rewards.reward_id=rewards.id");
                         p.setInt(1, charid);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -513,21 +434,18 @@ public class RaidDB {
                                 raids.add(raidtemp);
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return raids;
         }
 
-        public static int getTotalRaidsLastThirtyDays() {
+        public static int getTotalRaidsLastSixtyDays() {
                 int total_raids = 0;
                 DateTime dt = new DateTime();
-                String startdate = dt.toYearMonthDay().minusDays(30).toString();
+                String startdate = dt.toYearMonthDay().minusDays(60).toString();
                 String enddate = dt.toYearMonthDay().toString();
-                DBConnection c = new DBConnection();
                 try {
 
-                        PreparedStatement p = c.prepareStatement("SELECT COUNT(distinct raids.id) as total_raids FROM raids JOIN rewards WHERE raids.id=rewards.raid_id AND date BETWEEN ? AND ?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT COUNT(distinct raids.id) as total_raids FROM raids JOIN rewards WHERE raids.id=rewards.raid_id AND date BETWEEN ? AND ?");
                         p.setString(1, startdate);
                         p.setString(2, enddate);
                         ResultSet rs = p.executeQuery();
@@ -535,20 +453,17 @@ public class RaidDB {
                                 total_raids = rs.getInt("total_raids");
                         }
                 } catch (SQLException e) {
-                } finally {
-                        c.close();
                 }
                 return total_raids;
         }
 
-        public static int getAttendedRaidsLastThirtyDays(User user) {
+        public static int getAttendedRaidsLastSixtyDays(User user) {
                 int i = 0;
                 DateTime dt = new DateTime();
-                String startdate = dt.toYearMonthDay().minusDays(30).toString();
+                String startdate = dt.toYearMonthDay().minusDays(60).toString();
                 String enddate = dt.toYearMonthDay().toString();
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT DISTINCT raid_id FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT DISTINCT raid_id FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
                         p.setInt(1, user.getId());
                         p.setString(2, startdate);
                         p.setString(3, enddate);
@@ -558,18 +473,15 @@ public class RaidDB {
                         }
                 } catch (SQLException e) {
                         e.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 return i;
         }
 
         public static boolean getLootedHeroic(String charname, int itemid, double price) {
-                DBConnection c = new DBConnection();
                 boolean isheroic = false;
                 int charid = CharDB.getCharacterId(charname);
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT DISTINCT * FROM loots WHERE item_id=? AND character_id=? AND price=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT DISTINCT * FROM loots WHERE item_id=? AND character_id=? AND price=?");
                         p.setInt(1, itemid);
                         p.setInt(2, charid);
                         p.setDouble(3, price);
@@ -579,8 +491,6 @@ public class RaidDB {
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 return isheroic;
         }
@@ -589,9 +499,8 @@ public class RaidDB {
                 int itemid = ItemDB.getItemId(itemname);
                 int charid = CharDB.getCharacterId(looter);
                 int success = 0;
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("UPDATE loots SET item_id=? , raid_id=? , character_id=? , price=? , heroic=? WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE loots SET item_id=? , raid_id=? , character_id=? , price=? , heroic=? WHERE id=?");
                         p.setInt(1, itemid);
                         p.setInt(2, raidid);
                         p.setInt(3, charid);
@@ -601,92 +510,67 @@ public class RaidDB {
                         success = p.executeUpdate();
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 addLog("Updated Loot [" + itemname + " looted by " + looter + " (id: " + lootid + ")]");
                 return success;
         }
 
-        private static void closeConnection(Connection c) {
-                try {
-                        c.close();
-                } catch (SQLException ex) {
-                        Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
-                }
-        }
-
         public static void removeZone(String zone) {
                 fixExistingZonesToDefaultWhenRemovingThatZone(zone);
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("DELETE FROM zones WHERE name=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM zones WHERE name=?");
                         p.setString(1, zone);
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 addLog("Removed Zone [" + zone + "]");
         }
 
         public static void addZone(String zone) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("INSERT INTO zones (name) VALUES(?)");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO zones (name) VALUES(?)");
                         p.setString(1, zone);
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 addLog("Added Zone [" + zone + "]");
         }
 
         private static void fixExistingZonesToDefaultWhenRemovingThatZone(String zone) {
-                DBConnection c = new DBConnection();
                 int zoneid = 1;
                 try {
                         zoneid = getZoneIdByName(zone);
-                        PreparedStatement p = c.prepareStatement("UPDATE raids SET zone_id=? WHERE zone_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE raids SET zone_id=? WHERE zone_id=?");
                         p.setInt(1, 1);
                         p.setInt(2, zoneid);
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
         }
 
         public static void updateZoneName(String oldZone, String newZone) {
-                DBConnection c = new DBConnection();
                 int zoneid = 0;
                 try {
                         zoneid = getZoneIdByName(oldZone);
-                        PreparedStatement p = c.prepareStatement("UPDATE zones SET name=? WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("UPDATE zones SET name=? WHERE id=?");
                         p.setString(1, newZone);
                         p.setInt(2, zoneid);
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 addLog("Renamed Zone [" + oldZone + " to " + newZone + "]");
         }
 
         private static int getValidZoneByName(String raidzoneName) {
-                DBConnection c = new DBConnection();
                 int zoneid = 0;
                 try {
-                        PreparedStatement pzone = c.prepareStatement("SELECT * FROM zones WHERE name=?");
+                        PreparedStatement pzone = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM zones WHERE name=?");
                         pzone.setString(1, raidzoneName);
                         ResultSet rs = pzone.executeQuery();
                         while (rs.next()) {
                                 zoneid = rs.getInt("id");
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return zoneid;
         }
@@ -708,38 +592,29 @@ public class RaidDB {
         }
 
         private static void deleteRewardsForRaid(Raid raid) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("DELETE FROM rewards WHERE raid_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM rewards WHERE raid_id=?");
                         p.setInt(1, raid.getId());
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
         }
 
         private static void deleteLootsForRaid(Raid raid) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("DELETE FROM loots WHERE raid_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM loots WHERE raid_id=?");
                         p.setInt(1, raid.getId());
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
         }
 
         private static void deleteRaid(Raid raid) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("DELETE FROM raids WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM raids WHERE id=?");
                         p.setInt(1, raid.getId());
                         p.executeUpdate();
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 addLog("Removed Raid [" + raid.getDate() + " | " + raid.getComment() + " | " + raid.getRaidname() + "]");
         }
@@ -755,9 +630,8 @@ public class RaidDB {
 
         public static List<Adjustment> getAdjustmentsForCharacter(int charid) {
                 List<Adjustment> pun = new ArrayList<Adjustment>();
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT * FROM adjustments WHERE character_id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT * FROM adjustments WHERE character_id=?");
                         p.setInt(1, charid);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -770,8 +644,6 @@ public class RaidDB {
                                 pun.add(pTemp);
                         }
                 } catch (SQLException ex) {
-                } finally {
-                        c.close();
                 }
                 return pun;
         }
@@ -782,9 +654,8 @@ public class RaidDB {
         }
 
         private static Adjustment doAddAdjustment(Adjustment p) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO adjustments (shares, comment, character_id, date) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                        PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().prepareStatement("INSERT INTO adjustments (shares, comment, character_id, date) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
                         ps.setInt(1, p.getShares());
                         ps.setString(2, p.getComment());
                         ps.setInt(3, p.getCharId());
@@ -796,26 +667,20 @@ public class RaidDB {
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 addLog("Added adjustment [" + p.getDate() + " | " + p.getComment() + " (" + p.getShares() + " shares)] to " + getCharacter(p.getCharId()));
                 return p;
         }
 
         public static void removeAdjustment(Adjustment p) {
-                DBConnection c = new DBConnection();
                 try {
-                        PreparedStatement ps = c.prepareStatement("DELETE FROM adjustments WHERE id=?");
+                        PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().prepareStatement("DELETE FROM adjustments WHERE id=?");
                         ps.setInt(1, p.getId());
                         ps.executeUpdate();
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 addLog("Removed adjustment [" + p.getDate() + " | " + p.getComment() + " (" + p.getShares() + " shares)] from " + getCharacter(p.getCharId()));
-
         }
         
         private static void addLog(String message) {
@@ -824,10 +689,9 @@ public class RaidDB {
         }
 
         private static String getCharacter(int id) {
-                DBConnection c = new DBConnection();
                 String foo = "";
                 try {
-                        PreparedStatement p = c.prepareStatement("SELECT name FROM characters WHERE id=?");
+                        PreparedStatement p = UnknownEntityDKP.getInstance().getConn().prepareStatement("SELECT name FROM characters WHERE id=?");
                         p.setInt(1, id);
                         ResultSet rs = p.executeQuery();
                         while (rs.next()) {
@@ -835,8 +699,6 @@ public class RaidDB {
                         }
                 } catch (SQLException ex) {
                         ex.printStackTrace();
-                } finally {
-                        c.close();
                 }
                 return foo;
         }

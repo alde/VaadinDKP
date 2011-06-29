@@ -1,13 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.character;
 
-/**
- *
- * @author alde
- */
+
 public class CharacterItem {
 
         private int id;

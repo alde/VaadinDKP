@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity.items.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
@@ -22,10 +18,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class EditMultiplierWindow extends Window {
         List<Multiplier> multipliers = new ArrayList<Multiplier>();
         TextField itemlevel;
@@ -151,7 +144,6 @@ public class EditMultiplierWindow extends Window {
                         Multiplier mp2 = ItemDB.getMultiplierForItemlevel(i.getIlvl() + 13);
                         BigDecimal formattedpricehc = new BigDecimal(ItemDB.getDefaultPrice(i) * mp2.getMultiplier()).setScale(2, BigDecimal.ROUND_HALF_DOWN);
                         ItemDB.updateLoots(i, formattedprice.toString(), formattedpricehc.toString());
-                        System.out.println(""+i.getId());
                 }
         }
 

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity;
 
 import java.io.File;
@@ -12,10 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- *
- * @author alde
- */
 public final class DBConnection {
 
         private Connection conn = null;
@@ -23,16 +15,20 @@ public final class DBConnection {
         private Properties properties;
 
         public DBConnection() {
-                properties = getProperties();
                 try {
                         Class.forName("com.mysql.jdbc.Driver").newInstance();
                 } catch (Exception ex) {
                         ex.printStackTrace();
                 }
-
         }
 
-        private Connection connect() {
+//        public Connection Connect() {
+//                UnknownEntityDKP.getInstance().fileName = database;
+//                return this.connect();
+//        }
+
+        public Connection connect() {
+                properties = getProperties();
                 try {
                         conn = DriverManager.getConnection("jdbc:mysql://" + properties.getProperty("db.url") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.db"), properties.getProperty("db.username"), properties.getProperty("db.password"));
                         return conn;
@@ -44,12 +40,7 @@ public final class DBConnection {
 
         }
 
-        public Connection getConnection() throws SQLException {
-                return connect();
-        }
-
         public PreparedStatement prepareStatement(String string) {
-                connect();
                 try {
 
                         ps = conn.prepareStatement(string);
@@ -57,17 +48,6 @@ public final class DBConnection {
                         throw new SQLRuntimeException(ex);
                 }
                 return ps;
-        }
-
-        public void close() {
-                closeStatement();
-                try {
-                        if (conn != null) {
-                                conn.close();
-                        }
-                } catch (SQLException ex) {
-                        //Ignore
-                }
         }
 
         public void closeStatement() {
@@ -98,7 +78,7 @@ public final class DBConnection {
                 boolean notFound = true;
                 while (notFound) {
                         try {
-                                f = new File("db.properties");
+                                f = new File("/srv/data/"+ UnknownEntityDKP.getInstance().fileName + ".properties");
                                 final FileInputStream fileInputStream = new FileInputStream(f);
                                 prop.load(fileInputStream);
                                 fileInputStream.close();
@@ -111,12 +91,11 @@ public final class DBConnection {
                         if (notFound) {
                                 printError(f);
                                 try {
-                                        Thread.sleep(3000);
+                                        Thread.sleep(15000);
                                 } catch (InterruptedException ex2) {
                                         ex2.printStackTrace();
                                 }
                         }
-
                 }
                 return prop;
         }
@@ -137,21 +116,7 @@ public final class DBConnection {
                 return true;
         }
 
-        public void closeConnection(Connection conn) {
-
-
-
-                if (conn != null) {
-                        try {
-                                conn.close();
-                        } catch (Exception ex) {
-                                ex.printStackTrace();
-                        }
-                }
-        }
-
         public PreparedStatement prepareStatement(String string, int options) {
-                connect();
                 try {
 
                         ps = conn.prepareStatement(string, options);
@@ -159,6 +124,5 @@ public final class DBConnection {
                         throw new SQLRuntimeException(ex);
                 }
                 return ps;
-
         }
 }

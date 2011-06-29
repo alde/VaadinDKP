@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.panel;
 
 import com.unknown.entity.database.RaidDB;
@@ -20,10 +17,7 @@ import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 class EditZonesWindow extends Window {
 
         private String oldZone = "";
@@ -143,7 +137,7 @@ class EditZonesWindow extends Window {
         }
 
         void addApplication(Application app) {
-                // RaidDB.setApplication(app);
+               
         }
 
         private class CloseButtonListener implements ClickListener {

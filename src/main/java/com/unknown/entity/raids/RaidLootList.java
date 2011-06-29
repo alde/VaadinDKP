@@ -14,10 +14,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.ArrayList;
 
-/**
- *
- * @author alde
- */
+
 public class RaidLootList extends Table implements RaidLootListener {
 
         IndexedContainer ic;

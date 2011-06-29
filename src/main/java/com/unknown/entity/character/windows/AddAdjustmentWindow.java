@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.character.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
@@ -22,10 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 class AddAdjustmentWindow extends Window {
 
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
@@ -135,7 +129,6 @@ class AddAdjustmentWindow extends Window {
                         p.setComment(comment.getValue().toString());
                         p.setDate(dateFormat.format(date.getValue()));
                         p.setShares(share);
-                        // RaidDB.setApplication(app);
                         RaidDB.addAdjustment(p);
                         notifyListeners();
                         close();

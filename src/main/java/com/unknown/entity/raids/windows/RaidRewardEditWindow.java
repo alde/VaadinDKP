@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.google.common.collect.ImmutableList;
@@ -20,10 +17,7 @@ import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidRewardEditWindow extends Window {
 
         private List<RaidRewardListener> listeners = new ArrayList<RaidRewardListener>();
@@ -81,7 +75,7 @@ public class RaidRewardEditWindow extends Window {
         }
 
         private void updateReward(RaidReward reward, List<String> newAttendants, int newShares, String newComment) {
-                // RaidDB.setApplication(app);
+               
                 RaidDB.doUpdateReward(reward, newAttendants, newShares, newComment);
         }
 
@@ -108,7 +102,7 @@ public class RaidRewardEditWindow extends Window {
         }
 
         private void removeReward(RaidReward reward) {
-                // RaidDB.setApplication(app);
+               
                 RaidDB.removeReward(reward);
         }
 

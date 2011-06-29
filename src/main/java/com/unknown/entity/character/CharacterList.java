@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity.character;
 
 import com.unknown.entity.PopUpControl;
@@ -10,7 +6,7 @@ import com.unknown.entity.database.CharDB;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.raids.RaidList;
 import com.vaadin.Application;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -23,10 +19,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- *
- * @author bobo
- */
 public class CharacterList extends HorizontalLayout implements CharacterInfoListener {
 
         private DkpList dkpList;
@@ -49,7 +41,10 @@ public class CharacterList extends HorizontalLayout implements CharacterInfoList
                 for (Role r : roles) {
                         VerticalLayout roleList = new VerticalLayout();
                         addComponent(roleList);
-                        Embedded e = new Embedded("", new ThemeResource("../shared/" + r.toString().toLowerCase() + ".png"));
+                        Embedded e = new Embedded("", new ExternalResource("http://www.unknown-entity.com/images/classes/"+r.toString().toLowerCase() + ".png"));
+                        e.setType(Embedded.TYPE_IMAGE);
+                        e.setWidth("100px");
+                        e.setHeight("20px");
                         roleList.addComponent(e);
                         addUsersForRole(r, roleList);
                 }

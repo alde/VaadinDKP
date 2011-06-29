@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity;
 
 import java.io.IOException;
@@ -12,10 +9,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-/**
- *
- * @author alde
- */
+
 public class XmlParser {
 
         private String startString = "http://www.wowhead.com/item=";

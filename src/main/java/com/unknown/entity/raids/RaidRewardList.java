@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids;
 
 import com.unknown.entity.PopUpControl;
@@ -15,10 +12,7 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Table;
 import java.util.Collection;
 
-/**
- *
- * @author alde
- */
+
 public class RaidRewardList extends Table implements RaidRewardListener {
 
         IndexedContainer ic;

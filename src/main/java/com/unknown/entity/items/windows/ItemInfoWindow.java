@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.items.windows;
 
 import com.unknown.entity.XmlParser;
@@ -21,10 +18,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alde
- */
+
 public class ItemInfoWindow extends Window {
 
 

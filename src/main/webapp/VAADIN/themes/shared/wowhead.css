@@ -213,11 +213,11 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .icontiny { background: none no-repeat scroll left center transparent; padding-left: 18px !important; }
 .wowclass { background: none no-repeat scroll left center transparent; padding-left: 23px !important; padding-top: 3px; padding-bottom: 3px;}
 
-/* dkp colors */
+
 .negative { color: #FF0000;}
 .positive { color: #00FF00;}
 
-/* raid zones */
+
 .tier1 { color: #00F080; }
 .tier2 { color: #00BF00; }
 .tier3 { color: #DFBE29; }
@@ -228,30 +228,30 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
         color: #000000 !important;
 }
 
-/* Epic */
+
 .epic { color: #9035CF;}
 .v-label-epic { color: #9035CF; }
 .v-label-epic:hover { text-decoration: underline; }
 
-/* Legendary */
+
 .legendary { color: #DE800D; }
 .v-label-legendary { color: #DE800D; }
 .v-label-legendary:hover { text-decoration: underline; }
 
-/* Rare */
+
 .rare { color: #0000FF; }
 .v-label-rare { color: #0000FF; }
 .v-label-rare:hover { text-decoration: underline; }
 
-/* Uncommon */
+
 .uncommon { color: #00BF00; }
 .v-label-uncommon { color: #00BF00; }
 .v-label-uncommon:hover { text-decoration: underline; }
 
-/* Artifact */
+
 .artifact { color: gold; }
 
-/* Warlock */
+
 .v-nativebutton-warlock, v-nativebutton-warlock:active, v-nativebutton-warlock:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-warlock:hover { text-decoration: underline; color: #9482C9; }
 .v-nativebutton-warlock .v-nativebutton-caption { font-size: 12px; color: #9482C9; text-decoration: none; }
@@ -259,7 +259,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-warlock { color: #9482C9;}
 .v-label-warlock:hover { text-decoration: underline; }
 
-/* Warrior */
+
 .v-nativebutton-warrior, v-nativebutton-warrior:active, v-nativebutton-warrior:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-warrior:hover { text-decoration: underline; color: #C79C6E; }
 .v-nativebutton-warrior .v-nativebutton-caption { font-size: 12px; color: #C79C6E; text-decoration: none; }
@@ -267,7 +267,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-warrior { color: #C79C6E; }
 .v-label-warrior:hover { text-decoration: underline; }
 
-/* Death Knight */
+
 .v-nativebutton-deathknight, v-nativebutton-deathknight:active, v-nativebutton-deathknight:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-deathknight:hover { text-decoration: underline; color: #C41F3B; }
 .v-nativebutton-deathknight .v-nativebutton-caption {font-size: 12px; color: #C41F3B; text-decoration: none; }
@@ -275,7 +275,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-deathnkight {color: #C41F3B; }
 .v-label-deathknight:hover { text-decoration: underline; }
 
-/* Druid */
+
 .v-nativebutton-druid, v-nativebutton-druid:active, v-nativebutton-druid:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-druid:hover { text-decoration: underline; color: #FF7D0A; }
 .v-nativebutton-druid .v-nativebutton-caption {font-size: 12px; color: #FF7D0A; text-decoration: none; }
@@ -283,7 +283,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-druid {color: #FF7D0A; }
 .v-label-druid:hover { text-decoration: underline; }
 
-/* Shaman */
+
 .v-nativebutton-shaman, v-nativebutton-shaman:active, v-nativebutton-shaman:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-shaman:hover { text-decoration: underline; color: #0070DE; }
 .v-nativebutton-shaman .v-nativebutton-caption {font-size: 12px; color: #0070DE; text-decoration: none; }
@@ -291,7 +291,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-shaman {color: #0070DE; }
 .v-label-shaman:hover { text-decoration: underline; }
 
-/* Mage */
+
 .v-nativebutton-mage, v-nativebutton-mage:active, v-nativebutton-mage:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-mage:hover { text-decoration: underline; color: #69CCF0; }
 .v-nativebutton-mage .v-nativebutton-caption {font-size: 12px; color: #69CCF0; text-decoration: none; }
@@ -299,7 +299,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-mage {color: #69CCF0; }
 .v-label-mage:hover { text-decoration: underline; }
 
-/* Rogue */
+
 .v-nativebutton-rogue, v-nativebutton-rogue:active, v-nativebutton-rogue:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-rogue:hover { text-decoration: underline; color: #FFF569; }
 .v-nativebutton-rogue .v-nativebutton-caption {font-size: 12px; color: #FFF569; text-decoration: none; }
@@ -307,7 +307,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-rogue {color: #FFF569; }
 .v-label-rogue:hover { text-decoration: underline; }
 
-/* Priest */
+
 .v-nativebutton-priest, v-nativebutton-priest:active, v-nativebutton-priest:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-priest:hover { text-decoration: underline; color: #FFFFFF; }
 .v-nativebutton-priest .v-nativebutton-caption {font-size: 12px; color: #FFFFFF; text-decoration: none; }
@@ -315,7 +315,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-priest {color: #FFFFFF; }
 .v-label-priest:hover { text-decoration: underline; }
 
-/* Hunter */
+
 .v-nativebutton-hunter, v-nativebutton-hunter:active, v-nativebutton-hunter:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-hunter:hover { text-decoration: underline; color: #ABD473; }
 .v-nativebutton-hunter .v-nativebutton-caption {font-size: 12px; color: #ABD473; text-decoration: none; }
@@ -323,7 +323,7 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .v-label-hunter {color: #ABD473; }
 .v-label-hunter:hover { text-decoration: underline; }
 
-/* Paladin */
+
 .v-nativebutton-paladin, v-nativebutton-paladin:active, v-nativebutton-paladin:focus {outline: none; border: none; text-decoration: none; }
 .v-nativebutton-paladin:hover { text-decoration: underline; color: #F58CBA; }
 .v-nativebutton-paladin .v-nativebutton-caption {font-size: 12px; color: #F58CBA; text-decoration: none; }

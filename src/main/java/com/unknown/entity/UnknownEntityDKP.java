@@ -9,6 +9,10 @@ import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,10 +26,13 @@ public class UnknownEntityDKP extends Application implements HttpServletRequestL
         private DkpList dkpList;
         private ItemList itemList;
         private RaidList raidList;
+        private Connection conn = null;
+        public String fileName = "Tier12";
 
         @Override
         public void init() {
                 setInstance(this);
+                setDatabase("Tier12");
                 window = new Window("Unknown Entity DKP");
                 setMainWindow(window);
                 doDrawings();
@@ -43,7 +50,7 @@ public class UnknownEntityDKP extends Application implements HttpServletRequestL
         }
 
         private void doDrawings() {
-                dkpList = new DkpList(this);
+                dkpList = new DkpList();
                 dkpList.attach();
 
                 charList = new CharacterList(dkpList, this);
@@ -97,5 +104,24 @@ public class UnknownEntityDKP extends Application implements HttpServletRequestL
         @Override
         public void onRequestEnd(HttpServletRequest request, HttpServletResponse response) {
                 threadLocal.remove();
+        }
+
+        public void setDatabase(String database) {
+                if (getInstance().conn != null)
+                        closeDatabase();
+                getInstance().fileName = database;
+                getInstance().conn = new DBConnection().connect();
+        }
+
+        public void closeDatabase() {
+                try {
+                        getInstance().conn.close();
+                } catch (SQLException ex) {
+                        Logger.getLogger(UnknownEntityDKP.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+
+        public Connection getConn() {
+                return getInstance().conn;
         }
 }

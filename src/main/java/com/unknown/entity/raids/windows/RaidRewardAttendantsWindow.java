@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.database.CharDB;
@@ -18,10 +15,7 @@ import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidRewardAttendantsWindow extends Window {
 
 	private final List<RaidChar> chars;

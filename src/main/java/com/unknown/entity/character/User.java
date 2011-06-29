@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity.character;
 
 import com.google.common.collect.ImmutableList;
@@ -11,10 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- *
- * @author bobo
- */
 public class User implements SiteUser {
 
         private final int id;
@@ -71,7 +63,7 @@ public class User implements SiteUser {
                 return role;
         }
 
-        /** Character name */
+        
         public String getUsername() {
                 return username;
         }
@@ -126,7 +118,7 @@ public class User implements SiteUser {
                 this.siteusername = name;
         }
 
-        /** SiteUserName */
+        
         @Override
         public String getName() {
                 return this.siteusername;

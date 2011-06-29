@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.panel;
 
 import com.unknown.entity.Log;
@@ -10,10 +7,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.Table;
 
-/**
- *
- * @author alde
- */
+
 class LogTable extends Table {
 
         private IndexedContainer ic;

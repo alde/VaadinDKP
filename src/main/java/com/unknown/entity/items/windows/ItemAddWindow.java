@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.items.windows;
 
 import com.unknown.entity.database.ItemDB;
@@ -29,10 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class ItemAddWindow extends Window {
 
         private List<ItemInfoListener> listeners = new ArrayList<ItemInfoListener>();

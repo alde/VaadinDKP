@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.items;
 
 import com.unknown.entity.PopUpControl;
@@ -19,10 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- *
- * @author bobo
- */
+
 public class ItemList extends Table implements ItemInfoListener {
         private IndexedContainer ic;
         private final ItemList itemList = this;

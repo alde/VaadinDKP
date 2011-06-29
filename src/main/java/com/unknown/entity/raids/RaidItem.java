@@ -1,16 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids;
 
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.Items;
 
-/**
- *
- * @author bobo
- */
+
 public class RaidItem {
 
         private boolean heroic;

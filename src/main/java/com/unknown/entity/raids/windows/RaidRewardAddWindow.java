@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.google.common.collect.ImmutableList;
@@ -24,10 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidRewardAddWindow extends Window {
 
         private Raid raid;
@@ -86,7 +80,7 @@ public class RaidRewardAddWindow extends Window {
         private void addReward(String comment, Integer shares, List<String> attendantlist, Raid raid) {
                 List<String> invalidchars = findInvalidCharacters(attendantlist);
                 if (invalidchars.isEmpty()) {
-                        // RaidDB.setApplication(app);
+                       
                         RaidReward raidReward = new RaidReward(comment, 0, raid.getId(), shares);
                         Collection<RaidChar> chars = RaidDB.getRaidCharsForRaid(attendantlist, raid.getId());
                         raidReward.setRewardChars(chars);

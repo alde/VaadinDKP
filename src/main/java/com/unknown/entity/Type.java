@@ -1,9 +1,6 @@
 package com.unknown.entity;
 
-/**
- *
- * @author alde
- */
+
 public enum Type{
         Shields {
                 @Override

@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.database.RaidDB;
@@ -25,10 +22,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidAddWindow extends Window {
 
         private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
@@ -132,7 +126,7 @@ public class RaidAddWindow extends Window {
         }
 
         private void addRaid(String zone, String comment, String date) {
-                // RaidDB.setApplication(app);
+               
                 RaidDB.addNewRaid(zone, comment, date);
         }
 

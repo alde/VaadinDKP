@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.character.windows;
 
 import com.unknown.entity.database.CharDB;
@@ -26,10 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alde
- */
+
 public class CharacterAddWindow extends Window {
 
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();

@@ -1,12 +1,8 @@
 @import "../chameleon/styles.css";
 @import "../shared/wowhead.css";
-/**
- * "optional-" prefix means that the style is not necessarily used, it can be left blank
- * "generated-" prefix means that the style is calculated from some other color, and not directly selected by the editor user
- *
- **/
 
-/* Application background */
+
+
 .v-app {
         background: rgb(45,45,45);
 }
@@ -51,7 +47,7 @@ body.v-ie7 .v-menubar-submenu,
         background-color: rgb(45,45,45);
 }
 
-/* Base font size and color */
+
 .v-app,
 .v-window,
 .v-popupview-popup,
@@ -90,7 +86,7 @@ body.v-ie7 .v-menubar-submenu,
         text-shadow: 0 1px 0 rgb(29,29,29)
 }
 
-/* Base background color */
+
 .v-button:active,
 .v-ie .v-button.v-pressed,
 div.v-button-down,
@@ -107,7 +103,7 @@ div.v-button-down:active {
         background-color: rgb(30,30,30);
 }
 
-/* Base border color */
+
 .v-button:active .v-button-wrap,
 .v-ie .v-button.v-pressed .v-button-wrap,
 .v-button-down .v-button-wrap,
@@ -223,7 +219,7 @@ td.v-datefield-calendarpanel-month,
         text-shadow: 0 -1px 0 rgb(24,24,24);
 }
 
-/* Background border color */
+
 .v-window,
 .v-popupview-popup,
 .v-filterselect-suggestpopup,
@@ -258,7 +254,7 @@ td.v-datefield-calendarpanel-month,
         border-color: rgba(129,129,129,.3);;
 }
 
-/* Alternate colors */
+
 .v-label-color,
 .v-button-link,
 .v-button-link:focus,

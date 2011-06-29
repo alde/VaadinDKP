@@ -1,18 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity.panel;
 
 import com.unknown.entity.character.windows.AddNewUserWindow;
 import com.unknown.entity.items.windows.EditDefaultPricesWindow;
 import com.unknown.entity.LoginWindow;
+import com.unknown.entity.UnknownEntityDKP;
 import com.unknown.entity.character.CharacterInfoListener;
 import com.unknown.entity.character.CharacterList;
 import com.unknown.entity.character.DkpList;
 import com.unknown.entity.character.windows.CharacterAddWindow;
 import com.unknown.entity.character.SiteUser;
-import com.unknown.entity.database.CharDB;
 import com.unknown.entity.items.ItemInfoListener;
 import com.unknown.entity.items.ItemList;
 import com.unknown.entity.items.windows.EditMultiplierWindow;
@@ -20,10 +16,14 @@ import com.unknown.entity.items.windows.ItemAddWindow;
 import com.unknown.entity.raids.RaidInfoListener;
 import com.unknown.entity.raids.RaidList;
 import com.unknown.entity.raids.windows.RaidAddWindow;
+import com.vaadin.Application;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
@@ -33,10 +33,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alde
- */
 public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
         private final Button loginBtn = new Button();
@@ -51,7 +47,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         private final Button viewLogBtn = new Button("View Logs");
         private final Button logOutButton = new Button("");
         private final Button refreshBtn = new Button();
-        private final Label activeUsers = new Label("");
+        private final ComboBox databaseBox = new ComboBox();
         private List<CharacterInfoListener> listeners = new ArrayList<CharacterInfoListener>();
         private List<RaidInfoListener> raidlisteners = new ArrayList<RaidInfoListener>();
         private List<ItemInfoListener> itemlisteners = new ArrayList<ItemInfoListener>();
@@ -65,7 +61,6 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 setListeners();
                 styleLoginLogoutRefresh();
                 this.setSpacing(true);
-                activeUsers.setCaption("Active users: " + CharDB.countActiveUsers());
         }
 
         private void notifyListeners() {
@@ -114,6 +109,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 logOutButton.addListener(new LogOutListener());
                 refreshBtn.addListener(new refreshListener());
                 viewLogBtn.addListener(new ViewLogListener());
+                databaseBox.addListener(new DatabaseSelectListener());
         }
 
         public void init() {
@@ -121,10 +117,13 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         addComponent(loginBtn);
                         this.addComponent(refreshBtn);
                 }
+                setDatabaseBoxData();
+                this.addComponent(databaseBox);
         }
 
         private void login() {
                 this.removeAllComponents();
+                setDatabaseBoxData();
                 if (isAdmin() || isSuperAdmin()) {
                         this.addComponent(logOutButton);
                         this.addComponent(addCharacterBtn);
@@ -142,20 +141,22 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                                 this.addComponent(viewLogBtn);
                         }
                         this.addComponent(refreshBtn);
-                        this.addComponent(activeUsers);
                 } else {
                         this.addComponent(loginBtn);
                         this.addComponent(refreshBtn);
                 }
+                this.addComponent(databaseBox);
         }
 
         private boolean isAdmin() {
-                final SiteUser siteUser = (SiteUser) getApplication().getUser();
+                Application app = UnknownEntityDKP.getInstance();
+                final SiteUser siteUser = (SiteUser) app.getUser();
                 return siteUser != null && siteUser.getLevel() == 1;
         }
 
         private boolean isSuperAdmin() {
-                final SiteUser siteUser = (SiteUser) getApplication().getUser();
+                Application app = UnknownEntityDKP.getInstance();
+                final SiteUser siteUser = (SiteUser) app.getUser();
                 return siteUser != null && siteUser.getLevel() == 2;
         }
 
@@ -182,6 +183,25 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
 
         public void setCharacterList(CharacterList characterList) {
                 this.characterList = characterList;
+        }
+
+        private void setDatabaseBoxData() {
+                databaseBox.addItem("Tier11");
+                databaseBox.addItem("Tier12");
+                if (isSuperAdmin()) {
+                        databaseBox.addItem("Devel");
+                }
+                databaseBox.setNullSelectionAllowed(false);
+                databaseBox.setImmediate(true);
+                databaseBox.setNewItemsAllowed(false);
+                databaseBox.setValue(UnknownEntityDKP.getInstance().fileName);
+                triggerDatabaseChange();
+        }
+
+        private void triggerDatabaseChange() {
+                UnknownEntityDKP.getInstance().closeDatabase();
+                UnknownEntityDKP.getInstance().setDatabase(databaseBox.getValue().toString());
+                notifyListeners();
         }
 
         private class AddItemListener implements ClickListener {
@@ -323,6 +343,14 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                         ViewLogWindow viewLogs = new ViewLogWindow();
                         viewLogs.printInfo();
                         getMainWindow().addWindow(viewLogs);
+                }
+        }
+
+        private class DatabaseSelectListener implements ValueChangeListener {
+
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                        triggerDatabaseChange();
                 }
         }
 }

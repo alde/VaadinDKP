@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.character;
 
 import com.unknown.entity.database.RaidDB;
@@ -12,10 +9,7 @@ import java.util.Comparator;
 import com.vaadin.ui.Table;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class AdjustmentTable extends Table {
         private IndexedContainer ic = new IndexedContainer();
         private User user;

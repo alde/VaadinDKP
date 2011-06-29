@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.character.CharacterInfoListener;
@@ -39,10 +36,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alde
- */
+
 public class RaidLootAddWindow extends Window {
 
         private HashSet<User> charlist;
@@ -117,9 +111,9 @@ public class RaidLootAddWindow extends Window {
                 horizontal.addComponent(addButton);
                 addComponent(horizontal);
                 
-//                addComponent(price);
+               addComponent(price);
                 addComponent(notice);
-//                addComponent(addButton);
+               addComponent(addButton);
                 addComponent(table);
                 addComponent(addAllButton);
                 setImmediates();
@@ -157,7 +151,7 @@ public class RaidLootAddWindow extends Window {
         }
 
         private void addRaidLoot(String name, String loot, boolean isheroic, double price) {
-                // RaidDB.setApplication(app);
+               
                 RaidDB.addLootToRaid(raid, name, loot, isheroic, price);
         }
 

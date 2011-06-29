@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.raids.windows;
 
 import com.unknown.entity.database.*;
@@ -22,10 +19,7 @@ import com.vaadin.ui.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 public class RaidLootEditWindow extends Window {
 
         Raid raid;
@@ -121,7 +115,7 @@ public class RaidLootEditWindow extends Window {
         }
 
         private int deleteItem(RaidItem item) {
-                // RaidDB.setApplication(app);
+               
                 return RaidDB.removeLootFromRaid(item);
         }
 
@@ -163,7 +157,7 @@ public class RaidLootEditWindow extends Window {
 
         private void updateItem(String looter, String itemname, double price, boolean heroic) {
                 int lootid = ItemDB.getLootId(item.getId(), CharDB.getCharacterId(item.getLooter()), item.getPrice(), item.isHeroic(), raid.getId());
-                // RaidDB.setApplication(app);
+               
                 RaidDB.doUpdateLoot(lootid, looter, itemname, price, heroic, raid.getId());
         }
 

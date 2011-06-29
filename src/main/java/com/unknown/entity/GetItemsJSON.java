@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.unknown.entity;
 
 import com.google.gson.Gson;
@@ -15,10 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author alde
- */
 public class GetItemsJSON extends HttpServlet {
 
         /**
@@ -36,14 +28,13 @@ public class GetItemsJSON extends HttpServlet {
                         List<Items> itm = ItemDB.getItems();
                         Gson gson = new Gson();
                         String userJson = gson.toJson(itm);
-                        System.out.println(userJson);
                         out.println(userJson);
-                } finally {
+               } finally { 
                         out.close();
                 }
         }
 
-        // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+       
         /**
          * Handles the HTTP <code>GET</code> method.
          * @param request servlet request

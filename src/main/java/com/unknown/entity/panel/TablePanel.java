@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.panel;
 
 import com.unknown.entity.Armor;
@@ -24,10 +21,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 
-/**
- *
- * @author alde
- */
+
 public class TablePanel {
 
         private CharacterList charList;
@@ -47,15 +41,15 @@ public class TablePanel {
                 final HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setSpacing(true);
 
-                // Vertical DKP List
+               
                 VerticalLayout vertDkp = VerticalDKPListLayout();
                 hzl.addComponent(vertDkp);
 
-                // Vertical Item List
+               
                 VerticalLayout vertItem = VerticalItemListLayout();
                 hzl.addComponent(vertItem);
 
-                // Vertical Raid List
+               
                 VerticalLayout vertRaid = VerticalRaidListLayout();
                 hzl.addComponent(vertRaid);
 

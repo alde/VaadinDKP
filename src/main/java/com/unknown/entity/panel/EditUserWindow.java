@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.unknown.entity.panel;
 
 import com.unknown.entity.character.SiteUser;
@@ -26,10 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author alde
- */
+
 class EditUserWindow extends Window {
         final private ComboBox allUsernames;
         final private TextField oldPassword;
