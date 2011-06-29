@@ -42,6 +42,7 @@ public class UnknownEntityDKP extends Application implements HttpServletRequestL
         public static void setInstance(UnknownEntityDKP application) {
                 if (getInstance() == null) {
                         threadLocal.set(application);
+                        getInstance().conn = new DBConnection().connect();
                 }
         }
 
