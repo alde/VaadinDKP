@@ -90,7 +90,8 @@ public class XmlParser {
                                                 foo = "Other";
                                         }
                                 } else if (foo.equals("Miscellaneous")) {
-                                        if (findElement(root, "subclass").equalsIgnoreCase("Armor Tokens")) {
+                                        String fe = findElement(root, "subclass");
+                                        if (fe.equalsIgnoreCase("Armor Tokens") || fe.equalsIgnoreCase("junk")) {
                                                 foo = findElement(root, "name");
                                                 if (foo.contains("Vanquisher")) {
                                                         foo = "vanquisher";
@@ -110,6 +111,7 @@ public class XmlParser {
                                 foo = "Item not found!";
                         }
                 }
+                System.out.println(foo);
                 return foo;
         }
 
