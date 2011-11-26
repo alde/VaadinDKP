@@ -41,7 +41,7 @@ public class CharacterInfoWindow extends Window {
                 this.itemList = itemList;
                 this.longest = 1;
                 this.addStyleName("opaque");
-                this.setCaption("Character information: " + user.getUsername());
+                this.setCaption("Character information: " + user.getName());
                 this.setPositionX(200);
                 this.setPositionY(100);
                 this.getContent().setSizeUndefined();
@@ -85,7 +85,7 @@ public class CharacterInfoWindow extends Window {
                 HorizontalLayout hzl = new HorizontalLayout();
                 hzl.setWidth("200px");
                 hzl.addComponent(new Label("Name: "));
-                Label charname = new Label(user.getUsername());
+                Label charname = new Label(user.getName());
                 charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
                 hzl.addComponent(charname);
                 addComponent(hzl);

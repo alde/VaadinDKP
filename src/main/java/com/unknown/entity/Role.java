@@ -4,6 +4,7 @@ public enum Role {
     Druid(Armor.leather),
     Hunter(Armor.mail),
     Mage(Armor.cloth),
+    Monk(Armor.leather),
     Paladin(Armor.plate),
     Priest(Armor.cloth),
     Rogue(Armor.leather),

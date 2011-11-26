@@ -111,7 +111,6 @@ public class XmlParser {
                                 foo = "Item not found!";
                         }
                 }
-                System.out.println(foo);
                 return foo;
         }
 

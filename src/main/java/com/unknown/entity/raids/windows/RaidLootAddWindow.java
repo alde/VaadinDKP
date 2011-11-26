@@ -160,7 +160,7 @@ public class RaidLootAddWindow extends Window {
                 cname.setWidth("150px");
                 TreeSet<String> sortedlist = new TreeSet<String>();
                 for (User eachname : this.charlist) {
-                        sortedlist.add(eachname.getUsername());
+                        sortedlist.add(eachname.getName());
                 }
                 for (String s : sortedlist) {
                         cname.addItem(s);

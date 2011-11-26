@@ -41,7 +41,7 @@ class EditUserWindow extends Window {
                 this.loginDao = new LoginDao();
                 this.app = app;
                 SiteUser sUser = (SiteUser) app.getUser();
-                this.user = sUser.getName();
+                this.user = sUser.getSiteUserName();
                 this.allUsernames = new ComboBox("Username: ");
                 if (isSuperAdmin()) {
                         this.oldPassword = new TextField(user + "'s Password: ");

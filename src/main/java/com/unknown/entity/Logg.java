@@ -52,7 +52,7 @@ public class Logg {
                 if (app == null || (SiteUser) app.getUser() == null) {
                         name = "<unknown>";
                 } else {
-                        name = ((SiteUser) app.getUser()).getName();
+                        name = ((SiteUser) app.getUser()).getSiteUserName();
                 }
                 this.addLog(message, name, string);
         }

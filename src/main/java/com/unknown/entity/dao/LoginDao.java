@@ -47,7 +47,7 @@ public class LoginDao implements ILoginDao {
                 }
 
                 @Override
-                public String getName() {
+                public String getSiteUserName() {
                         return name;
                 }
         }

@@ -10,7 +10,7 @@ import java.util.List;
 public class User implements SiteUser {
 
         private final int id;
-        private final String username;
+        private final String name;
         private final Role role;
         private int shares;
         private double dkp_earned;
@@ -22,9 +22,9 @@ public class User implements SiteUser {
         private String siteusername;
         private final List<CharacterItem> charItems = new ArrayList<CharacterItem>();
 
-        public User(int id, String username, Role role, boolean active, int shares, double dkp_earned, double dkp_spent, double dkp) {
+        public User(int id, String name, Role role, boolean active, int shares, double dkp_earned, double dkp_spent, double dkp) {
                 this.id = id;
-                this.username = username;
+                this.name = name;
                 this.role = role;
                 this.shares = shares;
                 this.dkp = dkp;
@@ -63,13 +63,13 @@ public class User implements SiteUser {
         }
 
         
-        public String getUsername() {
-                return username;
+        public String getName() {
+                return name;
         }
 
         @Override
         public String toString() {
-                return username;
+                return name;
         }
 
         public double getDKP() {
@@ -111,7 +111,7 @@ public class User implements SiteUser {
 
         
         @Override
-        public String getName() {
+        public String getSiteUserName() {
                 return this.siteusername;
         }
 }

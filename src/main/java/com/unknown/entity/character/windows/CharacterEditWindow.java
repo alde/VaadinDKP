@@ -67,7 +67,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
                 this.loots.setEditable(true);
                 this.loots.setImmediate(true);
                 this.loots.setHeight("400px");
-                this.setCaption("Edit character: " + user.getUsername());
+                this.setCaption("Edit character: " + user.getName());
                 this.addStyleName("opaque");
                 this.setPositionX(60);
                 this.setPositionY(50);
@@ -90,7 +90,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         private void characterInformation() {
-                nameField = new TextField("Name: ", user.getUsername());
+                nameField = new TextField("Name: ", user.getName());
                 nameField.setWidth("150px");
                 nameField.setImmediate(true);
                 final ComboBox characterClass = characterEditClassComboBox();
@@ -290,7 +290,7 @@ public class CharacterEditWindow extends Window implements CharacterInfoListener
         }
 
         public void update() {
-                this.user = CharDB.getUser(user.getUsername());
+                this.user = CharDB.getUser(user.getName());
                 shares.setValue("");
                 hraid.removeAllComponents();
                 shares.setValue(user.getShares());

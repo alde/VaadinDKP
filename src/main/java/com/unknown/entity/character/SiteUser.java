@@ -7,5 +7,5 @@ public interface SiteUser {
 
 	public int getLevel();
 
-        public String getName();
+        public String getSiteUserName();
 }

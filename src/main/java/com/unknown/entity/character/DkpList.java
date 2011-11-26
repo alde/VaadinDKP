@@ -79,7 +79,7 @@ public class DkpList extends Table implements CharacterInfoListener {
         }
 
         private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException {
-                Label charname = new Label(user.getUsername());
+                Label charname = new Label(user.getName());
                 charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
                 addItem.getItemProperty("Name").setValue(charname);
                 addItem.getItemProperty("Armor").setValue(user.getArmor());
