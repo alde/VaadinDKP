@@ -46,6 +46,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
     private final Button editUserBtn = new Button("Edit User");
     private final Button editZoneBtn = new Button("Edit Zones");
     private final Button viewLogBtn = new Button("View Logs");
+    private final Button decayBtn = new Button("Decay Shares");
     private final Button logOutButton = new Button("");
     private final Button refreshBtn = new Button();
     private final ComboBox databaseBox = new ComboBox();
@@ -120,6 +121,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         refreshBtn.addListener(new refreshListener());
         viewLogBtn.addListener(new ViewLogListener());
         databaseBox.addListener(new DatabaseSelectListener());
+        decayBtn.addListener(new DecayWindowListener());
     }
 
     public void init() {
@@ -149,6 +151,7 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
                 this.addComponent(addUserBtn);
                 this.addComponent(viewLogBtn);
                 this.addComponent(viewLogBtn);
+                this.addComponent(decayBtn);
             }
             this.addComponent(refreshBtn);
         } else {
@@ -385,6 +388,22 @@ public class AdminPanel extends HorizontalLayout implements MyLoginListener {
         public void valueChange(ValueChangeEvent event) {
             setDatabase(event.getProperty().getValue().toString());
             triggerDatabaseChange();
+        }
+    }
+
+    private class DecayWindowListener implements ClickListener
+    {
+
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+            DecayWindow decayWindow = new DecayWindow();
+            decayWindow.printInfo();
+            decayWindow.addItemInfoListener(itemList);
+            decayWindow.addCharacterInfoListener(dkpList);
+            decayWindow.addCharacterInfoListener(characterList);
+            decayWindow.addRaidInfoListener(raidList);
+            getMainWindow().addWindow(decayWindow);
         }
     }
 }
