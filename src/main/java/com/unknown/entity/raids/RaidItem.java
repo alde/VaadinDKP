@@ -1,84 +1,98 @@
-
 package com.unknown.entity.raids;
 
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.items.Items;
 
+public class RaidItem
+{
 
-public class RaidItem {
+    private boolean heroic;
+    private int id;
+    private String looter;
+    private String name;
+    private double price;
+    private String quality;
 
-        private boolean heroic;
-        private int id;
-        private String looter;
-        private String name;
-        private double price;
-        private String quality;
+    public RaidItem()
+    {
+    }
 
-        public RaidItem() {
+    public RaidItem(String itemname, String looter, int itemid, double price, boolean isheroic, String quality)
+    {
+        this.name = itemname;
+        this.looter = looter;
+        this.id = itemid;
+        this.price = price;
+        this.heroic = isheroic;
+        this.quality = quality;
+    }
 
-        }
-        
-        public RaidItem(String itemname, String looter, int itemid, double price, boolean isheroic, String quality) {
-                this.name = itemname;
-                this.looter = looter;
-                this.id = itemid;
-                this.price = price;
-                this.heroic = isheroic;
-                this.quality = quality;
-        }
+    public void setId(Integer integer)
+    {
+    }
 
-        public void setId(Integer integer) {
-        }
+    public boolean isHeroic()
+    {
+        return heroic;
+    }
 
-        public boolean isHeroic() {
-                return heroic;
-        }
+    public void setHeroic(boolean heroic)
+    {
+        this.heroic = heroic;
+    }
 
-        public void setHeroic(boolean heroic) {
-                this.heroic = heroic;
-        }
+    public int getId()
+    {
+        return id;
+    }
 
-        public int getId() {
-                return id;
-        }
+    public void setId(int id)
+    {
+        this.id = id;
+    }
 
-        public void setId(int id) {
-                this.id = id;
-        }
+    public String getLooter()
+    {
+        return looter;
+    }
 
-        public String getLooter() {
-                return looter;
-        }
+    public void setLooter(String looter)
+    {
+        this.looter = looter;
+    }
 
-        public void setLooter(String looter) {
-                this.looter = looter;
-        }
+    public String getName()
+    {
+        return name;
+    }
 
-        public String getName() {
-                return name;
-        }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-        public void setName(String name) {
-                this.name = name;
-        }
+    public double getPrice()
+    {
+        return price;
+    }
 
-        public double getPrice() {
-                return price;
-        }
+    public void setPrice(double price)
+    {
+        this.price = price;
+    }
 
-        public void setPrice(double price) {
-                this.price = price;
-        }
+    public String getQuality()
+    {
+        return quality;
+    }
 
-        public String getQuality() {
-                return quality;
-        }
+    public void setQuality(String quality)
+    {
+        this.quality = quality;
+    }
 
-        public void setQuality(String quality) {
-                this.quality = quality;
-        }
-
-        public Items toItem() {
-                return ItemDB.getSingleItem(this.name);
-        }
+    public Items toItem()
+    {
+        return ItemDB.getSingleItem(this.name);
+    }
 }

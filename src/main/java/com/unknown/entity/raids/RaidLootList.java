@@ -14,98 +14,110 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import java.util.ArrayList;
 
+public class RaidLootList extends Table implements RaidLootListener
+{
 
-public class RaidLootList extends Table implements RaidLootListener {
+    IndexedContainer ic;
+    private final RaidLootList raidLootList = this;
+    private Raid raid;
+    private final DkpList dkplist;
+    private final CharacterList clist;
+    private final ItemList itemList;
+    private int longest;
+    private int longestname;
 
-        IndexedContainer ic;
-        private final RaidLootList raidLootList = this;
-        private Raid raid;
-        private final DkpList dkplist;
-        private final CharacterList clist;
-        private final ItemList itemList;
-        private int longest;
-        private int longestname;
+    public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList)
+    {
+        this.ic = new IndexedContainer();
+        this.raid = raid;
+        this.dkplist = dkplist;
+        this.clist = clist;
+        this.itemList = itemList;
+        this.setSelectable(true);
+        this.setSizeUndefined();
+        this.setHeight("500px");
+        this.addListener(new RewardListClickListener());
+        this.longest = 1;
+        this.longestname = 1;
+        raidRewardListSetHeaders();
+        printList();
+    }
 
-        public RaidLootList(Raid raid, DkpList dkplist, CharacterList clist, ItemList itemList) {
-                this.ic = new IndexedContainer();
-                this.raid = raid;
-                this.dkplist = dkplist;
-                this.clist = clist;
-                this.itemList = itemList;
-                this.setSelectable(true);
-                this.setSizeUndefined();
-                this.setHeight("500px");
-                this.addListener(new RewardListClickListener());
-                this.longest = 1;
-                this.longestname = 1;
-                raidRewardListSetHeaders();
-                printList();
+    private void update()
+    {
+        ic.removeAllItems();
+        ic.removeAllContainerFilters();
+        printList();
+    }
+
+    @Override
+    public void onRaidInfoChanged()
+    {
+        CharDB.clearCache();
+        update();
+    }
+
+    private void raidRewardListSetHeaders()
+    {
+        ic.addContainerProperty("Name", Label.class, "");
+        ic.addContainerProperty("Item", Label.class, "");
+        ic.addContainerProperty("Price", Double.class, 0);
+        ic.addContainerProperty("Heroic", String.class, "");
+        this.setContainerDataSource(ic);
+    }
+
+    public void clear()
+    {
+        this.removeAllItems();
+    }
+
+    private void printList()
+    {
+        ArrayList<RaidItem> temp;
+        temp = ItemDB.getItemsForRaid(raid.getId());
+        for (RaidItem item : temp) {
+            Item addItem = ic.addItem(item);
+            raidListAddRow(addItem, item);
+            if (longest < item.getName().length() + 1) {
+                longest = item.getName().length() + 1;
+            }
+            if (longestname < item.getLooter().length() + 1) {
+                longestname = item.getLooter().length() + 1;
+            }
         }
+        this.setColumnWidth("Item", longest * 6);
+        this.setColumnWidth("Name", longestname * 6);
+    }
 
-        private void update() {
-                ic.removeAllItems();
-                ic.removeAllContainerFilters();
-                printList();
-        }
+    private void raidListAddRow(Item addItem, RaidItem item)
+    {
+        Label looter = new Label(item.getLooter());
+        looter.addStyleName(CharDB.getRoleForCharacter(item.getLooter()).
+                toLowerCase().replace(" ", ""));
+        addItem.getItemProperty("Name").setValue(looter);
+        Label itemname = new Label(item.getName());
+        itemname.addStyleName(item.getQuality().toLowerCase());
+        addItem.getItemProperty("Item").setValue(itemname);
+        addItem.getItemProperty("Price").setValue(item.getPrice());
+        addItem.getItemProperty("Heroic").
+                setValue((item.isHeroic() ? "Yes" : "No"));
+        super.requestRepaint();
+    }
+
+    private class RewardListClickListener implements ItemClickListener
+    {
 
         @Override
-        public void onRaidInfoChanged() {
-                CharDB.clearCache();
-                update();
+        public void itemClick(ItemClickEvent event)
+        {
+            RaidItem ritem = (RaidItem) event.getItemId();
+            PopUpControl pop = new PopUpControl(RaidLootList.this.
+                    getApplication());
+            pop.setRaidLootList(raidLootList);
+            pop.setCharacterList(clist);
+            pop.setDkpList(dkplist);
+            pop.setItemList(itemList);
+            pop.showProperRaidLootWindow(raid, ritem);
         }
-
-        private void raidRewardListSetHeaders() {
-                ic.addContainerProperty("Name", Label.class, "");
-                ic.addContainerProperty("Item", Label.class, "");
-                ic.addContainerProperty("Price", Double.class, 0);
-                ic.addContainerProperty("Heroic", String.class, "");
-                this.setContainerDataSource(ic);
-        }
-
-        public void clear() {
-                this.removeAllItems();
-        }
-
-        private void printList() {
-                ArrayList<RaidItem> temp;
-                temp = ItemDB.getItemsForRaid(raid.getId());
-                for (RaidItem item : temp) {
-                        Item addItem = ic.addItem(item);
-                        raidListAddRow(addItem, item);
-                        if (longest < item.getName().length() + 1) {
-                                longest = item.getName().length() + 1;
-                        }
-                        if (longestname < item.getLooter().length() +1) {
-                                longestname = item.getLooter().length() +1;
-                        }
-                }
-                this.setColumnWidth("Item", longest * 6);
-                this.setColumnWidth("Name", longestname * 6);
-        }
-
-        private void raidListAddRow(Item addItem, RaidItem item) {
-                Label looter = new Label(item.getLooter());
-                looter.addStyleName(CharDB.getRoleForCharacter(item.getLooter()).toLowerCase().replace(" ", ""));
-                addItem.getItemProperty("Name").setValue(looter);
-                Label itemname = new Label(item.getName());
-                itemname.addStyleName(item.getQuality().toLowerCase());
-                addItem.getItemProperty("Item").setValue(itemname);
-                addItem.getItemProperty("Price").setValue(item.getPrice());
-                addItem.getItemProperty("Heroic").setValue((item.isHeroic() ? "Yes" : "No"));
-                super.requestRepaint();
-        }
-
-        private class RewardListClickListener implements ItemClickListener {
-
-                @Override
-                public void itemClick(ItemClickEvent event) {
-                                RaidItem ritem = (RaidItem) event.getItemId();
-                                PopUpControl pop = new PopUpControl(RaidLootList.this.getApplication());
-                                pop.setRaidLootList(raidLootList);
-                                pop.setCharacterList(clist);
-                                pop.setDkpList(dkplist);
-                                pop.setItemList(itemList);
-                                pop.showProperRaidLootWindow(raid, ritem);
-                }
-        }
+    }
 }

@@ -15,141 +15,159 @@ import com.vaadin.ui.Table;
 import java.util.Comparator;
 import java.util.List;
 
-public class DkpList extends Table implements CharacterInfoListener {
+public class DkpList extends Table implements CharacterInfoListener
+{
 
-        private IndexedContainer ic;
-        private DkpList dkpList = this;
-        private CharacterList charList;
-        private ItemList itemList;
-        private RaidList raidList;
+    private IndexedContainer ic;
+    private DkpList dkpList = this;
+    private CharacterList charList;
+    private ItemList itemList;
+    private RaidList raidList;
 
-        public DkpList() {
-                this.ic = new IndexedContainer();
-                this.setSelectable(true);
-                this.setWidth("185px");
-                this.setHeight("650px");
-                this.setPageLength(0);
-                this.addListener(new dkpListClickListener());
-                dkpListSetColumnHeaders();
+    public DkpList()
+    {
+        this.ic = new IndexedContainer();
+        this.setSelectable(true);
+        this.setWidth("185px");
+        this.setHeight("650px");
+        this.setPageLength(0);
+        this.addListener(new dkpListClickListener());
+        dkpListSetColumnHeaders();
+    }
+
+    public void setLists(ItemList itemList, RaidList raidList)
+    {
+        this.itemList = itemList;
+        this.raidList = raidList;
+    }
+
+    @SuppressWarnings("CallToThreadDumpStack")
+    private void dkpListSetColumnHeaders() throws UnsupportedOperationException
+    {
+        ic.addContainerProperty("Name", Label.class, "");
+        ic.addContainerProperty("Armor", Armor.class, "");
+        ic.addContainerProperty("DKP", Label.class, 0);
+        ic.setItemSorter(new DefaultItemSorter(new DkpItemSorter()));
+        this.setContainerDataSource(ic);
+    }
+
+    public void clear()
+    {
+        this.removeAllItems();
+    }
+
+    @Override
+    public void onCharacterInfoChange()
+    {
+        CharDB.clearCache();
+        update();
+    }
+
+    private void update()
+    {
+        ic.removeAllItems();
+        ic.removeAllContainerFilters();
+        printList();
+    }
+
+    public void printList()
+    {
+        clear();
+        List<User> users = CharDB.getUsersSortedByDKP();
+        for (final User user : users) {
+            if (user.isActive()) {
+                Item addItem = addItem(user);
+                dkpListAddRow(addItem, user);
+            }
         }
+        this.setColumnCollapsingAllowed(true);
+        this.setColumnCollapsed("Armor", true);
+        this.setColumnCollapsed("Attendance", true);
 
-        public void setLists(ItemList itemList, RaidList raidList) {
-                this.itemList = itemList;
-                this.raidList = raidList;
+    }
+
+    private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException
+    {
+        Label charname = new Label(user.getName());
+        charname.addStyleName(user.getRole().toString().replace(" ", "").
+                toLowerCase());
+        addItem.getItemProperty("Name").setValue(charname);
+        addItem.getItemProperty("Armor").setValue(user.getArmor());
+        Label dkp = new Label("" + user.getDKP());
+        dkp.setContentMode(Label.CONTENT_XHTML);
+        if (user.getDKP() >= 0) {
+            dkp.addStyleName("positive");
+        } else {
+            dkp.addStyleName("negative");
         }
+        addItem.getItemProperty("DKP").setValue(dkp);
+    }
 
-        @SuppressWarnings("CallToThreadDumpStack")
-        private void dkpListSetColumnHeaders() throws UnsupportedOperationException {
-                ic.addContainerProperty("Name", Label.class, "");
-                ic.addContainerProperty("Armor", Armor.class, "");
-                ic.addContainerProperty("DKP", Label.class, 0);
-                ic.setItemSorter(new DefaultItemSorter(new DkpItemSorter()));
-                this.setContainerDataSource(ic);
+    public void filter(Object value)
+    {
+        ic.removeAllContainerFilters();
+        String foo = filterString(value);
+        ic.addContainerFilter("Armor", foo, true, false);
+    }
+
+    private String filterString(Object value)
+    {
+        if (value == null) {
+            return "";
+        } else {
+            return value.toString();
         }
+    }
 
-        public void clear() {
-                this.removeAllItems();
+    public void setCharacterList(CharacterList charList)
+    {
+        this.charList = charList;
+    }
+
+    private class dkpListClickListener implements ItemClickListener
+    {
+
+        @Override
+        public void itemClick(ItemClickEvent event)
+        {
+            User user = (User) event.getItemId();
+            PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
+            pop.setItemList(itemList);
+            pop.setRaidList(raidList);
+            pop.setDkpList(dkpList);
+            pop.setCharacterList(charList);
+            pop.showProperCharWindow(user);
+        }
+    }
+
+    class DkpItemSorter implements Comparator<Object>
+    {
+
+        public boolean isParsableToDouble(String i)
+        {
+            try {
+                Double.parseDouble(i);
+                return true;
+            } catch (NumberFormatException nfe) {
+                return false;
+            }
         }
 
         @Override
-        public void onCharacterInfoChange() {
-                CharDB.clearCache();
-                update();
-        }
-
-        private void update() {
-                ic.removeAllItems();
-                ic.removeAllContainerFilters();
-                printList();
-        }
-
-        public void printList() {
-                clear();
-                List<User> users = CharDB.getUsersSortedByDKP();
-                for (final User user : users) {
-                        if (user.isActive()) {
-                                Item addItem = addItem(user);
-                                dkpListAddRow(addItem, user);
-                        }
+        public int compare(Object o1, Object o2)
+        {
+            if (o1 instanceof Label && o2 instanceof Label) {
+                String s1 = ((Label) o1).getValue().toString();
+                String s2 = ((Label) o2).getValue().toString();
+                if (isParsableToDouble(s1) && isParsableToDouble(s2)) {
+                    return Double.parseDouble(s1) < Double.parseDouble(s2) ? 1 : 0;
                 }
-                this.setColumnCollapsingAllowed(true);
-                this.setColumnCollapsed("Armor", true);
-                this.setColumnCollapsed("Attendance", true);
-
+                return s1.compareToIgnoreCase(s2);
+            } else if (o1 instanceof Double && o2 instanceof Double) {
+                return (Double) o1 < (Double) o2 ? 1 : 0;
+            } else {
+                return 0;
+            }
         }
-
-        private void dkpListAddRow(Item addItem, final User user) throws ConversionException, ReadOnlyException {
-                Label charname = new Label(user.getName());
-                charname.addStyleName(user.getRole().toString().replace(" ", "").toLowerCase());
-                addItem.getItemProperty("Name").setValue(charname);
-                addItem.getItemProperty("Armor").setValue(user.getArmor());
-                Label dkp = new Label("" + user.getDKP());
-                dkp.setContentMode(Label.CONTENT_XHTML);
-                if (user.getDKP() >= 0) {
-                        dkp.addStyleName("positive");
-                } else {
-                        dkp.addStyleName("negative");
-                }
-                addItem.getItemProperty("DKP").setValue(dkp);
-        }
-
-        public void filter(Object value) {
-                ic.removeAllContainerFilters();
-                String foo = filterString(value);
-                ic.addContainerFilter("Armor", foo, true, false);
-        }
-
-        private String filterString(Object value) {
-                if (value == null) {
-                        return "";
-                } else {
-                        return value.toString();
-                }
-        }
-
-        public void setCharacterList(CharacterList charList) {
-                this.charList = charList;
-        }
-
-        private class dkpListClickListener implements ItemClickListener {
-
-                @Override
-                public void itemClick(ItemClickEvent event) {
-                        User user = (User) event.getItemId();
-                        PopUpControl pop = new PopUpControl(DkpList.this.getApplication());
-                        pop.setItemList(itemList);
-                        pop.setRaidList(raidList);
-                        pop.setDkpList(dkpList);
-                        pop.setCharacterList(charList);
-                        pop.showProperCharWindow(user);
-                }
-        }
-
-        class DkpItemSorter implements Comparator<Object> {
-
-                public boolean isParsableToDouble(String i) {
-                        try {
-                                Double.parseDouble(i);
-                                return true;
-                        } catch (NumberFormatException nfe) {
-                                return false;
-                        }
-                }
-
-                @Override
-                public int compare(Object o1, Object o2) {
-                        if (o1 instanceof Label && o2 instanceof Label) {
-                                String s1 = ((Label) o1).getValue().toString();
-                                String s2 = ((Label) o2).getValue().toString();
-                                if (isParsableToDouble(s1) && isParsableToDouble(s2)) {
-                                        return Double.parseDouble(s1) < Double.parseDouble(s2) ? 1 : 0;
-                                }
-                                return s1.compareToIgnoreCase(s2);
-                        } else if (o1 instanceof Double && o2 instanceof Double) {
-                                return (Double) o1 < (Double) o2 ? 1 : 0;
-                        } else {
-                                return 0;
-                        }
-                }
-        }
+    }
 }

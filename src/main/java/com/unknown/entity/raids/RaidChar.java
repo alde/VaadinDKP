@@ -1,42 +1,50 @@
-
-
 package com.unknown.entity.raids;
 
+public class RaidChar
+{
 
-public class RaidChar {
-	private int id;
-        private int raidid;
-	private String name;
-        private int shares;
+    private int id;
+    private int raidid;
+    private String name;
+    private double shares;
 
-        public int getRaidId() {
-                return raidid;
-        }
+    public int getRaidId()
+    {
+        return raidid;
+    }
 
-        public void setRaidId(int raidid) {
-                this.raidid = raidid;
-        }
-		public int getId() {
-		return id;
-	}
+    public void setRaidId(int raidid)
+    {
+        this.raidid = raidid;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getId()
+    {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(int id)
+    {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-        public int getShares() {
-            return shares;
-        }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-        public void setShares(int shares) {
-            this.shares = shares;
-        }
+    public double getShares()
+    {
+        return shares;
+    }
+
+    public void setShares(double shares)
+    {
+        this.shares = shares;
+    }
 }

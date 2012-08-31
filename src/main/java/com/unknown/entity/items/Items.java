@@ -4,12 +4,13 @@ package com.unknown.entity.items;
 
 import com.google.common.collect.ImmutableList;
 import com.unknown.entity.Type;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 
-public class Items {
+public class Items implements Serializable {
 
     private final int id;
     private final String itemname;

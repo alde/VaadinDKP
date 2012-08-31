@@ -1,11 +1,9 @@
-
-
 package com.unknown.entity.character;
 
+public interface SiteUser
+{
 
-public interface SiteUser {
+    public int getLevel();
 
-	public int getLevel();
-
-        public String getSiteUserName();
+    public String getSiteUserName();
 }
