@@ -160,7 +160,17 @@ public class DkpList extends Table implements CharacterInfoListener
                 String s1 = ((Label) o1).getValue().toString();
                 String s2 = ((Label) o2).getValue().toString();
                 if (isParsableToDouble(s1) && isParsableToDouble(s2)) {
-                    return Double.parseDouble(s1) < Double.parseDouble(s2) ? 1 : 0;
+                    double one = Double.parseDouble(s1);
+                    double two = Double.parseDouble(s2);
+                    double delta = one - two;
+                    if (delta > 0) {
+                        return 1;
+                    }
+                    if (delta < 0) {
+                        return -1;
+                    }
+                    return 0;
+
                 }
                 return s1.compareToIgnoreCase(s2);
             } else if (o1 instanceof Double && o2 instanceof Double) {

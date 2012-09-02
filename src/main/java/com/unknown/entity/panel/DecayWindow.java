@@ -98,8 +98,7 @@ public class DecayWindow extends Window
         decay_over_four_months.addListener(new DecayPercentListener2());
 
         Label notice = new Label(
-                "Decay is automatically calculated from the original shares gained. "
-                + "There is no need to undo decay before applying a new decay.");
+                "Decay is automatically calculated from the original shares gained.");
         notice.addStyleName("notice");
 
         Button decayButton = new Button("Perform Decay");
@@ -108,7 +107,7 @@ public class DecayWindow extends Window
         closeButton.addListener(new CloseButtonListener());
         closeButton.addStyleName("button_close_decay");
 
-        Button undoDecayButton = new Button("Undo Decay");
+        Button undoDecayButton = new Button("Restore Original Shares");
         undoDecayButton.addListener(new UndoDecayButtonListener());
 
         HorizontalLayout buttonHoriz = new HorizontalLayout();

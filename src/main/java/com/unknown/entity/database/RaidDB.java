@@ -335,10 +335,11 @@ public class RaidDB
     private static int doUpdateSharesAndComment(RaidReward reward, double newShares, String newComment) throws SQLException
     {
         PreparedStatement p =
-                prepareStatement("UPDATE rewards SET number_of_shares=? , comment=? WHERE id=?");
+                prepareStatement("UPDATE rewards SET number_of_shares=?, original_shares=?, comment=? WHERE id=?");
         p.setDouble(1, newShares);
-        p.setString(2, newComment);
-        p.setInt(3, reward.getId());
+        p.setDouble(2, newShares);
+        p.setString(3, newComment);
+        p.setInt(4, reward.getId());
         return p.executeUpdate();
     }
 
@@ -919,7 +920,7 @@ public class RaidDB
         Double newShares = reward.getOriginalShares() - (reward.
                 getOriginalShares() * (percent / 100));
         double shares = new BigDecimal(newShares).
-                setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+                setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 
         PreparedStatement p;
         try {
@@ -940,7 +941,7 @@ public class RaidDB
 
         Double newShares = adj.getOriginalShares() - (adj.getOriginalShares() * (percent / 100));
         double shares = new BigDecimal(newShares).
-                setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+                setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 
         try {
             PreparedStatement p = prepareStatement("UPDATE adjustments SET shares=? WHERE id=?");
