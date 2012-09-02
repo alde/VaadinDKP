@@ -24,6 +24,7 @@ import com.vaadin.ui.Window;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +35,7 @@ import java.util.logging.Logger;
  */
 public class DecayWindow extends Window
 {
+
     private Label message;
     private List<ItemInfoListener> itemListeners = new ArrayList<ItemInfoListener>();
     private List<CharacterInfoListener> charListeners = new ArrayList<CharacterInfoListener>();
@@ -44,10 +46,10 @@ public class DecayWindow extends Window
     public DecayWindow()
     {
         this.setWidth("400px");
-        this.setHeight("300px");
+        this.setHeight("400px");
         this.setPositionX(200);
         this.setPositionY(100);
-        this.setCaption("Share Decay");
+        this.setCaption("Decay shares from Raids and Adjustments");
 
         percentDecay = 50d;
         percentDecay2 = 90d;
@@ -56,8 +58,29 @@ public class DecayWindow extends Window
     void printInfo()
     {
         this.message = new Label();
+        String decay_one = "";
+        String decay_two = "";
+        try {
+            HashMap<String, Integer> counts = RaidDB.
+                    countRewardsAndAdjustmentsToBeDecayed();
+            decay_one = "(" + rewardNotice(counts.get("rewards_mid")) + " and "
+                    + adjustmentNotice(counts.get("adjustments_mid"))
+                    + " will be affected.)";
+            decay_two = "(" + rewardNotice(counts.get("rewards_old")) + " and "
+                    + adjustmentNotice(counts.get("adjustments_old"))
+                    + " will be affected.)";
+        } catch (ParseException ex) {
+            Logger.getLogger(DecayWindow.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
 
-        TextField decay_over_two_months = new TextField("Decay raids older than 2 months by (value in %)");
+        Label notice_two_months = new Label(decay_one);
+        Label notice_four_months = new Label(decay_two);
+        notice_two_months.addStyleName("small");
+        notice_four_months.addStyleName("small");
+
+        TextField decay_over_two_months = new TextField(
+                "Older than 2 months by (value in %)");
         decay_over_two_months.
                 setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
         decay_over_two_months.setValue(percentDecay);
@@ -65,7 +88,8 @@ public class DecayWindow extends Window
         decay_over_two_months.setImmediate(true);
         decay_over_two_months.addListener(new DecayPercentListener());
 
-        TextField decay_over_four_months = new TextField("Decay raids older than 4 months by (value in %)");
+        TextField decay_over_four_months = new TextField(
+                "Older than 4 months by (value in %)");
         decay_over_four_months.
                 setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
         decay_over_four_months.setValue(percentDecay2);
@@ -73,24 +97,33 @@ public class DecayWindow extends Window
         decay_over_four_months.setImmediate(true);
         decay_over_four_months.addListener(new DecayPercentListener2());
 
+        Label notice = new Label(
+                "Decay is automatically calculated from the original shares gained. "
+                + "There is no need to undo decay before applying a new decay.");
+        notice.addStyleName("notice");
+
         Button decayButton = new Button("Perform Decay");
         decayButton.addListener(new DecayButtonListener());
         Button closeButton = new Button("Close");
         closeButton.addListener(new CloseButtonListener());
+        closeButton.addStyleName("button_close_decay");
+
         Button undoDecayButton = new Button("Undo Decay");
         undoDecayButton.addListener(new UndoDecayButtonListener());
 
         HorizontalLayout buttonHoriz = new HorizontalLayout();
         buttonHoriz.addComponent(decayButton);
-        buttonHoriz.addComponent(closeButton);
         buttonHoriz.addComponent(undoDecayButton);
+        buttonHoriz.addComponent(closeButton);
 
         VerticalLayout layout = new VerticalLayout();
-
         layout.addComponent(decay_over_two_months);
+        layout.addComponent(notice_two_months);
         layout.addComponent(decay_over_four_months);
+        layout.addComponent(notice_four_months);
         layout.addComponent(message);
         layout.addComponent(buttonHoriz);
+        layout.addComponent(notice);
 
         this.addComponent(layout);
     }
@@ -123,33 +156,60 @@ public class DecayWindow extends Window
         }
     }
 
-    private void undoDecay() {
+    private void undoDecay()
+    {
         try {
             RaidDB.restoreRewards();
             RaidDB.restoreAdjustments();
             message.setValue("Decay undone.");
+            message.setStyleName("success");
         } catch (SQLException ex) {
-            message.setValue("Failed to undo decay: " + ex.getLocalizedMessage());
+            message.setValue("Failed to undo decay: \n" + ex.
+                    getLocalizedMessage());
+            message.setStyleName("error");
+            ex.printStackTrace();
         }
     }
 
     private void performDecay()
     {
-
-        undoDecay();
-
         try {
             int count_rewards = 0;
             count_rewards += RaidDB.decayRaid(percentDecay, percentDecay2);
 
             int count_adjustments = 0;
-            count_adjustments += RaidDB.decayAdjustments(percentDecay, percentDecay2);
+            count_adjustments += RaidDB.
+                    decayAdjustments(percentDecay, percentDecay2);
 
-            message.setValue(count_rewards + " rewards and " + count_adjustments + " adjustments successfully updated.");
+            message.
+                    setValue(rewardNotice(count_rewards) + " and " + adjustmentNotice(count_adjustments) + " successfully updated.");
+            message.setStyleName("success");
         } catch (ParseException ex) {
             Logger.getLogger(DecayWindow.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
+    }
+
+    private String rewardNotice(int get)
+    {
+        if (get > 1) {
+            return get + " rewards";
+        }
+        if (get == 1) {
+            return get + " reward";
+        }
+        return "no rewards";
+    }
+
+    private String adjustmentNotice(int get)
+    {
+        if (get > 1) {
+            return get + " adjustments";
+        }
+        if (get == 1) {
+            return get + " adjustment";
+        }
+        return "no adjustments";
     }
 
     private class CloseButtonListener implements ClickListener
@@ -168,6 +228,8 @@ public class DecayWindow extends Window
         @Override
         public void buttonClick(ClickEvent event)
         {
+            message.setValue("");
+            message.setStyleName("");
             performDecay();
             notifyListeners();
         }
@@ -179,7 +241,6 @@ public class DecayWindow extends Window
         @Override
         public void valueChange(ValueChangeEvent event)
         {
-            System.out.println(event.getProperty().getValue().toString());
             percentDecay = Double.parseDouble(event.getProperty().getValue().
                     toString());
         }
@@ -203,6 +264,8 @@ public class DecayWindow extends Window
         @Override
         public void buttonClick(ClickEvent event)
         {
+            message.setValue("");
+            message.setStyleName("");
             undoDecay();
             notifyListeners();
         }

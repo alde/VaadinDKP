@@ -86,7 +86,7 @@ public class RaidRewardAddWindow extends Window
         List<String> invalidchars = findInvalidCharacters(attendantlist);
         if (invalidchars.isEmpty()) {
 
-            RaidReward raidReward = new RaidReward(comment, 0, raid.getId(), shares);
+            RaidReward raidReward = new RaidReward(comment, 0, raid.getId(), shares, shares);
             Collection<RaidChar> chars = RaidDB.
                     getRaidCharsForRaid(attendantlist, raid.getId());
             raidReward.setRewardChars(chars);

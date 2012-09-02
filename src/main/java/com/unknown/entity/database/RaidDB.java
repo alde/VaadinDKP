@@ -16,10 +16,12 @@ import java.util.Set;
 import com.unknown.entity.Logg;
 import com.unknown.entity.UnknownEntityDKP;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
@@ -150,6 +152,8 @@ public class RaidDB
                 rrewards.setId(rs.getInt("rewards.id"));
                 rrewards.setComment(rs.getString("rewards.comment"));
                 rrewards.setShares(rs.getDouble("rewards.number_of_shares"));
+                rrewards.setOriginalShares(rs.
+                        getDouble("rewards.original_shares"));
                 rrewards.setRewardChars(getCharsForReward(rrewards.getId()));
                 raidRewards.add(rrewards);
             }
@@ -393,12 +397,17 @@ public class RaidDB
 
     private static RaidReward doAddReward(RaidReward reward)
     {
+        double shares = new BigDecimal(reward.getShares()).
+                setScale(2, RoundingMode.HALF_UP).doubleValue();
+        double original_shares = new BigDecimal(reward.getOriginalShares()).
+                setScale(2, RoundingMode.HALF_UP).doubleValue();
         try {
             PreparedStatement p = UnknownEntityDKP.getInstance().getConn().
-                    prepareStatement("INSERT INTO rewards (number_of_shares, comment, raid_id) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            p.setDouble(1, reward.getShares());
-            p.setString(2, reward.getComment());
-            p.setInt(3, reward.getRaidId());
+                    prepareStatement("INSERT INTO rewards (number_of_shares, original_shares, comment, raid_id) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            p.setDouble(1, shares);
+            p.setDouble(2, original_shares);
+            p.setString(3, reward.getComment());
+            p.setInt(4, reward.getRaidId());
             p.executeUpdate();
             ResultSet rs = p.getGeneratedKeys();
             while (rs.next()) {
@@ -734,6 +743,7 @@ public class RaidDB
                 pTemp.setDate(rs.getString("date"));
                 pTemp.setId(rs.getInt("id"));
                 pTemp.setShares(rs.getDouble("shares"));
+                pTemp.setOriginalShares(rs.getDouble("original_shares"));
                 pun.add(pTemp);
             }
         } catch (SQLException ex) {
@@ -749,13 +759,18 @@ public class RaidDB
 
     private static Adjustment doAddAdjustment(Adjustment p)
     {
+        double shares = new BigDecimal(p.getShares()).
+                setScale(2, RoundingMode.HALF_UP).doubleValue();
+        double original_shares = new BigDecimal(p.getOriginalShares()).
+                setScale(2, RoundingMode.HALF_UP).doubleValue();
         try {
             PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().
-                    prepareStatement("INSERT INTO adjustments (shares, comment, character_id, date) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setDouble(1, p.getShares());
-            ps.setString(2, p.getComment());
-            ps.setInt(3, p.getCharId());
-            ps.setString(4, p.getDate());
+                    prepareStatement("INSERT INTO adjustments (shares, original_shares, comment, character_id, date) values(?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setDouble(1, shares);
+            ps.setDouble(2, original_shares);
+            ps.setString(3, p.getComment());
+            ps.setInt(4, p.getCharId());
+            ps.setString(5, p.getDate());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             while (rs.next()) {
@@ -813,6 +828,46 @@ public class RaidDB
                 toDate();
     }
 
+    public static HashMap<String, Integer> countRewardsAndAdjustmentsToBeDecayed() throws ParseException
+    {
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        Date raidDate, adjustmentDate;
+        int count_adj_old = 0;
+        int count_rew_old = 0;
+        int count_adj_mid = 0;
+        int count_rew_mid = 0;
+
+        Date two_months_ago = getDateNMonthsAgo(2);
+        Date four_months_ago = getDateNMonthsAgo(4);
+
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for (Raid r : getRaids()) {
+            raidDate = sdf.parse(r.getDate());
+            for (RaidReward rr : getRewardsForRaid(r.getId())) {
+                if (raidDate.before(four_months_ago)) {
+                    count_rew_old += 1;
+                } else if (raidDate.before(two_months_ago)) {
+                    count_rew_mid += 1;
+                }
+            }
+        }
+        for (Adjustment a : getAllAdjustment()) {
+            adjustmentDate = sdf.parse(a.getDate());
+            if (adjustmentDate.before(four_months_ago)) {
+                count_adj_old += 1;
+            } else if (adjustmentDate.before(two_months_ago)) {
+                count_adj_mid += 1;
+            }
+        }
+
+        map.put("adjustments_mid", count_adj_mid);
+        map.put("adjustments_old", count_adj_old);
+        map.put("rewards_mid", count_rew_mid);
+        map.put("rewards_old", count_rew_old);
+
+        return map;
+    }
+
     public static int decayRaid(double decay_one, double decay_two) throws ParseException
     {
         int count = 0;
@@ -861,10 +916,10 @@ public class RaidDB
     {
         int result = 0;
 
-        Double newShares = reward.getShares() - (reward.getShares() * (percent / 100));
-        double shares = new BigDecimal(newShares).setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
-
-        backupRewards(reward);
+        Double newShares = reward.getOriginalShares() - (reward.
+                getOriginalShares() * (percent / 100));
+        double shares = new BigDecimal(newShares).
+                setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
 
         PreparedStatement p;
         try {
@@ -883,10 +938,9 @@ public class RaidDB
     {
         int result = 0;
 
-        Double newShares = adj.getShares() - (adj.getShares() * (percent / 100));
-        double shares = new BigDecimal(newShares).setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
-
-        backupAdjustment(adj);
+        Double newShares = adj.getOriginalShares() - (adj.getOriginalShares() * (percent / 100));
+        double shares = new BigDecimal(newShares).
+                setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
 
         try {
             PreparedStatement p = prepareStatement("UPDATE adjustments SET shares=? WHERE id=?");
@@ -900,61 +954,33 @@ public class RaidDB
         return result;
     }
 
-    private static void backupRewards(RaidReward reward)
-    {
-        try {
-            PreparedStatement p = prepareStatement("CREATE TABLE IF NOT EXISTS `rewards_backup` (`id` int(11) NOT NULL, `number_of_shares` double NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1;");
-            p.execute();
-            p = prepareStatement("REPLACE INTO rewards_backup (id, number_of_shares, raid_id) VALUES(?,?)");
-            p.setInt(1, reward.getId());
-            p.setDouble(2, reward.getShares());
-            p.executeQuery();
-        } catch (SQLException ex) {
-            Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private static void backupAdjustment(Adjustment adj)
-    {
-        try {
-            PreparedStatement p = prepareStatement("CREATE TABLE IF NOT EXISTS `adjustment_backup` (`id` int(11) NOT NULL, `number_of_shares` double NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1;");
-            p.execute();
-            p = prepareStatement("REPLACE INTO adjustment_backup (id, number_of_shares) VALUES(?,?)");
-            p.setInt(1, adj.getId());
-            p.setDouble(2, adj.getShares());
-            p.executeQuery();
-        } catch (SQLException ex) {
-            Logger.getLogger(RaidDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public static void restoreAdjustments() throws SQLException
     {
-        PreparedStatement p = prepareStatement("SELECT id, number_of_shares FROM adjustment_backup");
+        PreparedStatement p = prepareStatement("SELECT id, original_shares FROM adjustments");
         ResultSet rs = p.executeQuery();
 
         while (rs.next()) {
             Adjustment adj = getAdjustment(rs.getInt("id"));
-            adj.setShares(rs.getDouble("number_of_shares"));
+            adj.setShares(rs.getDouble("original_shares"));
             updateAdjustment(adj);
         }
     }
 
     public static void restoreRewards() throws SQLException
     {
-        PreparedStatement p = prepareStatement("SELECT id, number_of_shares FROM rewards_backup");
+        PreparedStatement p = prepareStatement("SELECT id, original_shares FROM rewards");
         ResultSet rs = p.executeQuery();
 
         while (rs.next()) {
             RaidReward reward = getReward(rs.getInt("id"));
-            reward.setShares(rs.getDouble("number_of_shares"));
+            reward.setShares(rs.getDouble("original_shares"));
             updateReward(reward);
         }
     }
 
     private static Adjustment getAdjustment(int id) throws SQLException
     {
-        PreparedStatement p = prepareStatement("SELECT `character_id`, `comment`, `date`, `shares` FROM `adjustments` WHERE id=?");
+        PreparedStatement p = prepareStatement("SELECT `character_id`, `comment`, `date`, `shares`, `original_shares` FROM `adjustments` WHERE id=?");
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
 
@@ -965,6 +991,7 @@ public class RaidDB
             a.setComment(rs.getString("comment"));
             a.setDate(rs.getString("date"));
             a.setShares(rs.getDouble("shares"));
+            a.setOriginalShares(rs.getDouble("original_shares"));
         }
         return a;
     }
@@ -982,7 +1009,7 @@ public class RaidDB
 
     private static RaidReward getReward(int id) throws SQLException
     {
-        PreparedStatement p = prepareStatement("SELECT `number_of_shares`, `comment`, `raid_id`, `mob_id`, `loot_id` FROM `rewards` WHERE id=?");
+        PreparedStatement p = prepareStatement("SELECT `number_of_shares`, `original_shares`, `comment`, `raid_id`, `mob_id`, `loot_id` FROM `rewards` WHERE id=?");
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
 
@@ -992,6 +1019,7 @@ public class RaidDB
             reward.setComment(rs.getString("comment"));
             reward.setRaidId(rs.getInt("raid_id"));
             reward.setShares(rs.getDouble("number_of_shares"));
+            reward.setOriginalShares(rs.getDouble("original_shares"));
             reward.setRewardChars(getCharsForReward(id));
         }
         return reward;
@@ -1021,6 +1049,7 @@ public class RaidDB
                 pTemp.setDate(rs.getString("date"));
                 pTemp.setId(rs.getInt("id"));
                 pTemp.setShares(rs.getDouble("shares"));
+                pTemp.setOriginalShares(rs.getDouble("original_shares"));
                 pun.add(pTemp);
             }
         } catch (SQLException ex) {

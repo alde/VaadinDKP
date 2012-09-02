@@ -8,6 +8,7 @@ public class Adjustment
     private double shares;
     private String date;
     private String comment;
+    private double originalShares;
 
     public String getComment()
     {
@@ -57,5 +58,15 @@ public class Adjustment
     public void setCharId(int charId)
     {
         this.charId = charId;
+    }
+
+    public void setOriginalShares(double originalShares)
+    {
+        this.originalShares = originalShares;
+    }
+
+    public double getOriginalShares()
+    {
+        return this.originalShares;
     }
 }

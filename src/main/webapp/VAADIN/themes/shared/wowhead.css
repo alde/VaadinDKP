@@ -349,3 +349,29 @@ table.wowhead_tooltip td.wh_left div.wh_right {background-image: url(../../../wo
 .i-window-druid .i-window-header { color: #FF7D0A; }
 .i-window-mage .i-window-header { color: #69CCF0; }
 .i-window-monk .i-window-header { color: #077F5B; }
+
+.v-label-notice {
+    background-color: #FFD100;
+    border: 2px solid #000000;
+    box-shadow: 5px 5px 5px #000000;
+    color: #000000;
+    font-size: 15px;
+    margin-top: 15px;
+    padding: 6px;
+    text-shadow: 0 0 0 !important;
+}
+
+.success {
+    background-color: #099F2C;
+    border: 2px solid #000000;
+    box-shadow: 5px 5px 5px #000000;
+    color: #000000;
+    font-size: 15px;
+    margin-top: 15px;
+    padding: 6px;
+    text-shadow: 0 0 0 !important;
+}
+
+.button_close_decay {
+    margin-left: 90px;
+}
