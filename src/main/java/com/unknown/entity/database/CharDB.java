@@ -45,19 +45,16 @@ public class CharDB
             ResultSet rss = ps.executeQuery();
             PreparedStatement totalShares = UnknownEntityDKP.getInstance().
                     getConn().
-                    prepareStatement("SELECT * FROM rewards JOIN character_rewards ON character_rewards.reward_id=rewards.id JOIN characters ON character_rewards.character_id=characters.id");
+                    prepareStatement("SELECT SUM( number_of_shares ) as shares FROM rewards JOIN character_rewards ON character_rewards.reward_id = rewards.id JOIN characters ON character_rewards.character_id = characters.id AND characters.active =1");
             ResultSet rsTotalShares = totalShares.executeQuery();
             PreparedStatement pAdjust = UnknownEntityDKP.getInstance().getConn().
-                    prepareStatement("SELECT SUM(shares) AS pun FROM adjustments");
+                    prepareStatement("SELECT SUM(shares) AS pun FROM adjustments JOIN characters ON characters.id=adjustments.character_id AND characters.active=1");
             ResultSet rsAdjust = pAdjust.executeQuery();
             while (rsAdjust.next()) {
                 totaladjustments = rsAdjust.getDouble("pun");
             }
             while (rsTotalShares.next()) {
-                if (rsTotalShares.getBoolean("characters.active")) {
-                    totalshares += rsTotalShares.
-                            getDouble("rewards.number_of_shares");
-                }
+                totalshares = rsTotalShares.getDouble("shares");
             }
             totalshares += totaladjustments;
 
@@ -111,7 +108,7 @@ public class CharDB
         double adjustments = getTotalAdjustmentsForCharacter(userid);
         double dkp_earned = 0.0, dkp_spent = 0.0, dkp = 0.0, share_value = 0.0;
         Collection<Double> priceCollection = prices.get(userid);
-        for (Double dkpvalue : priceCollection) {
+        for (double dkpvalue : priceCollection) {
             dkp_spent = dkp_spent + dkpvalue;
         }
 

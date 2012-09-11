@@ -514,8 +514,9 @@ public class RaidDB
     {
         int total_raids = 0;
         DateTime dt = new DateTime();
-        String startdate = dt.toYearMonthDay().minusDays(n).toString();
-        String enddate = dt.toYearMonthDay().toString();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String startdate = df.format(dt.toYearMonthDay().minusDays(n).toDateTimeAtCurrentTime().toDate());
+        String enddate = df.format(dt.toYearMonthDay().toDateTimeAtCurrentTime().toDate());
         try {
 
             PreparedStatement p = UnknownEntityDKP.getInstance().getConn().
@@ -533,24 +534,25 @@ public class RaidDB
 
     public static int getAttendedRaidsLastNDays(int n, User user)
     {
-        int i = 0;
+        int attended = 0;
         DateTime dt = new DateTime();
-        String startdate = dt.toYearMonthDay().minusDays(n).toString();
-        String enddate = dt.toYearMonthDay().toString();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String startdate = df.format(dt.toYearMonthDay().minusDays(n).toDateTimeAtCurrentTime().toDate());
+        String enddate = df.format(dt.toYearMonthDay().toDateTimeAtCurrentTime().toDate());
         try {
             PreparedStatement p = UnknownEntityDKP.getInstance().getConn().
-                    prepareStatement("SELECT DISTINCT raid_id FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
+                    prepareStatement("SELECT count(DISTINCT raid_id) as attended FROM characters JOIN character_rewards JOIN rewards JOIN raids WHERE characters.id=character_rewards.character_id AND characters.id=? AND rewards.id=character_rewards.reward_id AND raids.id = rewards.raid_id AND raids.date BETWEEN ? AND ?");
             p.setInt(1, user.getId());
             p.setString(2, startdate);
             p.setString(3, enddate);
             ResultSet rs = p.executeQuery();
             while (rs.next()) {
-                i++;
+                attended = rs.getInt("attended");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return i;
+        return attended;
     }
 
     public static boolean getLootedHeroic(String charname, int itemid, double price)

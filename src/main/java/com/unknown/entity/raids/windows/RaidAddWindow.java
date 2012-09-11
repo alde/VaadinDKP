@@ -3,8 +3,10 @@ package com.unknown.entity.raids.windows;
 import com.unknown.entity.database.RaidDB;
 import com.unknown.entity.raids.RaidInfoListener;
 import com.vaadin.Application;
+import com.vaadin.data.Property;
 import com.vaadin.data.Property.ConversionException;
 import com.vaadin.data.Property.ReadOnlyException;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -26,6 +28,7 @@ public class RaidAddWindow extends Window
 
     private List<RaidInfoListener> listeners = new ArrayList<RaidInfoListener>();
     private Application app;
+    private Date addDate;
 
     public RaidAddWindow()
     {
@@ -52,8 +55,17 @@ public class RaidAddWindow extends Window
 
         DateField datum = raidAddWindowDateField();
         addItem.addComponent(datum);
+        datum.addListener(new Property.ValueChangeListener() {
 
-        Button addButton = raidAddWindowAddButton(zone, comment, datum);
+            @Override
+            public void valueChange(ValueChangeEvent event)
+            {
+                addDate = (Date) event.getProperty().getValue();
+                System.out.println("addDate: " + addDate);
+            }
+        });
+
+        Button addButton = raidAddWindowAddButton(zone, comment);
         Button closeButton = RaidAddWindowCloseButton();
 
         HorizontalLayout hzl = new HorizontalLayout();
@@ -83,23 +95,23 @@ public class RaidAddWindow extends Window
         this.app = app;
     }
 
-    private Button raidAddWindowAddButton(final ComboBox zone, final TextField comment, final DateField datum)
+    private Button raidAddWindowAddButton(final ComboBox zone, final TextField comment)
     {
         final Button btn = new Button("Add");
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        btn.addListener(new AddButtonClickListener(zone, comment, dateFormat.
-                format(datum.getValue())));
+        btn.addListener(new AddButtonClickListener(zone, comment));
         return btn;
     }
 
     private DateField raidAddWindowDateField() throws ConversionException, ReadOnlyException
     {
         final DateField datum = new DateField("Date");
-        datum.setImmediate(true);
         Date date = new Date();
 
         datum.setDateFormat("yyyy-MM-dd HH:mm");
         datum.setValue(date);
+        datum.setImmediate(true);
+        addDate = date;
+
         return datum;
     }
 
@@ -147,13 +159,11 @@ public class RaidAddWindow extends Window
 
         private final ComboBox zone;
         private final TextField comment;
-        private final String datum;
 
-        public AddButtonClickListener(ComboBox zone, TextField comment, String datum)
+        public AddButtonClickListener(ComboBox zone, TextField comment)
         {
             this.zone = zone;
             this.comment = comment;
-            this.datum = datum;
         }
 
         @Override
@@ -161,7 +171,10 @@ public class RaidAddWindow extends Window
         {
             String rzone = zone.getValue().toString();
             String rcomment = comment.getValue().toString();
-            String rdate = datum;
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+            String rdate = dateFormat.format(addDate);
+            System.out.println("rdate: " + addDate);
             addRaid(rzone, rcomment, rdate);
             notifyListeners();
             close();

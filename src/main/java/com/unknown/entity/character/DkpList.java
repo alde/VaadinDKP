@@ -83,6 +83,9 @@ public class DkpList extends Table implements CharacterInfoListener
         this.setColumnCollapsingAllowed(true);
         this.setColumnCollapsed("Armor", true);
         this.setColumnCollapsed("Attendance", true);
+        this.setSortContainerPropertyId("DKP");
+        this.setSortAscending(false);
+        this.sort();
 
     }
 
