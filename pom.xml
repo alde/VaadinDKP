@@ -150,7 +150,7 @@
                         <url>http://maven.vaadin.com/vaadin-addons</url>
                 </repository>
         </repositories>
-        
+
         <pluginRepositories>
                 <pluginRepository>
                         <id>mojo-snapshots</id>
@@ -162,7 +162,7 @@
                                 <enabled>true</enabled>
                         </releases>
                 </pluginRepository>
-                
+
                 <pluginRepository>
                         <id>vaadin-snapshots</id>
                         <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
@@ -190,7 +190,7 @@
                 <dependency>
                         <groupId>com.vaadin</groupId>
                         <artifactId>vaadin</artifactId>
-                        <version>6.5.3</version>
+                        <version>6.8.4</version>
                 </dependency>
                 <dependency>
                         <groupId>com.google.gwt</groupId>
