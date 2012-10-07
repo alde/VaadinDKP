@@ -337,12 +337,12 @@ public class ItemDB
                     prepareStatement("DELETE FROM items WHERE id=?");
             p.setInt(1, id);
             success += p.executeUpdate();
-            p.getResultSet().close();
-            p = UnknownEntityDKP.getInstance().getConn().
+            PreparedStatement ps = UnknownEntityDKP.getInstance().getConn().
                     prepareStatement("DELETE FROM loots WHERE item_id=?");
-            p.setInt(1, id);
-            success += p.executeUpdate();
-        } catch (SQLException ex) {
+            ps.setInt(1, id);
+            success += ps.executeUpdate();
+        } catch (Exception ex) {
+            return success;
         }
         addLog("Deleted Item {" + getItemById(id).getName() + "]");
         return success;
