@@ -7,6 +7,7 @@ import com.unknown.entity.character.DkpList;
 import com.unknown.entity.database.ItemDB;
 import com.unknown.entity.raids.RaidList;
 import com.vaadin.data.Item;
+import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -58,6 +59,7 @@ public class ItemList extends Table implements ItemInfoListener {
                 ic.addContainerProperty("Price Heroic", Double.class, 0);
                 ic.addContainerProperty("Slot", String.class, "");
                 ic.addContainerProperty("Type", String.class, "");
+                ic.setItemSorter(new DefaultItemSorter(new ItemSorter()));
                 this.setContainerDataSource(ic);
         }
 
@@ -132,6 +134,28 @@ public class ItemList extends Table implements ItemInfoListener {
                 ic.removeAllContainerFilters();
                 printList();
         }
+
+    private static class ItemSorter implements Comparator<Object>
+    {
+
+        public ItemSorter()
+        {
+        }
+
+        @Override
+        public int compare(Object o1, Object o2)
+        {
+            if (o1 instanceof Label && o2 instanceof Label) {
+                String s1 = ((Label) o1).getValue().toString();
+                String s2 = ((Label) o2).getValue().toString();
+                return s1.compareToIgnoreCase(s2);
+            } else if (o1 instanceof String && o2 instanceof String) {
+                return o1.toString().compareToIgnoreCase(o2.toString());
+            } else {
+                return 0;
+            }
+        }
+    }
 
         private class ItemListClickListener implements ItemClickListener {
 
